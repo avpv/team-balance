@@ -1,10 +1,11 @@
 /**
- * Avatar Generator - Deterministic SVG Avatar Creation
+ * Avatar Generator - Chernoff Face SVG Avatar Creation
  *
- * Generates simple, unique SVG avatars based on player names.
- * Same name always produces the same avatar (deterministic).
+ * Generates unique Chernoff face avatars based on player names.
+ * Same name always produces the same face (deterministic).
+ * Different facial features represent player characteristics.
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 /**
@@ -23,92 +24,134 @@ function hashString(str) {
 }
 
 /**
- * Generate a color from hash value
+ * Get a value from hash within a range
  * @param {number} hash - Hash value
- * @param {number} index - Color index for variation
- * @returns {string} - HSL color string
+ * @param {number} index - Seed index
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} - Value in range
  */
-function getColor(hash, index = 0) {
-    // Use different hue ranges for variety
-    const hueRanges = [
-        [200, 240], // Blues
-        [260, 290], // Purples
-        [160, 200], // Cyans
-        [280, 320], // Magentas
-        [140, 180], // Teals
-    ];
-
-    const rangeIndex = (hash + index) % hueRanges.length;
-    const [minHue, maxHue] = hueRanges[rangeIndex];
-    const hue = minHue + ((hash + index * 13) % (maxHue - minHue));
-
-    const saturation = 60 + ((hash + index * 7) % 30); // 60-90%
-    const lightness = 50 + ((hash + index * 11) % 20); // 50-70%
-
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+function getHashValue(hash, index, min, max) {
+    const value = (hash + index * 1327) % 1000;
+    return min + (value / 1000) * (max - min);
 }
 
 /**
- * Generate geometric pattern SVG
+ * Get skin tone color from hash
+ * @param {number} hash - Hash value
+ * @returns {string} - HSL color string
+ */
+function getSkinTone(hash) {
+    const tones = [
+        'hsl(30, 55%, 75%)',   // Light
+        'hsl(25, 50%, 65%)',   // Medium-light
+        'hsl(20, 45%, 55%)',   // Medium
+        'hsl(15, 40%, 45%)',   // Medium-dark
+        'hsl(25, 60%, 70%)',   // Peachy
+        'hsl(22, 48%, 60%)',   // Tan
+    ];
+    return tones[hash % tones.length];
+}
+
+/**
+ * Get hair color from hash
+ * @param {number} hash - Hash value
+ * @returns {string} - HSL color string
+ */
+function getHairColor(hash) {
+    const colors = [
+        'hsl(25, 30%, 20%)',   // Dark brown
+        'hsl(30, 25%, 30%)',   // Brown
+        'hsl(35, 35%, 40%)',   // Light brown
+        'hsl(40, 50%, 50%)',   // Blonde
+        'hsl(0, 0%, 15%)',     // Black
+        'hsl(15, 60%, 35%)',   // Auburn
+    ];
+    return colors[(hash >> 3) % colors.length];
+}
+
+/**
+ * Generate Chernoff face SVG based on hash
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
- * @returns {string} - SVG pattern
+ * @returns {string} - SVG face
  */
-function generatePattern(hash, size) {
-    const patternType = hash % 5;
-    const color1 = getColor(hash, 0);
-    const color2 = getColor(hash, 1);
-    const color3 = getColor(hash, 2);
-
+function generateChernoffFace(hash, size) {
     const center = size / 2;
-    const quarter = size / 4;
-    const eighth = size / 8;
 
-    switch (patternType) {
-        case 0: // Concentric circles
-            return `
-                <circle cx="${center}" cy="${center}" r="${center}" fill="${color1}"/>
-                <circle cx="${center}" cy="${center}" r="${center * 0.7}" fill="${color2}"/>
-                <circle cx="${center}" cy="${center}" r="${center * 0.4}" fill="${color3}"/>
-            `;
+    // Extract facial features from hash (deterministic)
+    const faceWidth = getHashValue(hash, 1, 0.75, 0.95);
+    const faceHeight = getHashValue(hash, 2, 0.8, 1.0);
+    const eyeSize = getHashValue(hash, 3, 0.08, 0.14);
+    const eyeSpacing = getHashValue(hash, 4, 0.25, 0.35);
+    const eyebrowAngle = getHashValue(hash, 5, -15, 15);
+    const eyebrowThickness = getHashValue(hash, 6, 2, 4);
+    const noseWidth = getHashValue(hash, 7, 0.06, 0.12);
+    const noseHeight = getHashValue(hash, 8, 0.12, 0.2);
+    const mouthWidth = getHashValue(hash, 9, 0.25, 0.4);
+    const mouthCurve = getHashValue(hash, 10, -0.08, 0.12);
+    const earSize = getHashValue(hash, 11, 0.12, 0.18);
 
-        case 1: // Geometric grid
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <circle cx="${quarter}" cy="${quarter}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter * 3}" cy="${quarter}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter}" cy="${quarter * 3}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter * 3}" cy="${quarter * 3}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${center}" cy="${center}" r="${quarter}" fill="${color3}"/>
-            `;
+    const skinTone = getSkinTone(hash);
+    const hairColor = getHairColor(hash);
 
-        case 2: // Diagonal split with circles
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <polygon points="0,0 ${size},0 0,${size}" fill="${color2}"/>
-                <circle cx="${quarter}" cy="${quarter * 3}" r="${quarter}" fill="${color3}"/>
-                <circle cx="${quarter * 3}" cy="${quarter}" r="${eighth}" fill="${color1}"/>
-            `;
+    // Calculate positions
+    const faceW = center * faceWidth;
+    const faceH = center * faceHeight;
+    const eyeY = center * 0.75;
+    const eyeLeft = center - (center * eyeSpacing);
+    const eyeRight = center + (center * eyeSpacing);
+    const eyeR = size * eyeSize;
 
-        case 3: // Quadrants
-            return `
-                <rect width="${center}" height="${center}" fill="${color1}"/>
-                <rect x="${center}" width="${center}" height="${center}" fill="${color2}"/>
-                <rect y="${center}" width="${center}" height="${center}" fill="${color3}"/>
-                <rect x="${center}" y="${center}" width="${center}" height="${center}" fill="${color1}"/>
-                <circle cx="${center}" cy="${center}" r="${quarter}" fill="${color2}"/>
-            `;
+    const noseY = center * 1.05;
+    const noseW = size * noseWidth;
+    const noseH = size * noseHeight;
 
-        case 4: // Triangular pattern
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <polygon points="${center},${eighth} ${quarter * 3},${quarter * 3} ${quarter},${quarter * 3}" fill="${color2}"/>
-                <polygon points="${quarter},${quarter * 2.5} ${quarter * 3},${quarter * 2.5} ${center},${size - eighth}" fill="${color3}"/>
-            `;
+    const mouthY = center * 1.35;
+    const mouthW = size * mouthWidth;
+    const mouthCurveY = size * mouthCurve;
 
-        default:
-            return `<rect width="${size}" height="${size}" fill="${color1}"/>`;
-    }
+    const earW = size * earSize * 0.5;
+    const earH = size * earSize;
+    const earY = center * 0.9;
+
+    return `
+        <!-- Background -->
+        <rect width="${size}" height="${size}" fill="hsl(200, 25%, 85%)"/>
+
+        <!-- Hair (top) -->
+        <ellipse cx="${center}" cy="${center * 0.65}" rx="${faceW * 1.1}" ry="${faceH * 0.5}" fill="${hairColor}"/>
+
+        <!-- Ears -->
+        <ellipse cx="${center - faceW * 1.05}" cy="${earY}" rx="${earW}" ry="${earH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1"/>
+        <ellipse cx="${center + faceW * 1.05}" cy="${earY}" rx="${earW}" ry="${earH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1"/>
+
+        <!-- Face -->
+        <ellipse cx="${center}" cy="${center}" rx="${faceW}" ry="${faceH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1.5"/>
+
+        <!-- Eyes -->
+        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="white" stroke="hsl(0, 0%, 20%)" stroke-width="1.5"/>
+        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="white" stroke="hsl(0, 0%, 20%)" stroke-width="1.5"/>
+        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.5}" fill="hsl(200, 40%, 30%)"/>
+        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.5}" fill="hsl(200, 40%, 30%)"/>
+        <circle cx="${eyeLeft + eyeR * 0.2}" cy="${eyeY - eyeR * 0.2}" r="${eyeR * 0.25}" fill="white"/>
+        <circle cx="${eyeRight + eyeR * 0.2}" cy="${eyeY - eyeR * 0.2}" r="${eyeR * 0.25}" fill="white"/>
+
+        <!-- Eyebrows -->
+        <line x1="${eyeLeft - eyeR * 1.2}" y1="${eyeY - eyeR * 1.3}" x2="${eyeLeft + eyeR * 1.2}" y2="${eyeY - eyeR * 1.3 + eyebrowAngle * 0.5}"
+              stroke="hsl(25, 30%, 25%)" stroke-width="${eyebrowThickness}" stroke-linecap="round"/>
+        <line x1="${eyeRight - eyeR * 1.2}" y1="${eyeY - eyeR * 1.3 - eyebrowAngle * 0.5}" x2="${eyeRight + eyeR * 1.2}" y2="${eyeY - eyeR * 1.3}"
+              stroke="hsl(25, 30%, 25%)" stroke-width="${eyebrowThickness}" stroke-linecap="round"/>
+
+        <!-- Nose -->
+        <ellipse cx="${center}" cy="${noseY}" rx="${noseW}" ry="${noseH}" fill="hsl(25, 40%, 50%)" opacity="0.6"/>
+        <circle cx="${center - noseW * 0.5}" cy="${noseY + noseH * 0.3}" r="${noseW * 0.4}" fill="hsl(25, 30%, 35%)" opacity="0.5"/>
+        <circle cx="${center + noseW * 0.5}" cy="${noseY + noseH * 0.3}" r="${noseW * 0.4}" fill="hsl(25, 30%, 35%)" opacity="0.5"/>
+
+        <!-- Mouth -->
+        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
+              stroke="hsl(0, 40%, 35%)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    `;
 }
 
 /**
@@ -119,35 +162,22 @@ function generatePattern(hash, size) {
  */
 export function generateAvatar(name, size = 96) {
     if (!name || typeof name !== 'string') {
-        // Fallback for invalid input
+        // Fallback for invalid input - generate a generic Chernoff face
+        const hash = 12345; // Default hash for fallback
+        const face = generateChernoffFace(hash, size);
         return `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-                <rect width="${size}" height="${size}" fill="hsl(220, 60%, 60%)"/>
-                <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${size * 0.4}"
-                      fill="white" text-anchor="middle" dominant-baseline="central" font-weight="bold">?</text>
+                ${face}
             </svg>
         `.trim();
     }
 
     const hash = hashString(name.toLowerCase().trim());
-    const pattern = generatePattern(hash, size);
-
-    // Get initials for overlay
-    const initials = name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2);
-
-    const fontSize = size * 0.35;
+    const face = generateChernoffFace(hash, size);
 
     return `
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-            ${pattern}
-            <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${fontSize}"
-                  fill="white" text-anchor="middle" dominant-baseline="central"
-                  font-weight="bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">${initials}</text>
+            ${face}
         </svg>
     `.trim();
 }
