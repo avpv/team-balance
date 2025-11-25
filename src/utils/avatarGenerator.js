@@ -71,12 +71,38 @@ function getHairColor(hash) {
 }
 
 /**
- * Generate Chernoff face SVG based on hash
+ * Map ELO rating to mouth curvature (smile)
+ * @param {number|null} elo - ELO rating (typically 800-2200)
+ * @returns {number} - Mouth curvature (-0.08 to 0.12, higher = more smile)
+ */
+function eloToSmile(elo) {
+    if (elo === null || elo === undefined) {
+        return 0; // Neutral expression if no ELO provided
+    }
+
+    // Normalize ELO (1000-2000 range) to smile curve
+    // 1000 ELO → -0.08 (slight frown)
+    // 1500 ELO → 0.02 (neutral/slight smile)
+    // 2000+ ELO → 0.12 (big smile)
+    const minElo = 1000;
+    const maxElo = 2000;
+    const minSmile = -0.08;
+    const maxSmile = 0.12;
+
+    const normalizedElo = Math.max(minElo, Math.min(maxElo, elo));
+    const smileValue = minSmile + ((normalizedElo - minElo) / (maxElo - minElo)) * (maxSmile - minSmile);
+
+    return smileValue;
+}
+
+/**
+ * Generate Chernoff face SVG based on hash and optional ELO
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
+ * @param {number|null} elo - Optional ELO rating for smile
  * @returns {string} - SVG face
  */
-function generateChernoffFace(hash, size) {
+function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
 
     // Extract facial features from hash (deterministic)
@@ -89,7 +115,8 @@ function generateChernoffFace(hash, size) {
     const noseWidth = getHashValue(hash, 7, 0.06, 0.12);
     const noseHeight = getHashValue(hash, 8, 0.12, 0.2);
     const mouthWidth = getHashValue(hash, 9, 0.25, 0.4);
-    const mouthCurve = getHashValue(hash, 10, -0.08, 0.12);
+    // Mouth curve is now based on ELO rating if provided
+    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 10, -0.08, 0.12);
     const earSize = getHashValue(hash, 11, 0.12, 0.18);
 
     const skinTone = getSkinTone(hash);
@@ -155,16 +182,17 @@ function generateChernoffFace(hash, size) {
 }
 
 /**
- * Generate SVG avatar based on name
+ * Generate SVG avatar based on name and optional ELO rating
  * @param {string} name - Player name
  * @param {number} size - Avatar size (default: 96)
+ * @param {number|null} elo - Optional ELO rating (affects smile)
  * @returns {string} - SVG string
  */
-export function generateAvatar(name, size = 96) {
+export function generateAvatar(name, size = 96, elo = null) {
     if (!name || typeof name !== 'string') {
         // Fallback for invalid input - generate a generic Chernoff face
         const hash = 12345; // Default hash for fallback
-        const face = generateChernoffFace(hash, size);
+        const face = generateChernoffFace(hash, size, elo);
         return `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
                 ${face}
@@ -173,7 +201,7 @@ export function generateAvatar(name, size = 96) {
     }
 
     const hash = hashString(name.toLowerCase().trim());
-    const face = generateChernoffFace(hash, size);
+    const face = generateChernoffFace(hash, size, elo);
 
     return `
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">

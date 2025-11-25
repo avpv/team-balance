@@ -19,11 +19,11 @@ class ComparisonCard extends BaseComponent {
 
         if (!player) return '';
 
-        // Generate SVG avatar based on player name
-        const avatarSvg = generateAvatar(player.name, 96);
-
         const rating = Math.round(player.ratings[positionKey]);
         const comparisons = player.comparisons[positionKey];
+
+        // Generate SVG avatar with ELO-based smile
+        const avatarSvg = generateAvatar(player.name, 96, rating);
 
         return `
             <button
