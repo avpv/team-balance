@@ -1,10 +1,12 @@
 /**
- * Avatar Generator - Deterministic SVG Avatar Creation
+ * Avatar Generator - Minimalistic Chernoff Face Avatars (GitHub Style)
  *
- * Generates simple, unique SVG avatars based on player names.
- * Same name always produces the same avatar (deterministic).
+ * Generates clean, minimalistic Chernoff face avatars for TeamBalance.
+ * - Deterministic: Same name always produces the same face
+ * - Data-driven: ELO rating controls smile (higher ELO = bigger smile)
+ * - GitHub-inspired: Flat colors, simple geometry, clean design
  *
- * @version 1.0.0
+ * @version 3.0.0
  */
 
 /**
@@ -23,131 +25,157 @@ function hashString(str) {
 }
 
 /**
- * Generate a color from hash value
+ * Get a value from hash within a range
  * @param {number} hash - Hash value
- * @param {number} index - Color index for variation
- * @returns {string} - HSL color string
+ * @param {number} index - Seed index
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @returns {number} - Value in range
  */
-function getColor(hash, index = 0) {
-    // Use different hue ranges for variety
-    const hueRanges = [
-        [200, 240], // Blues
-        [260, 290], // Purples
-        [160, 200], // Cyans
-        [280, 320], // Magentas
-        [140, 180], // Teals
-    ];
-
-    const rangeIndex = (hash + index) % hueRanges.length;
-    const [minHue, maxHue] = hueRanges[rangeIndex];
-    const hue = minHue + ((hash + index * 13) % (maxHue - minHue));
-
-    const saturation = 60 + ((hash + index * 7) % 30); // 60-90%
-    const lightness = 50 + ((hash + index * 11) % 20); // 50-70%
-
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+function getHashValue(hash, index, min, max) {
+    const value = (hash + index * 1327) % 1000;
+    return min + (value / 1000) * (max - min);
 }
 
 /**
- * Generate geometric pattern SVG
+ * Get avatar color scheme from hash (GitHub-style minimalistic)
+ * @param {number} hash - Hash value
+ * @returns {object} - Color scheme with background and features
+ */
+function getColorScheme(hash) {
+    const schemes = [
+        { bg: 'hsl(210, 70%, 90%)', face: 'hsl(210, 60%, 75%)', features: 'hsl(210, 50%, 40%)' }, // Blue
+        { bg: 'hsl(160, 65%, 88%)', face: 'hsl(160, 55%, 70%)', features: 'hsl(160, 45%, 35%)' }, // Teal
+        { bg: 'hsl(280, 60%, 90%)', face: 'hsl(280, 50%, 75%)', features: 'hsl(280, 40%, 40%)' }, // Purple
+        { bg: 'hsl(340, 70%, 90%)', face: 'hsl(340, 60%, 75%)', features: 'hsl(340, 50%, 40%)' }, // Pink
+        { bg: 'hsl(30, 75%, 88%)', face: 'hsl(30, 65%, 70%)', features: 'hsl(30, 55%, 35%)' },    // Orange
+        { bg: 'hsl(120, 60%, 88%)', face: 'hsl(120, 50%, 70%)', features: 'hsl(120, 40%, 35%)' }, // Green
+    ];
+    return schemes[hash % schemes.length];
+}
+
+/**
+ * Map ELO rating to mouth curvature (smile)
+ * @param {number|null} elo - ELO rating (typically 800-2200)
+ * @returns {number} - Mouth curvature (-0.08 to 0.12, higher = more smile)
+ */
+function eloToSmile(elo) {
+    if (elo === null || elo === undefined) {
+        return 0; // Neutral expression if no ELO provided
+    }
+
+    // Normalize ELO (1000-2000 range) to smile curve
+    // 1000 ELO → -0.08 (slight frown)
+    // 1500 ELO → 0.02 (neutral/slight smile)
+    // 2000+ ELO → 0.12 (big smile)
+    const minElo = 1000;
+    const maxElo = 2000;
+    const minSmile = -0.08;
+    const maxSmile = 0.12;
+
+    const normalizedElo = Math.max(minElo, Math.min(maxElo, elo));
+    const smileValue = minSmile + ((normalizedElo - minElo) / (maxElo - minElo)) * (maxSmile - minSmile);
+
+    return smileValue;
+}
+
+/**
+ * Generate minimalistic Chernoff face (GitHub style)
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
- * @returns {string} - SVG pattern
+ * @param {number|null} elo - Optional ELO rating for smile
+ * @returns {string} - SVG face
  */
-function generatePattern(hash, size) {
-    const patternType = hash % 5;
-    const color1 = getColor(hash, 0);
-    const color2 = getColor(hash, 1);
-    const color3 = getColor(hash, 2);
-
+function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
-    const quarter = size / 4;
-    const eighth = size / 8;
+    const colors = getColorScheme(hash);
 
-    switch (patternType) {
-        case 0: // Concentric circles
-            return `
-                <circle cx="${center}" cy="${center}" r="${center}" fill="${color1}"/>
-                <circle cx="${center}" cy="${center}" r="${center * 0.7}" fill="${color2}"/>
-                <circle cx="${center}" cy="${center}" r="${center * 0.4}" fill="${color3}"/>
-            `;
+    // Extract minimal facial features from hash (deterministic)
+    const eyeSize = getHashValue(hash, 1, 0.08, 0.11);
+    const eyeSpacing = getHashValue(hash, 2, 0.28, 0.35);
+    const eyeStyle = Math.floor(getHashValue(hash, 3, 0, 3)); // 0=circles, 1=dots, 2=lines
+    const mouthWidth = getHashValue(hash, 4, 0.3, 0.42);
 
-        case 1: // Geometric grid
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <circle cx="${quarter}" cy="${quarter}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter * 3}" cy="${quarter}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter}" cy="${quarter * 3}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${quarter * 3}" cy="${quarter * 3}" r="${eighth}" fill="${color2}"/>
-                <circle cx="${center}" cy="${center}" r="${quarter}" fill="${color3}"/>
-            `;
+    // Mouth curve is based on ELO rating if provided
+    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 5, -0.08, 0.12);
 
-        case 2: // Diagonal split with circles
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <polygon points="0,0 ${size},0 0,${size}" fill="${color2}"/>
-                <circle cx="${quarter}" cy="${quarter * 3}" r="${quarter}" fill="${color3}"/>
-                <circle cx="${quarter * 3}" cy="${quarter}" r="${eighth}" fill="${color1}"/>
-            `;
+    // Calculate positions
+    const faceRadius = center * 0.8;
+    const eyeY = center * 0.85;
+    const eyeLeft = center - (center * eyeSpacing);
+    const eyeRight = center + (center * eyeSpacing);
+    const eyeR = size * eyeSize;
 
-        case 3: // Quadrants
-            return `
-                <rect width="${center}" height="${center}" fill="${color1}"/>
-                <rect x="${center}" width="${center}" height="${center}" fill="${color2}"/>
-                <rect y="${center}" width="${center}" height="${center}" fill="${color3}"/>
-                <rect x="${center}" y="${center}" width="${center}" height="${center}" fill="${color1}"/>
-                <circle cx="${center}" cy="${center}" r="${quarter}" fill="${color2}"/>
-            `;
+    const mouthY = center * 1.25;
+    const mouthW = size * mouthWidth;
+    const mouthCurveY = size * mouthCurve;
 
-        case 4: // Triangular pattern
-            return `
-                <rect width="${size}" height="${size}" fill="${color1}"/>
-                <polygon points="${center},${eighth} ${quarter * 3},${quarter * 3} ${quarter},${quarter * 3}" fill="${color2}"/>
-                <polygon points="${quarter},${quarter * 2.5} ${quarter * 3},${quarter * 2.5} ${center},${size - eighth}" fill="${color3}"/>
-            `;
-
-        default:
-            return `<rect width="${size}" height="${size}" fill="${color1}"/>`;
+    // Generate eyes based on style
+    let eyesHTML = '';
+    if (eyeStyle === 0) {
+        // Simple circles
+        eyesHTML = `
+            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
+            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
+        `;
+    } else if (eyeStyle === 1) {
+        // Small dots
+        eyesHTML = `
+            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
+            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
+        `;
+    } else {
+        // Simple lines
+        const lineLen = eyeR * 1.8;
+        eyesHTML = `
+            <line x1="${eyeLeft - lineLen / 2}" y1="${eyeY}" x2="${eyeLeft + lineLen / 2}" y2="${eyeY}"
+                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
+            <line x1="${eyeRight - lineLen / 2}" y1="${eyeY}" x2="${eyeRight + lineLen / 2}" y2="${eyeY}"
+                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
+        `;
     }
+
+    return `
+        <!-- Background -->
+        <rect width="${size}" height="${size}" fill="${colors.bg}" rx="${size * 0.15}"/>
+
+        <!-- Face circle -->
+        <circle cx="${center}" cy="${center}" r="${faceRadius}" fill="${colors.face}"/>
+
+        <!-- Eyes -->
+        ${eyesHTML}
+
+        <!-- Mouth (ELO-based smile) -->
+        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
+              stroke="${colors.features}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    `;
 }
 
 /**
- * Generate SVG avatar based on name
+ * Generate SVG avatar based on name and optional ELO rating
  * @param {string} name - Player name
  * @param {number} size - Avatar size (default: 96)
+ * @param {number|null} elo - Optional ELO rating (affects smile)
  * @returns {string} - SVG string
  */
-export function generateAvatar(name, size = 96) {
+export function generateAvatar(name, size = 96, elo = null) {
     if (!name || typeof name !== 'string') {
-        // Fallback for invalid input
+        // Fallback for invalid input - generate a generic Chernoff face
+        const hash = 12345; // Default hash for fallback
+        const face = generateChernoffFace(hash, size, elo);
         return `
             <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-                <rect width="${size}" height="${size}" fill="hsl(220, 60%, 60%)"/>
-                <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${size * 0.4}"
-                      fill="white" text-anchor="middle" dominant-baseline="central" font-weight="bold">?</text>
+                ${face}
             </svg>
         `.trim();
     }
 
     const hash = hashString(name.toLowerCase().trim());
-    const pattern = generatePattern(hash, size);
-
-    // Get initials for overlay
-    const initials = name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2);
-
-    const fontSize = size * 0.35;
+    const face = generateChernoffFace(hash, size, elo);
 
     return `
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-            ${pattern}
-            <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${fontSize}"
-                  fill="white" text-anchor="middle" dominant-baseline="central"
-                  font-weight="bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">${initials}</text>
+            ${face}
         </svg>
     `.trim();
 }
