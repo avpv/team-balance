@@ -5,13 +5,13 @@
  * Chernoff faces are statistical facial glyphs where each facial feature
  * encodes one numeric variable, making data visual and memorable.
  *
- * 13 Parameters Encoded:
+ * 19 Parameters Encoded:
  * 1. Head size - Overall face radius
  * 2. Face width/roundness - Horizontal vs vertical proportions
  * 3. Eye size - Horizontal size of eye ellipses
  * 4. Eye separation - Distance between eyes
  * 5. Pupil size - Size of pupils within eyes
- * 6. Eyebrow angle - Angle/expression of eyebrows (curved paths)
+ * 6. Eyebrow angle - Angle/expression of eyebrows
  * 7. Nose length - Vertical length of nose triangle
  * 8. Mouth curvature - Smile/frown (can be ELO-based)
  * 9. Mouth width - Horizontal width of mouth
@@ -19,6 +19,12 @@
  * 11. Nose width - Width of nose base (triangle)
  * 12. Left eye height - Vertical radius of left eye
  * 13. Right eye height - Vertical radius of right eye
+ * 14. Pupil X position - Horizontal gaze direction
+ * 15. Pupil Y position - Vertical gaze direction
+ * 16. Eyebrow curvature - Arc depth of eyebrows (cubic curves)
+ * 17. Nostril size - Size of nostrils
+ * 18. Lip thickness - Fullness of lips
+ * 19. Chin shape - Pointedness of chin
  *
  * Features:
  * - Deterministic: Same name always produces the same face
@@ -26,7 +32,7 @@
  * - Academic style: Clean geometric shapes, 1-3px lines, symmetric
  * - Statistical: Similar to R/Python Chernoff faces libraries
  *
- * @version 5.0.0 - Expressive Chernoff Faces with 13 Parameters
+ * @version 6.0.0 - Highly Expressive Chernoff Faces with 19 Parameters
  */
 
 /**
@@ -106,7 +112,7 @@ function eloToSmile(elo) {
 }
 
 /**
- * Generate expressive Chernoff face with 13 encoded parameters
+ * Generate highly expressive Chernoff face with 19 encoded parameters
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
  * @param {number|null} elo - Optional ELO rating for smile (variable 8)
@@ -116,7 +122,7 @@ function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
     const colors = getColorScheme(hash);
 
-    // === 13 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
+    // === 19 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
     // All parameters are continuous numeric values for proper statistical encoding
 
     // Variable 1: Head size (overall face radius)
@@ -124,6 +130,9 @@ function generateChernoffFace(hash, size, elo = null) {
 
     // Variable 2: Face width/roundness (aspect ratio: 0.8=tall, 1.0=circle, 1.2=wide)
     const faceAspect = getHashValue(hash, 2, 0.8, 1.2);
+
+    // Variable 19: Chin shape (pointedness: 0=round, 1=pointed/angular)
+    const chinShape = getHashValue(hash, 19, 0.0, 1.0);
 
     // Variable 3: Eye size (horizontal radius of eye ellipses)
     const eyeSize = getHashValue(hash, 3, 0.06, 0.14);
@@ -140,8 +149,17 @@ function generateChernoffFace(hash, size, elo = null) {
     // Variable 5: Pupil size (size of pupils within eyes, 0.3-0.7 of eye size)
     const pupilSize = getHashValue(hash, 5, 0.3, 0.7);
 
+    // Variable 14: Pupil X position (horizontal gaze direction: -0.3=left, 0=center, 0.3=right)
+    const pupilOffsetX = getHashValue(hash, 14, -0.3, 0.3);
+
+    // Variable 15: Pupil Y position (vertical gaze direction: -0.2=up, 0=center, 0.2=down)
+    const pupilOffsetY = getHashValue(hash, 15, -0.2, 0.2);
+
     // Variable 6: Eyebrow angle (-0.15=sad, 0=neutral, 0.15=surprised)
     const eyebrowAngle = getHashValue(hash, 6, -0.15, 0.15);
+
+    // Variable 16: Eyebrow curvature (arc depth: 0.1=slight, 0.5=strong)
+    const eyebrowCurve = getHashValue(hash, 16, 0.15, 0.5);
 
     // Variable 7: Nose length (0.5-1.5 times eye radius)
     const noseLength = getHashValue(hash, 7, 0.5, 1.5);
@@ -149,11 +167,17 @@ function generateChernoffFace(hash, size, elo = null) {
     // Variable 11: Nose width (width of nose base)
     const noseWidth = getHashValue(hash, 11, 0.03, 0.08);
 
+    // Variable 17: Nostril size (size of nostrils)
+    const nostrilSize = getHashValue(hash, 17, 0.01, 0.025);
+
     // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
     const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 8, -0.08, 0.12);
 
     // Variable 9: Mouth width (horizontal width)
     const mouthWidth = getHashValue(hash, 9, 0.25, 0.50);
+
+    // Variable 18: Lip thickness (fullness of lips)
+    const lipThickness = getHashValue(hash, 18, 0.008, 0.025);
 
     // Variable 10: Ear size (size of ears)
     const earSize = getHashValue(hash, 10, 0.08, 0.15);
@@ -199,8 +223,22 @@ function generateChernoffFace(hash, size, elo = null) {
 
     // === GENERATE SVG ELEMENTS ===
 
-    // Face (ellipse with aspect ratio)
-    const faceHTML = `<ellipse cx="${center}" cy="${center}" rx="${faceRadiusX}" ry="${faceRadiusY}" fill="${colors.face}" stroke="none"/>`;
+    // Face (path with variable chin shape)
+    // Create face shape that interpolates between round and pointed chin
+    const chinPointY = center + faceRadiusY * (1 - chinShape * 0.15); // How far down the point goes
+    const chinPointX = center; // Center of chin
+    const chinWidth = faceRadiusX * (1 - chinShape * 0.3); // Narrower at chin if pointed
+
+    // Use elliptical arc for round parts, then curve to chin point
+    const faceHTML = `
+        <path d="M ${center} ${center - faceRadiusY}
+                 A ${faceRadiusX} ${faceRadiusY * 0.8} 0 0 1 ${center + faceRadiusX} ${center}
+                 Q ${center + chinWidth} ${center + faceRadiusY * 0.9} ${chinPointX} ${chinPointY}
+                 Q ${center - chinWidth} ${center + faceRadiusY * 0.9} ${center - faceRadiusX} ${center}
+                 A ${faceRadiusX} ${faceRadiusY * 0.8} 0 0 1 ${center} ${center - faceRadiusY}
+                 Z"
+              fill="${colors.face}" stroke="none"/>
+    `;
 
     // Ears (simple ellipses on sides of face)
     const earsHTML = `
@@ -208,38 +246,62 @@ function generateChernoffFace(hash, size, elo = null) {
         <ellipse cx="${earRight}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
     `;
 
+    // Calculate pupil positions with gaze offset
+    const pupilLeftX = eyeLeft + (eyeRx * pupilOffsetX);
+    const pupilLeftY = eyeY + (eyeRyLeft * pupilOffsetY);
+    const pupilRightX = eyeRight + (eyeRx * pupilOffsetX);
+    const pupilRightY = eyeY + (eyeRyRight * pupilOffsetY);
+
     // Eyes (ellipses with pupils)
     const eyesHTML = `
         <!-- Left eye -->
         <ellipse cx="${eyeLeft}" cy="${eyeY}" rx="${eyeRx}" ry="${eyeRyLeft}" fill="white" stroke="${colors.features}" stroke-width="1.5"/>
-        <circle cx="${eyeLeft}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
+        <circle cx="${pupilLeftX}" cy="${pupilLeftY}" r="${pupilR}" fill="${colors.features}"/>
         <!-- Right eye -->
         <ellipse cx="${eyeRight}" cy="${eyeY}" rx="${eyeRx}" ry="${eyeRyRight}" fill="white" stroke="${colors.features}" stroke-width="1.5"/>
-        <circle cx="${eyeRight}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
+        <circle cx="${pupilRightX}" cy="${pupilRightY}" r="${pupilR}" fill="${colors.features}"/>
     `;
 
-    // Eyebrows (curved paths with quadratic bezier)
+    // Eyebrows (curved paths with cubic bezier for more complex shapes)
+    const browCurveDepth = browLength * eyebrowCurve;
     const browsHTML = `
         <!-- Left eyebrow -->
-        <path d="M ${browLeft - browLength / 2} ${browY + browAngleOffset} Q ${browLeft} ${browY - browLength * 0.3} ${browLeft + browLength / 2} ${browY - browAngleOffset}"
+        <path d="M ${browLeft - browLength / 2} ${browY + browAngleOffset} C ${browLeft - browLength / 4} ${browY - browCurveDepth} ${browLeft + browLength / 4} ${browY - browCurveDepth} ${browLeft + browLength / 2} ${browY - browAngleOffset}"
               fill="none" stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
         <!-- Right eyebrow -->
-        <path d="M ${browRight - browLength / 2} ${browY - browAngleOffset} Q ${browRight} ${browY - browLength * 0.3} ${browRight + browLength / 2} ${browY + browAngleOffset}"
+        <path d="M ${browRight - browLength / 2} ${browY - browAngleOffset} C ${browRight - browLength / 4} ${browY - browCurveDepth} ${browRight + browLength / 4} ${browY - browCurveDepth} ${browRight + browLength / 2} ${browY + browAngleOffset}"
               fill="none" stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
     `;
 
-    // Nose (filled triangle)
+    // Nose (filled triangle with nostrils)
     const noseTopY = noseY - noseLen / 2;
     const noseBottomY = noseY + noseLen / 2;
+    const nostrilR = size * nostrilSize;
+    const nostrilY = noseBottomY - nostrilR * 0.5;
+    const nostrilOffset = noseW * 0.35;
     const noseHTML = `
         <path d="M ${center} ${noseTopY} L ${center - noseW / 2} ${noseBottomY} L ${center + noseW / 2} ${noseBottomY} Z"
               fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
+        <!-- Nostrils -->
+        <ellipse cx="${center - nostrilOffset}" cy="${nostrilY}" rx="${nostrilR}" ry="${nostrilR * 0.7}" fill="${colors.features}"/>
+        <ellipse cx="${center + nostrilOffset}" cy="${nostrilY}" rx="${nostrilR}" ry="${nostrilR * 0.7}" fill="${colors.features}"/>
     `;
 
-    // Mouth (curved line for smile/frown)
+    // Mouth (with upper and lower lips)
+    const lipH = size * lipThickness;
+    const upperLipY = mouthY - lipH / 2;
+    const lowerLipY = mouthY + lipH / 2;
+    const lipCurveControl = mouthY + mouthCurveY;
     const mouthHTML = `
-        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
+        <!-- Upper lip (M-shaped cupid's bow) -->
+        <path d="M ${center - mouthW / 2} ${upperLipY} Q ${center - mouthW / 4} ${upperLipY - lipH * 0.3} ${center} ${upperLipY - lipH * 0.2} Q ${center + mouthW / 4} ${upperLipY - lipH * 0.3} ${center + mouthW / 2} ${upperLipY}"
+              stroke="${colors.features}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Lower lip (curved) -->
+        <path d="M ${center - mouthW / 2} ${lowerLipY} Q ${center} ${lipCurveControl + lipH} ${center + mouthW / 2} ${lowerLipY}"
               stroke="${colors.features}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Mouth line -->
+        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${lipCurveControl} ${center + mouthW / 2} ${mouthY}"
+              stroke="${colors.features}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
     `;
 
     return `
