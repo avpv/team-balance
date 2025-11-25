@@ -1,11 +1,12 @@
 /**
- * Avatar Generator - Chernoff Face SVG Avatar Creation
+ * Avatar Generator - Minimalistic Chernoff Face Avatars (GitHub Style)
  *
- * Generates unique Chernoff face avatars based on player names.
- * Same name always produces the same face (deterministic).
- * Different facial features represent player characteristics.
+ * Generates clean, minimalistic Chernoff face avatars for TeamBalance.
+ * - Deterministic: Same name always produces the same face
+ * - Data-driven: ELO rating controls smile (higher ELO = bigger smile)
+ * - GitHub-inspired: Flat colors, simple geometry, clean design
  *
- * @version 2.0.0
+ * @version 3.0.0
  */
 
 /**
@@ -37,37 +38,20 @@ function getHashValue(hash, index, min, max) {
 }
 
 /**
- * Get skin tone color from hash
+ * Get avatar color scheme from hash (GitHub-style minimalistic)
  * @param {number} hash - Hash value
- * @returns {string} - HSL color string
+ * @returns {object} - Color scheme with background and features
  */
-function getSkinTone(hash) {
-    const tones = [
-        'hsl(30, 55%, 75%)',   // Light
-        'hsl(25, 50%, 65%)',   // Medium-light
-        'hsl(20, 45%, 55%)',   // Medium
-        'hsl(15, 40%, 45%)',   // Medium-dark
-        'hsl(25, 60%, 70%)',   // Peachy
-        'hsl(22, 48%, 60%)',   // Tan
+function getColorScheme(hash) {
+    const schemes = [
+        { bg: 'hsl(210, 70%, 90%)', face: 'hsl(210, 60%, 75%)', features: 'hsl(210, 50%, 40%)' }, // Blue
+        { bg: 'hsl(160, 65%, 88%)', face: 'hsl(160, 55%, 70%)', features: 'hsl(160, 45%, 35%)' }, // Teal
+        { bg: 'hsl(280, 60%, 90%)', face: 'hsl(280, 50%, 75%)', features: 'hsl(280, 40%, 40%)' }, // Purple
+        { bg: 'hsl(340, 70%, 90%)', face: 'hsl(340, 60%, 75%)', features: 'hsl(340, 50%, 40%)' }, // Pink
+        { bg: 'hsl(30, 75%, 88%)', face: 'hsl(30, 65%, 70%)', features: 'hsl(30, 55%, 35%)' },    // Orange
+        { bg: 'hsl(120, 60%, 88%)', face: 'hsl(120, 50%, 70%)', features: 'hsl(120, 40%, 35%)' }, // Green
     ];
-    return tones[hash % tones.length];
-}
-
-/**
- * Get hair color from hash
- * @param {number} hash - Hash value
- * @returns {string} - HSL color string
- */
-function getHairColor(hash) {
-    const colors = [
-        'hsl(25, 30%, 20%)',   // Dark brown
-        'hsl(30, 25%, 30%)',   // Brown
-        'hsl(35, 35%, 40%)',   // Light brown
-        'hsl(40, 50%, 50%)',   // Blonde
-        'hsl(0, 0%, 15%)',     // Black
-        'hsl(15, 60%, 35%)',   // Auburn
-    ];
-    return colors[(hash >> 3) % colors.length];
+    return schemes[hash % schemes.length];
 }
 
 /**
@@ -96,7 +80,7 @@ function eloToSmile(elo) {
 }
 
 /**
- * Generate Chernoff face SVG based on hash and optional ELO
+ * Generate minimalistic Chernoff face (GitHub style)
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
  * @param {number|null} elo - Optional ELO rating for smile
@@ -104,80 +88,66 @@ function eloToSmile(elo) {
  */
 function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
+    const colors = getColorScheme(hash);
 
-    // Extract facial features from hash (deterministic)
-    const faceWidth = getHashValue(hash, 1, 0.75, 0.95);
-    const faceHeight = getHashValue(hash, 2, 0.8, 1.0);
-    const eyeSize = getHashValue(hash, 3, 0.08, 0.14);
-    const eyeSpacing = getHashValue(hash, 4, 0.25, 0.35);
-    const eyebrowAngle = getHashValue(hash, 5, -15, 15);
-    const eyebrowThickness = getHashValue(hash, 6, 2, 4);
-    const noseWidth = getHashValue(hash, 7, 0.06, 0.12);
-    const noseHeight = getHashValue(hash, 8, 0.12, 0.2);
-    const mouthWidth = getHashValue(hash, 9, 0.25, 0.4);
-    // Mouth curve is now based on ELO rating if provided
-    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 10, -0.08, 0.12);
-    const earSize = getHashValue(hash, 11, 0.12, 0.18);
+    // Extract minimal facial features from hash (deterministic)
+    const eyeSize = getHashValue(hash, 1, 0.08, 0.11);
+    const eyeSpacing = getHashValue(hash, 2, 0.28, 0.35);
+    const eyeStyle = Math.floor(getHashValue(hash, 3, 0, 3)); // 0=circles, 1=dots, 2=lines
+    const mouthWidth = getHashValue(hash, 4, 0.3, 0.42);
 
-    const skinTone = getSkinTone(hash);
-    const hairColor = getHairColor(hash);
+    // Mouth curve is based on ELO rating if provided
+    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 5, -0.08, 0.12);
 
     // Calculate positions
-    const faceW = center * faceWidth;
-    const faceH = center * faceHeight;
-    const eyeY = center * 0.75;
+    const faceRadius = center * 0.8;
+    const eyeY = center * 0.85;
     const eyeLeft = center - (center * eyeSpacing);
     const eyeRight = center + (center * eyeSpacing);
     const eyeR = size * eyeSize;
 
-    const noseY = center * 1.05;
-    const noseW = size * noseWidth;
-    const noseH = size * noseHeight;
-
-    const mouthY = center * 1.35;
+    const mouthY = center * 1.25;
     const mouthW = size * mouthWidth;
     const mouthCurveY = size * mouthCurve;
 
-    const earW = size * earSize * 0.5;
-    const earH = size * earSize;
-    const earY = center * 0.9;
+    // Generate eyes based on style
+    let eyesHTML = '';
+    if (eyeStyle === 0) {
+        // Simple circles
+        eyesHTML = `
+            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
+            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
+        `;
+    } else if (eyeStyle === 1) {
+        // Small dots
+        eyesHTML = `
+            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
+            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
+        `;
+    } else {
+        // Simple lines
+        const lineLen = eyeR * 1.8;
+        eyesHTML = `
+            <line x1="${eyeLeft - lineLen / 2}" y1="${eyeY}" x2="${eyeLeft + lineLen / 2}" y2="${eyeY}"
+                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
+            <line x1="${eyeRight - lineLen / 2}" y1="${eyeY}" x2="${eyeRight + lineLen / 2}" y2="${eyeY}"
+                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
+        `;
+    }
 
     return `
         <!-- Background -->
-        <rect width="${size}" height="${size}" fill="hsl(200, 25%, 85%)"/>
+        <rect width="${size}" height="${size}" fill="${colors.bg}" rx="${size * 0.15}"/>
 
-        <!-- Hair (top) -->
-        <ellipse cx="${center}" cy="${center * 0.65}" rx="${faceW * 1.1}" ry="${faceH * 0.5}" fill="${hairColor}"/>
-
-        <!-- Ears -->
-        <ellipse cx="${center - faceW * 1.05}" cy="${earY}" rx="${earW}" ry="${earH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1"/>
-        <ellipse cx="${center + faceW * 1.05}" cy="${earY}" rx="${earW}" ry="${earH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1"/>
-
-        <!-- Face -->
-        <ellipse cx="${center}" cy="${center}" rx="${faceW}" ry="${faceH}" fill="${skinTone}" stroke="hsl(25, 30%, 40%)" stroke-width="1.5"/>
+        <!-- Face circle -->
+        <circle cx="${center}" cy="${center}" r="${faceRadius}" fill="${colors.face}"/>
 
         <!-- Eyes -->
-        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="white" stroke="hsl(0, 0%, 20%)" stroke-width="1.5"/>
-        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="white" stroke="hsl(0, 0%, 20%)" stroke-width="1.5"/>
-        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.5}" fill="hsl(200, 40%, 30%)"/>
-        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.5}" fill="hsl(200, 40%, 30%)"/>
-        <circle cx="${eyeLeft + eyeR * 0.2}" cy="${eyeY - eyeR * 0.2}" r="${eyeR * 0.25}" fill="white"/>
-        <circle cx="${eyeRight + eyeR * 0.2}" cy="${eyeY - eyeR * 0.2}" r="${eyeR * 0.25}" fill="white"/>
+        ${eyesHTML}
 
-        <!-- Eyebrows -->
-        <line x1="${eyeLeft - eyeR * 1.2}" y1="${eyeY - eyeR * 1.3}" x2="${eyeLeft + eyeR * 1.2}" y2="${eyeY - eyeR * 1.3 + eyebrowAngle * 0.5}"
-              stroke="hsl(25, 30%, 25%)" stroke-width="${eyebrowThickness}" stroke-linecap="round"/>
-        <line x1="${eyeRight - eyeR * 1.2}" y1="${eyeY - eyeR * 1.3 - eyebrowAngle * 0.5}" x2="${eyeRight + eyeR * 1.2}" y2="${eyeY - eyeR * 1.3}"
-              stroke="hsl(25, 30%, 25%)" stroke-width="${eyebrowThickness}" stroke-linecap="round"/>
-
-        <!-- Nose -->
-        <ellipse cx="${center}" cy="${noseY}" rx="${noseW}" ry="${noseH}" fill="hsl(25, 40%, 50%)" opacity="0.6"/>
-        <circle cx="${center - noseW * 0.5}" cy="${noseY + noseH * 0.3}" r="${noseW * 0.4}" fill="hsl(25, 30%, 35%)" opacity="0.5"/>
-        <circle cx="${center + noseW * 0.5}" cy="${noseY + noseH * 0.3}" r="${noseW * 0.4}" fill="hsl(25, 30%, 35%)" opacity="0.5"/>
-
-        <!-- Mouth -->
+        <!-- Mouth (ELO-based smile) -->
         <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
-              stroke="hsl(0, 40%, 35%)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              stroke="${colors.features}" stroke-width="3" fill="none" stroke-linecap="round"/>
     `;
 }
 
