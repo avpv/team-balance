@@ -229,7 +229,7 @@ function generateChernoffFace(hash, size, elo = null) {
 
     return `
         <!-- Background -->
-        <rect width="${size}" height="${size}" fill="${colors.bg}" rx="${size * 0.15}"/>
+        <rect width="${size}" height="${size}" fill="${colors.bg}" rx="${size * 0.042}"/>
 
         <!-- Ears (Variable 10) -->
         ${earsHTML}
