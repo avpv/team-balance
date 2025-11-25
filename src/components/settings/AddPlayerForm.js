@@ -278,7 +278,7 @@ class AddPlayerForm extends BaseComponent {
         const nameInput = this.container.querySelector(`#${ELEMENT_IDS.PLAYER_NAME_INPUT}`);
         const name = nameInput.value.trim();
 
-        const checkedBoxes = this.container.querySelectorAll('.position-input:checked');
+        const checkedBoxes = this.container.querySelectorAll('.position-input.position-item:checked');
         const positions = Array.from(checkedBoxes).map(cb => cb.value);
 
         if (positions.length === 0) {
