@@ -5,17 +5,20 @@
  * Chernoff faces are statistical facial glyphs where each facial feature
  * encodes one numeric variable, making data visual and memorable.
  *
- * 10 Parameters Encoded:
+ * 13 Parameters Encoded:
  * 1. Head size - Overall face radius
  * 2. Face width/roundness - Horizontal vs vertical proportions
- * 3. Eye size - Size of eye circles
+ * 3. Eye size - Horizontal size of eye ellipses
  * 4. Eye separation - Distance between eyes
  * 5. Pupil size - Size of pupils within eyes
- * 6. Eyebrow angle - Angle/expression of eyebrows
- * 7. Nose length - Vertical length of nose
+ * 6. Eyebrow angle - Angle/expression of eyebrows (curved paths)
+ * 7. Nose length - Vertical length of nose triangle
  * 8. Mouth curvature - Smile/frown (can be ELO-based)
  * 9. Mouth width - Horizontal width of mouth
  * 10. Ear size - Size of ears
+ * 11. Nose width - Width of nose base (triangle)
+ * 12. Left eye height - Vertical radius of left eye
+ * 13. Right eye height - Vertical radius of right eye
  *
  * Features:
  * - Deterministic: Same name always produces the same face
@@ -23,7 +26,7 @@
  * - Academic style: Clean geometric shapes, 1-3px lines, symmetric
  * - Statistical: Similar to R/Python Chernoff faces libraries
  *
- * @version 4.0.0 - Full Statistical Chernoff Faces
+ * @version 5.0.0 - Expressive Chernoff Faces with 13 Parameters
  */
 
 /**
@@ -103,7 +106,7 @@ function eloToSmile(elo) {
 }
 
 /**
- * Generate statistical Chernoff face with 10 encoded parameters
+ * Generate expressive Chernoff face with 13 encoded parameters
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
  * @param {number|null} elo - Optional ELO rating for smile (variable 8)
@@ -113,7 +116,7 @@ function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
     const colors = getColorScheme(hash);
 
-    // === 10 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
+    // === 13 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
     // All parameters are continuous numeric values for proper statistical encoding
 
     // Variable 1: Head size (overall face radius)
@@ -122,11 +125,17 @@ function generateChernoffFace(hash, size, elo = null) {
     // Variable 2: Face width/roundness (aspect ratio: 0.8=tall, 1.0=circle, 1.2=wide)
     const faceAspect = getHashValue(hash, 2, 0.8, 1.2);
 
-    // Variable 3: Eye size (radius of eye circles)
+    // Variable 3: Eye size (horizontal radius of eye ellipses)
     const eyeSize = getHashValue(hash, 3, 0.06, 0.14);
 
     // Variable 4: Eye separation (distance between eyes)
     const eyeSeparation = getHashValue(hash, 4, 0.22, 0.40);
+
+    // Variable 12: Left eye height (vertical radius as ratio of horizontal)
+    const eyeHeightLeft = getHashValue(hash, 12, 0.6, 1.0);
+
+    // Variable 13: Right eye height (vertical radius as ratio of horizontal)
+    const eyeHeightRight = getHashValue(hash, 13, 0.6, 1.0);
 
     // Variable 5: Pupil size (size of pupils within eyes, 0.3-0.7 of eye size)
     const pupilSize = getHashValue(hash, 5, 0.3, 0.7);
@@ -136,6 +145,9 @@ function generateChernoffFace(hash, size, elo = null) {
 
     // Variable 7: Nose length (0.5-1.5 times eye radius)
     const noseLength = getHashValue(hash, 7, 0.5, 1.5);
+
+    // Variable 11: Nose width (width of nose base)
+    const noseWidth = getHashValue(hash, 11, 0.03, 0.08);
 
     // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
     const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 8, -0.08, 0.12);
@@ -157,19 +169,22 @@ function generateChernoffFace(hash, size, elo = null) {
     const eyeY = center * 0.85;
     const eyeLeft = center - (center * eyeSeparation);
     const eyeRight = center + (center * eyeSeparation);
-    const eyeR = size * eyeSize;
-    const pupilR = eyeR * pupilSize;
+    const eyeRx = size * eyeSize; // Horizontal radius
+    const eyeRyLeft = eyeRx * eyeHeightLeft; // Vertical radius for left eye
+    const eyeRyRight = eyeRx * eyeHeightRight; // Vertical radius for right eye
+    const pupilR = eyeRx * pupilSize;
 
     // Eyebrow positions
-    const browY = eyeY - eyeR * 2.2;
+    const browY = eyeY - eyeRx * 2.2;
     const browLeft = eyeLeft;
     const browRight = eyeRight;
-    const browLength = eyeR * 2.2;
+    const browLength = eyeRx * 2.2;
     const browAngleOffset = size * eyebrowAngle;
 
-    // Nose position and length
+    // Nose position and dimensions
     const noseY = center * 1.05;
-    const noseLen = eyeR * noseLength;
+    const noseLen = eyeRx * noseLength;
+    const noseW = size * noseWidth;
 
     // Mouth position and dimensions
     const mouthY = center * 1.28;
@@ -193,32 +208,32 @@ function generateChernoffFace(hash, size, elo = null) {
         <ellipse cx="${earRight}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
     `;
 
-    // Eyes (circles with pupils)
+    // Eyes (ellipses with pupils)
     const eyesHTML = `
         <!-- Left eye -->
-        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="${colors.bg}" stroke="${colors.features}" stroke-width="2"/>
+        <ellipse cx="${eyeLeft}" cy="${eyeY}" rx="${eyeRx}" ry="${eyeRyLeft}" fill="white" stroke="${colors.features}" stroke-width="1.5"/>
         <circle cx="${eyeLeft}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
         <!-- Right eye -->
-        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="${colors.bg}" stroke="${colors.features}" stroke-width="2"/>
+        <ellipse cx="${eyeRight}" cy="${eyeY}" rx="${eyeRx}" ry="${eyeRyRight}" fill="white" stroke="${colors.features}" stroke-width="1.5"/>
         <circle cx="${eyeRight}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
     `;
 
-    // Eyebrows (angled lines)
+    // Eyebrows (curved paths with quadratic bezier)
     const browsHTML = `
         <!-- Left eyebrow -->
-        <line x1="${browLeft - browLength / 2}" y1="${browY + browAngleOffset}"
-              x2="${browLeft + browLength / 2}" y2="${browY - browAngleOffset}"
-              stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M ${browLeft - browLength / 2} ${browY + browAngleOffset} Q ${browLeft} ${browY - browLength * 0.3} ${browLeft + browLength / 2} ${browY - browAngleOffset}"
+              fill="none" stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
         <!-- Right eyebrow -->
-        <line x1="${browRight - browLength / 2}" y1="${browY - browAngleOffset}"
-              x2="${browRight + browLength / 2}" y2="${browY + browAngleOffset}"
-              stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M ${browRight - browLength / 2} ${browY - browAngleOffset} Q ${browRight} ${browY - browLength * 0.3} ${browRight + browLength / 2} ${browY + browAngleOffset}"
+              fill="none" stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
     `;
 
-    // Nose (simple vertical line)
+    // Nose (filled triangle)
+    const noseTopY = noseY - noseLen / 2;
+    const noseBottomY = noseY + noseLen / 2;
     const noseHTML = `
-        <line x1="${center}" y1="${noseY - noseLen / 2}" x2="${center}" y2="${noseY + noseLen / 2}"
-              stroke="${colors.features}" stroke-width="2" stroke-linecap="round"/>
+        <path d="M ${center} ${noseTopY} L ${center - noseW / 2} ${noseBottomY} L ${center + noseW / 2} ${noseBottomY} Z"
+              fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
     `;
 
     // Mouth (curved line for smile/frown)
