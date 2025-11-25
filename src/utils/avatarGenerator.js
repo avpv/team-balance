@@ -1,12 +1,29 @@
 /**
- * Avatar Generator - Minimalistic Chernoff Face Avatars (GitHub Style)
+ * Avatar Generator - Statistical Chernoff Face Avatars
  *
- * Generates clean, minimalistic Chernoff face avatars for TeamBalance.
+ * Generates clean, academic-style Chernoff face avatars for TeamBalance.
+ * Chernoff faces are statistical facial glyphs where each facial feature
+ * encodes one numeric variable, making data visual and memorable.
+ *
+ * 10 Parameters Encoded:
+ * 1. Head size - Overall face radius
+ * 2. Face width/roundness - Horizontal vs vertical proportions
+ * 3. Eye size - Size of eye circles
+ * 4. Eye separation - Distance between eyes
+ * 5. Pupil size - Size of pupils within eyes
+ * 6. Eyebrow angle - Angle/expression of eyebrows
+ * 7. Nose length - Vertical length of nose
+ * 8. Mouth curvature - Smile/frown (can be ELO-based)
+ * 9. Mouth width - Horizontal width of mouth
+ * 10. Ear size - Size of ears
+ *
+ * Features:
  * - Deterministic: Same name always produces the same face
- * - Data-driven: ELO rating controls smile (higher ELO = bigger smile)
- * - GitHub-inspired: Flat colors, simple geometry, clean design
+ * - Data-driven: ELO rating can control smile (variable 8)
+ * - Academic style: Clean geometric shapes, 1-3px lines, symmetric
+ * - Statistical: Similar to R/Python Chernoff faces libraries
  *
- * @version 3.0.0
+ * @version 4.0.0 - Full Statistical Chernoff Faces
  */
 
 /**
@@ -38,24 +55,24 @@ function getHashValue(hash, index, min, max) {
 }
 
 /**
- * Get avatar color scheme from hash (GitHub-style minimalistic)
+ * Get avatar color scheme from hash (Academic/Scientific style)
  * @param {number} hash - Hash value
- * @returns {object} - Color scheme with background and features
+ * @returns {object} - Color scheme with background, face, and features
  */
 function getColorScheme(hash) {
     const schemes = [
-        { bg: 'hsl(210, 70%, 90%)', face: 'hsl(210, 60%, 75%)', features: 'hsl(210, 50%, 40%)' }, // Blue
-        { bg: 'hsl(160, 65%, 88%)', face: 'hsl(160, 55%, 70%)', features: 'hsl(160, 45%, 35%)' }, // Teal
-        { bg: 'hsl(280, 60%, 90%)', face: 'hsl(280, 50%, 75%)', features: 'hsl(280, 40%, 40%)' }, // Purple
-        { bg: 'hsl(340, 70%, 90%)', face: 'hsl(340, 60%, 75%)', features: 'hsl(340, 50%, 40%)' }, // Pink
-        { bg: 'hsl(30, 75%, 88%)', face: 'hsl(30, 65%, 70%)', features: 'hsl(30, 55%, 35%)' },    // Orange
-        { bg: 'hsl(120, 60%, 88%)', face: 'hsl(120, 50%, 70%)', features: 'hsl(120, 40%, 35%)' }, // Green
-        { bg: 'hsl(190, 70%, 88%)', face: 'hsl(190, 60%, 72%)', features: 'hsl(190, 50%, 38%)' }, // Cyan
-        { bg: 'hsl(50, 80%, 88%)', face: 'hsl(50, 70%, 68%)', features: 'hsl(50, 60%, 32%)' },    // Yellow
-        { bg: 'hsl(15, 75%, 88%)', face: 'hsl(15, 65%, 70%)', features: 'hsl(15, 55%, 35%)' },    // Red-Orange
-        { bg: 'hsl(260, 65%, 88%)', face: 'hsl(260, 55%, 73%)', features: 'hsl(260, 45%, 38%)' }, // Indigo
-        { bg: 'hsl(90, 60%, 88%)', face: 'hsl(90, 50%, 70%)', features: 'hsl(90, 40%, 35%)' },    // Lime
-        { bg: 'hsl(320, 70%, 88%)', face: 'hsl(320, 60%, 73%)', features: 'hsl(320, 50%, 38%)' }, // Magenta
+        { bg: 'hsl(210, 50%, 92%)', face: 'hsl(210, 40%, 80%)', features: 'hsl(210, 60%, 30%)' }, // Blue
+        { bg: 'hsl(160, 45%, 90%)', face: 'hsl(160, 35%, 75%)', features: 'hsl(160, 55%, 28%)' }, // Teal
+        { bg: 'hsl(280, 40%, 92%)', face: 'hsl(280, 30%, 80%)', features: 'hsl(280, 50%, 32%)' }, // Purple
+        { bg: 'hsl(340, 50%, 92%)', face: 'hsl(340, 40%, 80%)', features: 'hsl(340, 60%, 32%)' }, // Pink
+        { bg: 'hsl(30, 55%, 90%)', face: 'hsl(30, 45%, 75%)', features: 'hsl(30, 65%, 28%)' },    // Orange
+        { bg: 'hsl(120, 40%, 90%)', face: 'hsl(120, 30%, 75%)', features: 'hsl(120, 50%, 28%)' }, // Green
+        { bg: 'hsl(190, 50%, 90%)', face: 'hsl(190, 40%, 78%)', features: 'hsl(190, 60%, 30%)' }, // Cyan
+        { bg: 'hsl(50, 60%, 90%)', face: 'hsl(50, 50%, 73%)', features: 'hsl(50, 70%, 25%)' },    // Yellow
+        { bg: 'hsl(15, 55%, 90%)', face: 'hsl(15, 45%, 75%)', features: 'hsl(15, 65%, 28%)' },    // Red-Orange
+        { bg: 'hsl(260, 45%, 90%)', face: 'hsl(260, 35%, 78%)', features: 'hsl(260, 55%, 30%)' }, // Indigo
+        { bg: 'hsl(90, 40%, 90%)', face: 'hsl(90, 30%, 75%)', features: 'hsl(90, 50%, 28%)' },    // Lime
+        { bg: 'hsl(320, 50%, 90%)', face: 'hsl(320, 40%, 78%)', features: 'hsl(320, 60%, 30%)' }, // Magenta
     ];
     return schemes[hash % schemes.length];
 }
@@ -86,195 +103,151 @@ function eloToSmile(elo) {
 }
 
 /**
- * Generate minimalistic Chernoff face (GitHub style)
+ * Generate statistical Chernoff face with 10 encoded parameters
  * @param {number} hash - Hash value
  * @param {number} size - Avatar size
- * @param {number|null} elo - Optional ELO rating for smile
+ * @param {number|null} elo - Optional ELO rating for smile (variable 8)
  * @returns {string} - SVG face
  */
 function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
     const colors = getColorScheme(hash);
 
-    // Extract minimal facial features from hash (deterministic) - ENHANCED DIVERSITY
-    const eyeSize = getHashValue(hash, 1, 0.06, 0.14);        // Expanded from 0.08-0.11 to 0.06-0.14 (2.3x range)
-    const eyeSpacing = getHashValue(hash, 2, 0.22, 0.40);     // Expanded from 0.28-0.35 to 0.22-0.40 (2.6x range)
-    const eyeStyle = Math.floor(getHashValue(hash, 3, 0, 6)); // Expanded from 3 to 6 styles
-    const mouthWidth = getHashValue(hash, 4, 0.25, 0.50);     // Expanded from 0.3-0.42 to 0.25-0.50 (2x range)
-    const faceShape = Math.floor(getHashValue(hash, 6, 0, 3)); // 0=circle, 1=oval-tall, 2=oval-wide
-    const browStyle = Math.floor(getHashValue(hash, 7, 0, 4)); // 4 different eyebrow styles
-    const browAngle = getHashValue(hash, 8, -0.08, 0.08);     // Eyebrow angle variation
-    const noseStyle = Math.floor(getHashValue(hash, 9, 0, 3)); // 3 different nose styles
+    // === 10 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
+    // All parameters are continuous numeric values for proper statistical encoding
 
-    // Mouth curve is based on ELO rating if provided
-    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 5, -0.08, 0.12);
+    // Variable 1: Head size (overall face radius)
+    const headSize = getHashValue(hash, 1, 0.65, 0.85);
 
-    // Calculate positions - Enhanced with face shape variations
-    const faceRadius = center * 0.8;
-    let faceRadiusX = faceRadius;
-    let faceRadiusY = faceRadius;
+    // Variable 2: Face width/roundness (aspect ratio: 0.8=tall, 1.0=circle, 1.2=wide)
+    const faceAspect = getHashValue(hash, 2, 0.8, 1.2);
 
-    // Adjust face shape
-    if (faceShape === 1) {
-        // Oval - tall
-        faceRadiusY = faceRadius * 1.15;
-        faceRadiusX = faceRadius * 0.9;
-    } else if (faceShape === 2) {
-        // Oval - wide
-        faceRadiusX = faceRadius * 1.15;
-        faceRadiusY = faceRadius * 0.9;
-    }
+    // Variable 3: Eye size (radius of eye circles)
+    const eyeSize = getHashValue(hash, 3, 0.06, 0.14);
 
+    // Variable 4: Eye separation (distance between eyes)
+    const eyeSeparation = getHashValue(hash, 4, 0.22, 0.40);
+
+    // Variable 5: Pupil size (size of pupils within eyes, 0.3-0.7 of eye size)
+    const pupilSize = getHashValue(hash, 5, 0.3, 0.7);
+
+    // Variable 6: Eyebrow angle (-0.15=sad, 0=neutral, 0.15=surprised)
+    const eyebrowAngle = getHashValue(hash, 6, -0.15, 0.15);
+
+    // Variable 7: Nose length (0.5-1.5 times eye radius)
+    const noseLength = getHashValue(hash, 7, 0.5, 1.5);
+
+    // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
+    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 8, -0.08, 0.12);
+
+    // Variable 9: Mouth width (horizontal width)
+    const mouthWidth = getHashValue(hash, 9, 0.25, 0.50);
+
+    // Variable 10: Ear size (size of ears)
+    const earSize = getHashValue(hash, 10, 0.08, 0.15);
+
+    // === CALCULATE POSITIONS AND DIMENSIONS ===
+
+    // Face dimensions
+    const faceRadius = center * headSize;
+    const faceRadiusX = faceRadius * faceAspect;
+    const faceRadiusY = faceRadius;
+
+    // Eye positions and dimensions
     const eyeY = center * 0.85;
-    const eyeLeft = center - (center * eyeSpacing);
-    const eyeRight = center + (center * eyeSpacing);
+    const eyeLeft = center - (center * eyeSeparation);
+    const eyeRight = center + (center * eyeSeparation);
     const eyeR = size * eyeSize;
+    const pupilR = eyeR * pupilSize;
 
+    // Eyebrow positions
     const browY = eyeY - eyeR * 2.2;
     const browLeft = eyeLeft;
     const browRight = eyeRight;
-    const browLength = eyeR * 2;
+    const browLength = eyeR * 2.2;
+    const browAngleOffset = size * eyebrowAngle;
 
+    // Nose position and length
     const noseY = center * 1.05;
+    const noseLen = eyeR * noseLength;
 
-    const mouthY = center * 1.25;
+    // Mouth position and dimensions
+    const mouthY = center * 1.28;
     const mouthW = size * mouthWidth;
     const mouthCurveY = size * mouthCurve;
 
-    // Generate eyes based on style - ENHANCED with 6 styles
-    let eyesHTML = '';
-    if (eyeStyle === 0) {
-        // Simple circles
-        eyesHTML = `
-            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
-            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="${colors.features}"/>
-        `;
-    } else if (eyeStyle === 1) {
-        // Small dots
-        eyesHTML = `
-            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
-            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.7}" fill="${colors.features}"/>
-        `;
-    } else if (eyeStyle === 2) {
-        // Simple lines
-        const lineLen = eyeR * 1.8;
-        eyesHTML = `
-            <line x1="${eyeLeft - lineLen / 2}" y1="${eyeY}" x2="${eyeLeft + lineLen / 2}" y2="${eyeY}"
-                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
-            <line x1="${eyeRight - lineLen / 2}" y1="${eyeY}" x2="${eyeRight + lineLen / 2}" y2="${eyeY}"
-                  stroke="${colors.features}" stroke-width="3" stroke-linecap="round"/>
-        `;
-    } else if (eyeStyle === 3) {
-        // Large circles with white center (pupils)
-        eyesHTML = `
-            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 1.1}" fill="${colors.features}"/>
-            <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR * 0.5}" fill="${colors.face}"/>
-            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 1.1}" fill="${colors.features}"/>
-            <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR * 0.5}" fill="${colors.face}"/>
-        `;
-    } else if (eyeStyle === 4) {
-        // Vertical ovals
-        eyesHTML = `
-            <ellipse cx="${eyeLeft}" cy="${eyeY}" rx="${eyeR * 0.7}" ry="${eyeR * 1.2}" fill="${colors.features}"/>
-            <ellipse cx="${eyeRight}" cy="${eyeY}" rx="${eyeR * 0.7}" ry="${eyeR * 1.2}" fill="${colors.features}"/>
-        `;
-    } else {
-        // Curved lines (happy eyes)
-        const lineLen = eyeR * 1.8;
-        const curveY = eyeR * 0.3;
-        eyesHTML = `
-            <path d="M ${eyeLeft - lineLen / 2} ${eyeY} Q ${eyeLeft} ${eyeY + curveY} ${eyeLeft + lineLen / 2} ${eyeY}"
-                  stroke="${colors.features}" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M ${eyeRight - lineLen / 2} ${eyeY} Q ${eyeRight} ${eyeY + curveY} ${eyeRight + lineLen / 2} ${eyeY}"
-                  stroke="${colors.features}" stroke-width="3" fill="none" stroke-linecap="round"/>
-        `;
-    }
+    // Ear positions and dimensions
+    const earLeft = center - faceRadiusX;
+    const earRight = center + faceRadiusX;
+    const earY = center * 0.95;
+    const earR = size * earSize;
 
-    // Generate eyebrows based on style - NEW FEATURE
-    let browsHTML = '';
-    if (browStyle === 0) {
-        // Straight horizontal lines
-        browsHTML = `
-            <line x1="${browLeft - browLength / 2}" y1="${browY}" x2="${browLeft + browLength / 2}" y2="${browY}"
-                  stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="${browRight - browLength / 2}" y1="${browY}" x2="${browRight + browLength / 2}" y2="${browY}"
-                  stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
-        `;
-    } else if (browStyle === 1) {
-        // Angled brows (expressive)
-        const angleOffset = size * browAngle;
-        browsHTML = `
-            <line x1="${browLeft - browLength / 2}" y1="${browY + angleOffset}" x2="${browLeft + browLength / 2}" y2="${browY - angleOffset}"
-                  stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="${browRight - browLength / 2}" y1="${browY - angleOffset}" x2="${browRight + browLength / 2}" y2="${browY + angleOffset}"
-                  stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
-        `;
-    } else if (browStyle === 2) {
-        // Curved brows (friendly)
-        const curveY = eyeR * 0.4;
-        browsHTML = `
-            <path d="M ${browLeft - browLength / 2} ${browY} Q ${browLeft} ${browY - curveY} ${browLeft + browLength / 2} ${browY}"
-                  stroke="${colors.features}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M ${browRight - browLength / 2} ${browY} Q ${browRight} ${browY - curveY} ${browRight + browLength / 2} ${browY}"
-                  stroke="${colors.features}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        `;
-    } else {
-        // Thick short brows
-        const shortLen = browLength * 0.7;
-        browsHTML = `
-            <line x1="${browLeft - shortLen / 2}" y1="${browY}" x2="${browLeft + shortLen / 2}" y2="${browY}"
-                  stroke="${colors.features}" stroke-width="3.5" stroke-linecap="round"/>
-            <line x1="${browRight - shortLen / 2}" y1="${browY}" x2="${browRight + shortLen / 2}" y2="${browY}"
-                  stroke="${colors.features}" stroke-width="3.5" stroke-linecap="round"/>
-        `;
-    }
+    // === GENERATE SVG ELEMENTS ===
 
-    // Generate nose based on style - NEW FEATURE
-    let noseHTML = '';
-    if (noseStyle === 0) {
-        // Simple dot
-        noseHTML = `<circle cx="${center}" cy="${noseY}" r="${eyeR * 0.5}" fill="${colors.features}"/>`;
-    } else if (noseStyle === 1) {
-        // Small vertical line
-        const noseLen = eyeR * 1.2;
-        noseHTML = `<line x1="${center}" y1="${noseY - noseLen / 2}" x2="${center}" y2="${noseY + noseLen / 2}"
-                          stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>`;
-    } else {
-        // Minimal L-shape
-        const noseSize = eyeR * 0.8;
-        noseHTML = `<path d="M ${center} ${noseY - noseSize} L ${center} ${noseY} L ${center + noseSize} ${noseY}"
-                          stroke="${colors.features}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-    }
+    // Face (ellipse with aspect ratio)
+    const faceHTML = `<ellipse cx="${center}" cy="${center}" rx="${faceRadiusX}" ry="${faceRadiusY}" fill="${colors.face}" stroke="none"/>`;
 
-    // Generate face shape SVG
-    let faceHTML = '';
-    if (faceShape === 0) {
-        // Circle
-        faceHTML = `<circle cx="${center}" cy="${center}" r="${faceRadius}" fill="${colors.face}"/>`;
-    } else {
-        // Ellipse (oval)
-        faceHTML = `<ellipse cx="${center}" cy="${center}" rx="${faceRadiusX}" ry="${faceRadiusY}" fill="${colors.face}"/>`;
-    }
+    // Ears (simple ellipses on sides of face)
+    const earsHTML = `
+        <ellipse cx="${earLeft}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
+        <ellipse cx="${earRight}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
+    `;
+
+    // Eyes (circles with pupils)
+    const eyesHTML = `
+        <!-- Left eye -->
+        <circle cx="${eyeLeft}" cy="${eyeY}" r="${eyeR}" fill="${colors.bg}" stroke="${colors.features}" stroke-width="2"/>
+        <circle cx="${eyeLeft}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
+        <!-- Right eye -->
+        <circle cx="${eyeRight}" cy="${eyeY}" r="${eyeR}" fill="${colors.bg}" stroke="${colors.features}" stroke-width="2"/>
+        <circle cx="${eyeRight}" cy="${eyeY}" r="${pupilR}" fill="${colors.features}"/>
+    `;
+
+    // Eyebrows (angled lines)
+    const browsHTML = `
+        <!-- Left eyebrow -->
+        <line x1="${browLeft - browLength / 2}" y1="${browY + browAngleOffset}"
+              x2="${browLeft + browLength / 2}" y2="${browY - browAngleOffset}"
+              stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Right eyebrow -->
+        <line x1="${browRight - browLength / 2}" y1="${browY - browAngleOffset}"
+              x2="${browRight + browLength / 2}" y2="${browY + browAngleOffset}"
+              stroke="${colors.features}" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+
+    // Nose (simple vertical line)
+    const noseHTML = `
+        <line x1="${center}" y1="${noseY - noseLen / 2}" x2="${center}" y2="${noseY + noseLen / 2}"
+              stroke="${colors.features}" stroke-width="2" stroke-linecap="round"/>
+    `;
+
+    // Mouth (curved line for smile/frown)
+    const mouthHTML = `
+        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
+              stroke="${colors.features}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    `;
 
     return `
         <!-- Background -->
         <rect width="${size}" height="${size}" fill="${colors.bg}" rx="${size * 0.15}"/>
 
-        <!-- Face (enhanced with shape variations) -->
+        <!-- Ears (Variable 10) -->
+        ${earsHTML}
+
+        <!-- Face (Variables 1 & 2: head size and face aspect ratio) -->
         ${faceHTML}
 
-        <!-- Eyebrows (NEW) -->
+        <!-- Eyebrows (Variable 6: eyebrow angle) -->
         ${browsHTML}
 
-        <!-- Eyes -->
+        <!-- Eyes (Variables 3, 4, 5: eye size, separation, pupil size) -->
         ${eyesHTML}
 
-        <!-- Nose (NEW) -->
+        <!-- Nose (Variable 7: nose length) -->
         ${noseHTML}
 
-        <!-- Mouth (ELO-based smile) -->
-        <path d="M ${center - mouthW / 2} ${mouthY} Q ${center} ${mouthY + mouthCurveY} ${center + mouthW / 2} ${mouthY}"
-              stroke="${colors.features}" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- Mouth (Variables 8 & 9: mouth curvature and width) -->
+        ${mouthHTML}
     `;
 }
 
