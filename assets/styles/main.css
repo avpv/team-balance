@@ -503,7 +503,10 @@ a:hover {
 .app-footer .footer-content {
     max-width: var(--container-max-width);
     margin: 0 auto;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
 }
 
 .app-footer a {
@@ -525,8 +528,8 @@ a:hover {
 }
 
 .footer-separator {
-    margin: 0 var(--spacing-2);
     color: var(--color-text-tertiary);
+    line-height: 1;
 }
 
 /* =============================================================================
