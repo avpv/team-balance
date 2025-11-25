@@ -187,7 +187,8 @@
     display: grid;
     grid-template-columns: 1fr 200px 1fr;
     gap: var(--spacing-8);
-    align-items: stretch;
+    align-items: center;
+    justify-items: center;
     max-width: 100%;
     margin: 0 auto;
 }
@@ -201,6 +202,8 @@
 
 /* Player Card in Comparison - Enhanced Design */
 .comparison-cards .player-card {
+    width: 320px;
+    max-width: 320px;
     min-height: 340px;
     padding: var(--spacing-8);
     display: flex;
@@ -277,6 +280,11 @@
     letter-spacing: -0.02em;
     line-height: 1.2;
     color: var(--color-text-primary);
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 var(--spacing-2);
 }
 
 .comparison-cards .player-position {
@@ -1587,7 +1595,8 @@
     display: grid;
     grid-template-columns: 1fr 200px 1fr;
     gap: var(--spacing-8);
-    align-items: stretch;
+    align-items: center;
+    justify-items: center;
     width: 100%;
 }
 
@@ -2369,6 +2378,8 @@
 
     /* Optimized player cards on mobile for Compare page */
     .comparison-cards .player-card.clickable {
+        width: 100%;
+        max-width: 100%;
         padding: var(--spacing-5);
         min-height: 280px;
     }
@@ -2517,6 +2528,8 @@
 
     /* Compact player cards on very small screens */
     .comparison-cards .player-card.clickable {
+        width: 100%;
+        max-width: 100%;
         padding: var(--spacing-4);
         min-height: 240px;
     }
