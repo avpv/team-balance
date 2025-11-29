@@ -1395,7 +1395,7 @@ select.form-control {
 
 .vs-text {
     color: var(--color-text-secondary);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-semibold);
 }
 

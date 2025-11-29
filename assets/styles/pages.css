@@ -354,7 +354,7 @@
 
 /* VS Text - Bold Typography */
 .vs-text {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-5xl);
     font-weight: 900;
     color: var(--color-text-tertiary);
     opacity: 0.4;

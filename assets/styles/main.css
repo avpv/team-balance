@@ -100,6 +100,8 @@
     --font-size-xl: 24px;
     --font-size-2xl: 32px;
     --font-size-3xl: 40px;
+    --font-size-4xl: 48px;
+    --font-size-5xl: 64px;
 
     /* Font Weights */
     --font-weight-normal: 400;
