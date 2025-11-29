@@ -2363,12 +2363,14 @@
         order: 2;
     }
 
-    #leftPlayerCard {
+    #leftCardContainer {
         order: 1;
+        width: 100%;
     }
 
-    #rightPlayerCard {
+    #rightCardContainer {
         order: 3;
+        width: 100%;
     }
 
     .player-card.clickable,
@@ -2381,7 +2383,7 @@
         width: 100%;
         max-width: 100%;
         padding: var(--spacing-5);
-        min-height: 280px;
+        min-height: 220px;
     }
 
     .comparison-cards .player-avatar {
@@ -2531,7 +2533,7 @@
         width: 100%;
         max-width: 100%;
         padding: var(--spacing-4);
-        min-height: 240px;
+        min-height: 200px;
     }
 
     .comparison-cards .player-avatar {
