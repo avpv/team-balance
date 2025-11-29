@@ -1377,28 +1377,6 @@ select.form-control {
     border-color: var(--color-error);
     color: var(--color-error);
 }
-
-/* =============================================================================
-   VS Divider
-   ============================================================================= */
-
-.vs-divider {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-4);
-    padding: 0 var(--spacing-4);
-    user-select: none;
-    min-height: 100%;
-}
-
-.vs-text {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
-}
-
 .draw-button {
     padding: var(--spacing-3) var(--spacing-6);
     background-color: var(--color-surface-raised);
