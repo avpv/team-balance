@@ -317,7 +317,7 @@
 }
 
 .comparison-cards .rating-value {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     font-variant-numeric: tabular-nums;
