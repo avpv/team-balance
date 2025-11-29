@@ -28,10 +28,7 @@ class PositionSelector extends BaseComponent {
                                     Pick a position below to start comparing players head-to-head and build your rankings.
                                 </p>
                                 <div class="position-selector__shortcuts">
-                                    <svg class="shortcuts__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="2" y="5" width="12" height="8" rx="1"></rect>
-                                        <path d="M5 5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-                                    </svg>
+                                    ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
                                     <span class="shortcuts__text">Quick keys: <kbd>A</kbd> left • <kbd>D</kbd> right • <kbd>W</kbd> draw</span>
                                 </div>
                             </div>
