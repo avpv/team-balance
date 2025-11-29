@@ -5,7 +5,7 @@
  * Extends Component with page-specific functionality
  */
 import Component from '../components/base/Component.js';
-import { getLogo } from '../components/base/Icons.js';
+import { getLogo, getIcon } from '../components/base/Icons.js';
 import uiConfig from '../config/ui.js';
 
 const { ELEMENT_IDS, UI_CLASSES, ANIMATION } = uiConfig;
@@ -175,9 +175,7 @@ class BasePage extends Component {
         return `
             <div class="error-state d-flex items-center gap-2" role="alert" aria-live="assertive">
                 <div class="error-icon d-flex items-center justify-center" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM7 4v5h2V4H7zm0 6v2h2v-2H7z"/>
-                    </svg>
+                    ${getIcon('alert', { size: 16 })}
                 </div>
                 <div>
                     ${title ? `<strong class="error-title">${this.escape(title)}:</strong> ` : ''}
