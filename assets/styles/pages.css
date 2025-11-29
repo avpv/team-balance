@@ -274,7 +274,7 @@
 
 /* Enhanced Typography */
 .comparison-cards .player-name {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     margin-bottom: var(--spacing-2);
     letter-spacing: -0.02em;
@@ -317,7 +317,7 @@
 }
 
 .comparison-cards .rating-value {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     font-variant-numeric: tabular-nums;
