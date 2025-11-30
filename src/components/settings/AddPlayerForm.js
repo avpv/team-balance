@@ -66,22 +66,20 @@ class AddPlayerForm extends BaseComponent {
                     <div class="player-section manual-add-section">
                         <h4 class="section-title">Add Individual Players</h4>
                         <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}" aria-label="Add new player form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="${ELEMENT_IDS.PLAYER_NAME_INPUT}">Player Name</label>
-                                    <input
-                                        type="text"
-                                        id="${ELEMENT_IDS.PLAYER_NAME_INPUT}"
-                                        class="form-control"
-                                        placeholder="e.g., John Smith"
-                                        required
-                                        autocomplete="off"
-                                        ${!currentActivity ? 'disabled' : ''}
-                                        aria-required="true"
-                                        aria-describedby="player-name-help"
-                                    >
-                                    <p class="form-help" id="player-name-help">Enter the full name of the player</p>
-                                </div>
+                            <div class="form-group">
+                                <label for="${ELEMENT_IDS.PLAYER_NAME_INPUT}">Player Name</label>
+                                <input
+                                    type="text"
+                                    id="${ELEMENT_IDS.PLAYER_NAME_INPUT}"
+                                    class="form-control"
+                                    placeholder="e.g., John Smith"
+                                    required
+                                    autocomplete="off"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-required="true"
+                                    aria-describedby="player-name-help"
+                                >
+                                <p class="form-help" id="player-name-help">Enter the full name of the player</p>
                             </div>
 
                             <div class="form-group">
