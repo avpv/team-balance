@@ -444,7 +444,7 @@ class TeamsPage extends BasePage {
         return `
             <div class="team-card">
                 <div class="team-header mb-4 d-flex justify-between items-center">
-                    <h4 class="font-semibold text-base md:text-lg m-0">Team ${index + 1}</h4>
+                    <h4 class="font-semibold text-sm md:text-base m-0">Team ${index + 1}</h4>
                     ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
                 </div>
 
