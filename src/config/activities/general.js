@@ -1,36 +1,36 @@
 // src/config/activities/general.js
-// General activity configuration - universal for any team distribution
+// Universal team configuration for 1-player teams
 
 /**
- * General/Universal configuration for team optimizer
- * Simple single-position configuration for generic team balancing
- * Use this when you don't need specific positions or roles
+ * Team 1 - Universal configuration for 1-player teams
+ * Simple configuration for generic team balancing with 1 player per team
+ * Ideal for individual competitions or single-player activities
  */
 export default {
-    name: 'General',
+    name: 'Team 1',
 
     // Activity metadata
     activityType: 'general',
     teamSize: 1,
-    description: 'Universal team balancing without specific positions',
+    description: 'Universal team balancing for 1-player teams',
 
     // Position abbreviations and full names
     positions: {
-        'PLAYER': 'Player'
+        'PLAYER 1': 'Player 1'
     },
 
     // Position weights for team balancing
     // Equal weight for all players
     positionWeights: {
-        'PLAYER': 1.0  // Neutral weight - all players equal
+        'PLAYER 1': 1.0  // Neutral weight - all players equal
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['PLAYER'],
+    positionOrder: ['PLAYER 1'],
 
-    // Default team composition (flexible)
+    // Default team composition
     defaultComposition: {
-        'PLAYER': 1  // 1 player per position
+        'PLAYER 1': 1  // 1 player in Position 1
     }
-    // Total team size: Flexible based on number of players
+    // Total team size: 1 player
 };
