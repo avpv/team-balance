@@ -1,9 +1,9 @@
 // src/config/activities/team-2.js
-// Universal team configuration with 2 positions
+// Universal team configuration for 2-player teams
 
 /**
- * Team 2 - Universal configuration for 2-position teams
- * Simple dual-position configuration for generic team balancing
+ * Team 2 - Universal configuration for 2-player teams
+ * Simple configuration for generic team balancing with 2 players per team
  * Ideal for doubles games, pairs, or any 2-person team activities
  */
 export default {
@@ -12,28 +12,25 @@ export default {
     // Activity metadata
     activityType: 'general',
     teamSize: 2,
-    description: 'Universal team balancing with 2 positions',
+    description: 'Universal team balancing for 2-player teams',
 
     // Position abbreviations and full names
     positions: {
-        'P1': 'Position 1',
-        'P2': 'Position 2'
+        'PLAYER': 'Player'
     },
 
     // Position weights for team balancing
-    // Equal weight for all positions
+    // Equal weight for all players
     positionWeights: {
-        'P1': 1.0,  // Neutral weight
-        'P2': 1.0   // Neutral weight
+        'PLAYER': 1.0  // Neutral weight - all players equal
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['P1', 'P2'],
+    positionOrder: ['PLAYER'],
 
     // Default team composition
     defaultComposition: {
-        'P1': 1,  // 1 player in Position 1
-        'P2': 1   // 1 player in Position 2
+        'PLAYER': 1  // 1 player per position
     }
     // Total team size: 2 players
 };
