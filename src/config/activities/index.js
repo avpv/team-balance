@@ -57,7 +57,6 @@ const ACTIVITY_FILES = {
     rocketLeague: 'rocket-league.js',
 
     // Universal
-    general: 'general.js',
     team1: 'team-1.js',
     team2: 'team-2.js',
     team3: 'team-3.js',
