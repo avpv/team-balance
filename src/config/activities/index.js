@@ -57,7 +57,12 @@ const ACTIVITY_FILES = {
     rocketLeague: 'rocket-league.js',
 
     // Universal
-    general: 'general.js'
+    team1: 'team-1.js',
+    team2: 'team-2.js',
+    team3: 'team-3.js',
+    team4: 'team-4.js',
+    team5: 'team-5.js',
+    team6: 'team-6.js'
 };
 
 /**
