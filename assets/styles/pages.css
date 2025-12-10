@@ -68,6 +68,22 @@
     box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
+/* Create Session Button Highlight */
+#createSessionBtn.highlight {
+    animation: buttonPulse 2s ease-in-out infinite;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.2);
+}
+
+@keyframes buttonPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(47, 129, 247, 0.3);
+    }
+}
+
 @media (max-width: 768px) {
     .activity-selector-row {
         flex-direction: column;
