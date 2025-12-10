@@ -11,7 +11,6 @@ export default {
 
     // Activity metadata
     activityType: 'general',
-    teamSize: 6,
     description: 'Universal team balancing for 6-player teams',
 
     // Position abbreviations and full names

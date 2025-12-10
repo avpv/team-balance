@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'sport',
-    teamSize: 11,
     description: 'Cricket team building and player ranking',
 
     // Position abbreviations and full names

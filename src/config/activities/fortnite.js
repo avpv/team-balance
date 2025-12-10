@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 4,
     description: 'Fortnite competitive team building and player ranking',
 
     // Position abbreviations and full names

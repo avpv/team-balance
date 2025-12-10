@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 5,
     description: 'Dota 2 team building and player ranking',
 
     // Position abbreviations and full names

@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 5,
     description: "Rainbow Six Siege team building and player ranking",
 
     // Position abbreviations and full names

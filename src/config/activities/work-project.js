@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'work',
-    teamSize: 6,
     description: 'Balanced project team building based on roles and skills',
 
     // Role abbreviations and full names

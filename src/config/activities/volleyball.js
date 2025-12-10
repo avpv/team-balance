@@ -11,7 +11,6 @@ export default {
 
     // Activity metadata
     activityType: 'sport',
-    teamSize: 6,
     description: 'Volleyball team building and player ranking',
 
     // Position abbreviations and full names

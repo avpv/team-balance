@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 4,
     description: 'PUBG: Battlegrounds team building and player ranking',
 
     // Position abbreviations and full names

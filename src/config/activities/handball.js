@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'sport',
-    teamSize: 7,
     description: 'Handball team building and player ranking',
 
     // Position abbreviations and full names
