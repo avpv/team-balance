@@ -263,10 +263,12 @@ class GoogleSheetsSection extends Component {
 
         if (googleSheetsExportBtn) {
             googleSheetsExportBtn.addEventListener('click', () => this.handleExport());
+            console.log('✓ Export button listener attached');
         }
 
         if (googleSheetsImportBtn) {
             googleSheetsImportBtn.addEventListener('click', () => this.handleImport());
+            console.log('✓ Import button listener attached');
         }
     }
 
@@ -277,9 +279,14 @@ class GoogleSheetsSection extends Component {
     attachModalEventListenersWithRetry(maxRetries = 5, delay = 0) {
         const attemptAttach = (retriesLeft) => {
             requestAnimationFrame(() => {
+                // Check for any button that should exist in the current view
                 const connectBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN);
+                const exportBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN);
+                const importBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN);
+                const disconnectBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN);
 
-                if (connectBtn || retriesLeft === 0) {
+                // If any button is found, or we're out of retries, attach listeners
+                if (connectBtn || exportBtn || importBtn || disconnectBtn || retriesLeft === 0) {
                     // Button found or no retries left - attach all listeners
                     this.attachModalEventListeners();
                     return;
@@ -384,6 +391,8 @@ class GoogleSheetsSection extends Component {
     }
 
     async handleExport() {
+        console.log('handleExport called');
+
         if (!this.googleSheetsIntegration) {
             toast.error('Google Sheets integration is not initialized');
             return;
@@ -450,6 +459,8 @@ class GoogleSheetsSection extends Component {
     }
 
     async handleImport() {
+        console.log('handleImport called');
+
         if (!this.googleSheetsIntegration) {
             toast.error('Google Sheets integration is not initialized');
             return;
