@@ -8,10 +8,6 @@
 export default {
     name: 'Cricket',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Cricket team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'WK': 'Wicket-keeper',

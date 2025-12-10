@@ -8,10 +8,6 @@
 export default {
     name: 'Beach Volleyball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Beach Volleyball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'BLK': 'Blocker',

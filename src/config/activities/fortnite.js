@@ -8,10 +8,6 @@
 export default {
     name: 'Fortnite (Competitive)',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Fortnite competitive team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'FRAG': 'Frag',

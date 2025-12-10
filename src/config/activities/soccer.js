@@ -8,10 +8,6 @@
 export default {
     name: 'Soccer',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Soccer (5-a-side) team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GK': 'Goalkeeper',

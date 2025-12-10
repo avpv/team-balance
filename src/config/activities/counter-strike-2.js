@@ -8,10 +8,6 @@
 export default {
     name: 'Counter-Strike 2',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Counter-Strike 2 team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'ENTRY': 'Entry Fragger',

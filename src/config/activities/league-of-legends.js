@@ -8,10 +8,6 @@
 export default {
     name: 'League of Legends',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'League of Legends team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'TOP': 'Top Lane',

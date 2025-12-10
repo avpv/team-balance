@@ -8,10 +8,6 @@
 export default {
     name: 'Overwatch 2',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Overwatch 2 team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'TANK': 'Tank',

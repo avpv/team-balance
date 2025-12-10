@@ -8,10 +8,6 @@
 export default {
     name: 'Honor of Kings',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Honor of Kings team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'SOLO': 'Solo Lane',

@@ -8,10 +8,6 @@
 export default {
     name: 'Lacrosse',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Lacrosse team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'G': 'Goalie',

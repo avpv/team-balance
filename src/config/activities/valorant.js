@@ -8,10 +8,6 @@
 export default {
     name: 'Valorant',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Valorant team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'DUEL': 'Duelist',

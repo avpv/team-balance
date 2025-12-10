@@ -8,10 +8,6 @@
 export default {
     name: 'PUBG Mobile',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'PUBG Mobile team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'IGL': 'In-Game Leader',

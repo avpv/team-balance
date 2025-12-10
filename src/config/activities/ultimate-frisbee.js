@@ -8,10 +8,6 @@
 export default {
     name: 'Ultimate Frisbee',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Ultimate Frisbee team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'HAND': 'Handler',

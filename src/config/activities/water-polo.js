@@ -8,10 +8,6 @@
 export default {
     name: 'Water Polo',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Water Polo team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GK': 'Goalkeeper',

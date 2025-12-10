@@ -8,10 +8,6 @@
 export default {
     name: 'Netball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Netball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GS': 'Goal Shooter',

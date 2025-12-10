@@ -8,10 +8,6 @@
 export default {
     name: 'Rugby',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Rugby Union team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'PR': 'Prop',

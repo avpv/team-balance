@@ -8,10 +8,6 @@
 export default {
     name: 'Handball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Handball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GK': 'Goalkeeper',

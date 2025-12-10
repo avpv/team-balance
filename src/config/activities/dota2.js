@@ -8,10 +8,6 @@
 export default {
     name: 'Dota 2',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Dota 2 team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'CARRY': 'Carry',

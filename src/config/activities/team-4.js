@@ -9,10 +9,6 @@
 export default {
     name: 'Team 4',
 
-    // Activity metadata
-    activityType: 'general',
-    description: 'Universal team balancing for 4-player teams',
-
     // Position abbreviations and full names
     positions: {
         'PLAYER 1': 'Player 1',

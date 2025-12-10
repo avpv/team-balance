@@ -8,10 +8,6 @@
 export default {
     name: 'Ice Hockey',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Ice Hockey team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'G': 'Goaltender',

@@ -8,10 +8,6 @@
 export default {
     name: 'Baseball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Baseball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'P': 'Pitcher',

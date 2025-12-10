@@ -8,10 +8,6 @@
 export default {
     name: 'Basketball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Basketball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'PG': 'Point Guard',
