@@ -525,10 +525,25 @@ class GoogleSheetsSection extends Component {
             this.googleSheetsSpreadsheetId = spreadsheetId;
             storage.set('googleSheetsSpreadsheetId', spreadsheetId);
 
+            // Show success message
             toast.success(
                 `Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`,
                 { duration: TOAST.MEDIUM_DURATION }
             );
+
+            // Close the modal and trigger UI refresh
+            if (this.modal) {
+                this.modal.close();
+            }
+
+            // Update this component
+            this.update();
+
+            // Trigger a global refresh of the player list
+            // This ensures all components that display players are updated
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
             console.error('Import failed:', error);
             toast.error('Failed to import: ' + error.message);
