@@ -96,6 +96,12 @@ class ActivitySelector extends BaseComponent {
             createSessionBtn.addEventListener('click', () => {
                 this.handleCreateSession();
             });
+
+            // If there's a pending activity, add highlight on mount
+            const pendingActivity = storage.get(STORAGE_KEYS.PENDING_ACTIVITY, null);
+            if (pendingActivity) {
+                createSessionBtn.classList.add('highlight');
+            }
         }
     }
 
@@ -137,10 +143,14 @@ class ActivitySelector extends BaseComponent {
 
     handleActivityChange(activityKey) {
         const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+        const createSessionBtn = this.container.querySelector('#createSessionBtn');
 
-        // If empty selection, just clear pending activity
+        // If empty selection, just clear pending activity and remove highlight
         if (!activityKey) {
             storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+            if (createSessionBtn) {
+                createSessionBtn.classList.remove('highlight');
+            }
             return;
         }
 
@@ -153,6 +163,11 @@ class ActivitySelector extends BaseComponent {
         // Store pending activity selection
         storage.set(STORAGE_KEYS.PENDING_ACTIVITY, activityKey);
 
+        // Add highlight to create session button
+        if (createSessionBtn) {
+            createSessionBtn.classList.add('highlight');
+        }
+
         // Show info toast
         if (currentActivity !== activityKey) {
             toast.info(`${selectedActivity.name} will be applied when you create a new session`);
@@ -163,6 +178,7 @@ class ActivitySelector extends BaseComponent {
         // Check if there's a pending activity change
         const pendingActivity = storage.get(STORAGE_KEYS.PENDING_ACTIVITY, null);
         const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+        const createSessionBtn = this.container.querySelector('#createSessionBtn');
 
         // Determine which activity to use (prefer pending if it exists)
         const targetActivity = pendingActivity || currentActivity;
@@ -180,6 +196,11 @@ class ActivitySelector extends BaseComponent {
         }
 
         try {
+            // Remove highlight from button
+            if (createSessionBtn) {
+                createSessionBtn.classList.remove('highlight');
+            }
+
             // If activity is changing, apply it and reload
             if (pendingActivity && targetActivity !== currentActivity) {
                 storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, targetActivity);
