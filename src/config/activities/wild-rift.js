@@ -8,10 +8,6 @@
 export default {
     name: 'Wild Rift',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Wild Rift team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'BARON': 'Baron Lane',

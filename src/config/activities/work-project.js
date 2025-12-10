@@ -8,10 +8,6 @@
 export default {
     name: 'Project Team',
 
-    // Activity metadata
-    activityType: 'work',
-    description: 'Balanced project team building based on roles and skills',
-
     // Role abbreviations and full names
     positions: {
         'TL': 'Tech Lead',

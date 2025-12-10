@@ -8,10 +8,6 @@
 export default {
     name: 'Futsal',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Futsal team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GK': 'Goalkeeper',

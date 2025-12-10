@@ -8,10 +8,6 @@
 export default {
     name: 'Rocket League',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Rocket League team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'STR': 'Striker',

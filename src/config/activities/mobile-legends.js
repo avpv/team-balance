@@ -8,10 +8,6 @@
 export default {
     name: 'Mobile Legends: Bang Bang',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Mobile Legends: Bang Bang team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GOLD': 'Gold Lane',

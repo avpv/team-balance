@@ -8,10 +8,6 @@
 export default {
     name: 'American Football',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'American Football team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'QB': 'Quarterback',

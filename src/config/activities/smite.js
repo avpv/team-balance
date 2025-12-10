@@ -8,10 +8,6 @@
 export default {
     name: 'SMITE',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'SMITE team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'SOLO': 'Solo Lane',

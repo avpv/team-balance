@@ -8,10 +8,6 @@
 export default {
     name: 'Apex Legends',
 
-    // Activity metadata
-    activityType: 'esport',
-    description: 'Apex Legends team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'IGL': 'IGL/Recon',

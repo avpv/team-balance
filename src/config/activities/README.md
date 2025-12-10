@@ -18,11 +18,6 @@ Each activity config must follow this structure:
 export default {
     name: 'Activity Name',              // Display name
 
-    // Metadata (optional)
-    activityType: 'sport',              // 'sport', 'work', 'education', etc.
-    teamSize: 6,                        // Default team size
-    description: 'Description',         // Short description
-
     // Required: Position/Role definitions
     positions: {
         'CODE': 'Full Name',            // e.g., 'PG': 'Point Guard'
@@ -70,9 +65,6 @@ export default {
 ```javascript
 export default {
     name: 'Tennis',
-    activityType: 'sport',
-    teamSize: 2,
-    description: 'Tennis doubles team building',
 
     positions: {
         'NET': 'Net Player',

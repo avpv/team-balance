@@ -8,10 +8,6 @@
 export default {
     name: 'Field Hockey',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Field Hockey team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'GK': 'Goalkeeper',

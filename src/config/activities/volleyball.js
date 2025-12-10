@@ -9,10 +9,6 @@
 export default {
     name: 'Volleyball',
 
-    // Activity metadata
-    activityType: 'sport',
-    description: 'Volleyball team building and player ranking',
-
     // Position abbreviations and full names
     positions: {
         'S': 'Setter',

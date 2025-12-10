@@ -8,10 +8,6 @@
 export default {
     name: "Tom Clancy's Rainbow Six Siege",
 
-    // Activity metadata
-    activityType: 'esport',
-    description: "Rainbow Six Siege team building and player ranking",
-
     // Position abbreviations and full names
     positions: {
         'ENTRY': 'Entry Fragger',
