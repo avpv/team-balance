@@ -473,53 +473,72 @@ class GoogleSheetsSection extends Component {
         console.log('handleImport called');
 
         if (!this.googleSheetsIntegration) {
-            toast.error('Google Sheets integration is not initialized');
+            const errorMsg = 'Google Sheets integration is not initialized';
+            console.error('❌', errorMsg);
+            toast.error(errorMsg);
             return;
         }
+        console.log('✓ Google Sheets integration is initialized');
 
         const currentActivity = this.getCurrentActivity();
         if (!currentActivity) {
-            toast.error('Please select an activity first');
+            const errorMsg = 'Please select an activity first';
+            console.error('❌', errorMsg);
+            toast.error(errorMsg);
             return;
         }
+        console.log('✓ Current activity:', currentActivity);
 
         try {
             // Get spreadsheet ID from input
             const spreadsheetInput = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}`);
+            console.log('spreadsheetInput element:', spreadsheetInput);
+
             let spreadsheetId = spreadsheetInput?.value.trim() || this.googleSheetsSpreadsheetId;
+            console.log('spreadsheetId (raw):', spreadsheetId);
+            console.log('this.googleSheetsSpreadsheetId:', this.googleSheetsSpreadsheetId);
 
             if (!spreadsheetId) {
-                toast.error('Please provide a spreadsheet URL or ID');
+                const errorMsg = 'Please provide a spreadsheet URL or ID';
+                console.error('❌', errorMsg);
+                toast.error(errorMsg);
                 return;
             }
 
             // Extract ID from URL if full URL was provided
             const extractedId = this.googleSheetsIntegration.extractSpreadsheetId(spreadsheetId);
             spreadsheetId = extractedId || spreadsheetId;
+            console.log('✓ Final spreadsheetId:', spreadsheetId);
 
             toast.info('Importing from Google Sheets...', { duration: TOAST.LONG_DURATION });
 
+            console.log('Calling importPlayers...');
             const players = await this.googleSheetsIntegration.importPlayers(
                 spreadsheetId,
                 integrationsConfig.googleSheets.defaultSheetName
             );
+            console.log('✓ importPlayers returned:', players.length, 'players');
 
             if (players.length === 0) {
+                console.warn('⚠ No players found in the spreadsheet');
                 toast.warning('No players found in the spreadsheet');
                 return;
             }
 
             // Import players
+            console.log('Adding players to playerService...');
             let imported = 0, skipped = 0;
             players.forEach(playerData => {
                 try {
+                    console.log(`  Adding player: ${playerData.name}, positions:`, playerData.positions);
                     this.playerService.add(playerData.name, playerData.positions);
                     imported++;
                 } catch (error) {
                     skipped++;
-                    console.warn(`Skipped ${playerData.name}:`, error.message);
+                    console.warn(`  ⚠ Skipped ${playerData.name}:`, error.message);
                 }
             });
+            console.log(`✓ Import complete: ${imported} imported, ${skipped} skipped`);
 
             // Save the spreadsheet ID for future use
             this.googleSheetsSpreadsheetId = spreadsheetId;
@@ -541,11 +560,12 @@ class GoogleSheetsSection extends Component {
 
             // Trigger a global refresh of the player list
             // This ensures all components that display players are updated
+            console.log('Reloading page in 500ms...');
             setTimeout(() => {
                 window.location.reload();
             }, 500);
         } catch (error) {
-            console.error('Import failed:', error);
+            console.error('❌ Import failed:', error);
             toast.error('Failed to import: ' + error.message);
         }
     }

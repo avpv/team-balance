@@ -250,30 +250,41 @@ class GoogleSheetsIntegration {
      * @returns {Array} - Array of player objects {name, positions}
      */
     async importPlayers(spreadsheetId, sheetName = 'Players') {
+        console.log('importPlayers called with:', { spreadsheetId, sheetName });
+
         if (!this.checkAuthorization()) {
+            console.log('Not authorized, requesting authorization...');
             await this.authorize();
         }
+        console.log('✓ Authorized');
 
         try {
             // Read data from sheet
             const range = `${sheetName}!A:Z`;
+            console.log('Reading from range:', range);
+
             const response = await window.gapi.client.sheets.spreadsheets.values.get({
                 spreadsheetId: spreadsheetId,
                 range: range,
             });
+            console.log('✓ API response received:', response);
 
             const values = response.result.values;
+            console.log('Values from sheet:', values);
 
             if (!values || values.length === 0) {
+                console.error('❌ No data found in the sheet');
                 throw new Error('No data found in the sheet');
             }
 
             // Parse data
+            console.log('Parsing players from sheet...');
             const players = this.parsePlayersFromSheet(values);
+            console.log('✓ Parsed players:', players);
 
             return players;
         } catch (error) {
-            console.error('Import failed:', error);
+            console.error('❌ Import failed:', error);
             throw new Error(`Failed to import players: ${error.message}`);
         }
     }
