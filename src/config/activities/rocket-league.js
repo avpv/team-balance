@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 3,
     description: 'Rocket League team building and player ranking',
 
     // Position abbreviations and full names

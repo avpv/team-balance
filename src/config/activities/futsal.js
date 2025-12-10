@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'sport',
-    teamSize: 5,
     description: 'Futsal team building and player ranking',
 
     // Position abbreviations and full names

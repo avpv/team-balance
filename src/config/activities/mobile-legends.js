@@ -10,7 +10,6 @@ export default {
 
     // Activity metadata
     activityType: 'esport',
-    teamSize: 5,
     description: 'Mobile Legends: Bang Bang team building and player ranking',
 
     // Position abbreviations and full names
