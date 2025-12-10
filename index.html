@@ -14,17 +14,10 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" sizes="96x96">
     <link rel="apple-touch-icon" href="assets/images/logo.svg" sizes="180x180">
 
-    <!-- Prevent FOUC: Hide content until stylesheets are loaded -->
+    <!-- Minimal inline style for seamless loading -->
     <style>
-        /* Critical inline styles to prevent flash of unstyled content */
         body {
-            margin: 0;
-            padding: 0;
             background-color: #0d1117;
-            visibility: hidden;
-        }
-        body.styles-loaded {
-            visibility: visible;
         }
     </style>
 
@@ -37,26 +30,10 @@
 
     <!-- Preload critical resources -->
     <link rel="modulepreload" href="src/app.js" crossorigin="anonymous">
+    <link rel="modulepreload" href="src/core/PreloadInit.js" crossorigin="anonymous">
 
-    <!-- Wait for stylesheets to load before showing content -->
-    <script>
-        (function() {
-            // Show content once all stylesheets are loaded
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Small delay to ensure styles are applied
-                    requestAnimationFrame(function() {
-                        document.body.classList.add('styles-loaded');
-                    });
-                });
-            } else {
-                // DOM already loaded
-                requestAnimationFrame(function() {
-                    document.body.classList.add('styles-loaded');
-                });
-            }
-        })();
-    </script>
+    <!-- FOUC Prevention - Critical initialization -->
+    <script type="module" src="src/core/PreloadInit.js"></script>
 </head>
 
 <body>
