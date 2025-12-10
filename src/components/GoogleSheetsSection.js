@@ -252,6 +252,9 @@ class GoogleSheetsSection extends Component {
 
         if (googleSheetsConnectBtn) {
             googleSheetsConnectBtn.addEventListener('click', () => this.handleConnect());
+            console.log('✓ Connect button listener attached');
+        } else {
+            console.warn('⚠ Connect button not found - element may not be rendered yet');
         }
 
         if (googleSheetsDisconnectBtn) {
@@ -265,6 +268,31 @@ class GoogleSheetsSection extends Component {
         if (googleSheetsImportBtn) {
             googleSheetsImportBtn.addEventListener('click', () => this.handleImport());
         }
+    }
+
+    /**
+     * Attach modal event listeners with proper timing
+     * Uses requestAnimationFrame to ensure DOM is ready
+     */
+    attachModalEventListenersWithRetry(maxRetries = 5, delay = 0) {
+        const attemptAttach = (retriesLeft) => {
+            requestAnimationFrame(() => {
+                const connectBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN);
+
+                if (connectBtn || retriesLeft === 0) {
+                    // Button found or no retries left - attach all listeners
+                    this.attachModalEventListeners();
+                    return;
+                }
+
+                // Button not found - retry after a short delay
+                if (retriesLeft > 0) {
+                    setTimeout(() => attemptAttach(retriesLeft - 1), 50);
+                }
+            });
+        };
+
+        attemptAttach(maxRetries);
     }
 
     openModal() {
@@ -292,10 +320,8 @@ class GoogleSheetsSection extends Component {
         this.modal.mount();
         this.modal.open();
 
-        // Attach event listeners to modal content
-        setTimeout(() => {
-            this.attachModalEventListeners();
-        }, 100);
+        // Attach event listeners to modal content with retry mechanism
+        this.attachModalEventListenersWithRetry();
     }
 
     /**
@@ -306,23 +332,35 @@ class GoogleSheetsSection extends Component {
             const modalContent = document.querySelector('.modal-content');
             if (modalContent) {
                 modalContent.innerHTML = this.renderModalContent();
-                // Re-attach event listeners
-                setTimeout(() => {
-                    this.attachModalEventListeners();
-                }, 50);
+                // Re-attach event listeners with retry mechanism
+                this.attachModalEventListenersWithRetry();
             }
         }
     }
 
     async handleConnect() {
+        console.log('handleConnect called');
+
         if (!this.googleSheetsIntegration) {
-            toast.error('Google Sheets integration is not initialized');
+            const errorMsg = 'Google Sheets integration is not initialized';
+            console.error(errorMsg);
+            toast.error(errorMsg);
+            return;
+        }
+
+        const currentActivity = this.getCurrentActivity();
+        if (!currentActivity) {
+            const errorMsg = 'Please select an activity first';
+            console.warn(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 
         try {
+            console.log('Requesting Google authorization...');
             toast.info('Connecting to Google Sheets...', { duration: TOAST.MEDIUM_DURATION });
             await this.googleSheetsIntegration.authorize();
+            console.log('Authorization successful');
             toast.success('Successfully connected to Google Sheets!');
             this.updateModalContent();
             this.update();
