@@ -369,8 +369,19 @@ class GoogleSheetsSection extends Component {
             await this.googleSheetsIntegration.authorize();
             console.log('Authorization successful');
             toast.success('Successfully connected to Google Sheets!');
-            this.updateModalContent();
+
+            // Close the connection modal
+            if (this.modal) {
+                this.modal.close();
+            }
+
+            // Update the main component
             this.update();
+
+            // Open the configuration modal after a short delay
+            setTimeout(() => {
+                this.openModal();
+            }, 300);
         } catch (error) {
             console.error('Failed to connect to Google Sheets:', error);
             toast.error('Failed to connect: ' + error.message);
