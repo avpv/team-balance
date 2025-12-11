@@ -1,5 +1,4 @@
 import Component from '../base/Component.js';
-import './ImportMethod.css';
 
 /**
  * File import component - handles CSV and JSON file uploads

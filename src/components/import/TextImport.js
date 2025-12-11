@@ -1,5 +1,4 @@
 import Component from '../base/Component.js';
-import './ImportMethod.css';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
