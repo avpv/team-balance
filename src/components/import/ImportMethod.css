@@ -19,14 +19,14 @@
     align-self: flex-start;
 }
 
-.header-content {
+.import-method-header .header-content {
     display: flex;
     align-items: center;
     padding: var(--spacing-4) 0;
     border-bottom: 2px solid var(--color-border-default);
 }
 
-.header-content h2 {
+.import-method-header .header-content h2 {
     margin: 0;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
