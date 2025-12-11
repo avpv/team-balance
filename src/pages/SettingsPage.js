@@ -17,6 +17,7 @@ import ActivitySelector from '../components/settings/ActivitySelector.js';
 import AddPlayerForm from '../components/settings/AddPlayerForm.js';
 import PositionStats from '../components/settings/PositionStats.js';
 import PlayerList from '../components/settings/PlayerList.js';
+import ImportWizard from '../components/import/ImportWizard.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION } = uiConfig;
 
@@ -546,9 +547,20 @@ class SettingsPage extends BasePage {
             this.importModal.destroy();
         }
 
+        // Create the import wizard with current positions
+        const positions = this.playerService.positions;
+        const positionKeys = Object.keys(positions);
+
+        this.importWizard = new ImportWizard(positionKeys);
+
+        // Set up data change callback
+        this.importWizard.setDataChangeCallback((data) => {
+            this.previewImportData(data);
+        });
+
         this.importModal = new Modal({
             title: 'Import Players',
-            content: this.renderImportModalContent(),
+            content: '<div id="importWizardContainer"></div>',
             showCancel: true,
             showConfirm: true,
             confirmText: 'Import',
@@ -556,6 +568,10 @@ class SettingsPage extends BasePage {
             size: 'large',
             onConfirm: () => this.handleImportConfirm(),
             onClose: () => {
+                if (this.importWizard) {
+                    this.importWizard.unmount();
+                    this.importWizard = null;
+                }
                 this.importModal = null;
             }
         });
@@ -563,155 +579,28 @@ class SettingsPage extends BasePage {
         this.importModal.mount();
         this.importModal.open();
 
+        // Mount the wizard after modal is rendered
         setTimeout(() => {
-            this.attachImportModalListeners();
+            const wizardContainer = document.getElementById('importWizardContainer');
+            if (wizardContainer) {
+                this.importWizard.mount(wizardContainer);
+            }
         }, ANIMATION.SHORT);
     }
 
-    renderImportModalContent() {
-        const currentActivity = storage.get('selectedActivity', null);
-        const activityName = currentActivity ? activities[currentActivity]?.name : 'Unknown';
-        const positions = this.playerService.positions;
-        const positionsList = Object.entries(positions)
-            .map(([key, name]) => `${name} (${key})`)
-            .join(', ');
-
-        // Generate example positions from current activity
-        const positionKeys = Object.keys(positions);
-
-        // Create examples based on number of available positions
-        let csvExample, jsonExample;
-
-        if (positionKeys.length === 0) {
-            // No positions defined - use placeholders
-            csvExample = `name,positions
-"John Smith","POS1"
-"Alice Johnson","POS1"
-"Bob Williams","POS2"`;
-            jsonExample = `[
-  {"name": "John Smith", "positions": ["POS1"]},
-  {"name": "Alice Johnson", "positions": ["POS1"]}
-]`;
-        } else if (positionKeys.length === 1) {
-            // Single position - all players have the same position (no duplicates per player)
-            const pos = positionKeys[0];
-            csvExample = `name,positions
-"John Smith","${pos}"
-"Alice Johnson","${pos}"
-"Bob Williams","${pos}"`;
-            jsonExample = `[
-  {"name": "John Smith", "positions": ["${pos}"]},
-  {"name": "Alice Johnson", "positions": ["${pos}"]}
-]`;
-        } else {
-            // Multiple positions - show variety with unique positions per player
-            const pos1 = positionKeys[0];
-            const pos2 = positionKeys[1];
-            const pos3 = positionKeys[2] || pos1;
-            csvExample = `name,positions
-"John Smith","${pos1},${pos2}"
-"Alice Johnson","${pos2}"
-"Bob Williams","${pos3}"`;
-            jsonExample = `[
-  {"name": "John Smith", "positions": ["${pos1}", "${pos2}"]},
-  {"name": "Alice Johnson", "positions": ["${pos2}"]}
-]`;
-        }
-
-        return `
-            <div class="import-modal-content">
-                <p class="modal-description">
-                    Import players from CSV or JSON format. You can paste data or upload a file.
-                </p>
-
-                <div class="info-box">
-                    <div class="info-title">Current Activity: ${this.escape(activityName)}</div>
-                    <div class="info-text">
-                        Players should have positions for this activity: <strong>${positionsList}</strong>
-                    </div>
-                </div>
-
-                <div class="format-example">
-                    <strong>CSV Format:</strong>
-                    <pre class="code-block">${csvExample}</pre>
-                </div>
-
-                <div class="format-example">
-                    <strong>JSON Format:</strong>
-                    <pre class="code-block">${jsonExample}</pre>
-                </div>
-
-                <div class="form-group">
-                    <label>Upload File (CSV or JSON)</label>
-                    <input
-                        type="file"
-                        id="${ELEMENT_IDS.IMPORT_FILE_INPUT}"
-                        accept=".csv,.json"
-                        class="file-input"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Or Paste Data</label>
-                    <textarea
-                        id="${ELEMENT_IDS.IMPORT_DATA_INPUT}"
-                        rows="8"
-                        placeholder="Paste CSV or JSON data here..."
-                        class="import-textarea"
-                    ></textarea>
-                </div>
-
-                <div id="${ELEMENT_IDS.IMPORT_PREVIEW}"></div>
-            </div>
-        `;
-    }
-
-    attachImportModalListeners() {
-        const fileInput = document.getElementById(ELEMENT_IDS.IMPORT_FILE_INPUT);
-        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
-
-        if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    this.handleFileUpload(file);
-                }
-            });
-        }
-
-        if (dataInput) {
-            dataInput.addEventListener('input', (e) => {
-                this.previewImportData(e.target.value);
-            });
-        }
-    }
-
-    async handleFileUpload(file) {
-        try {
-            const text = await file.text();
-            const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
-            if (dataInput) {
-                dataInput.value = text;
-                this.previewImportData(text);
-            }
-        } catch (error) {
-            toast.error('Failed to read file: ' + error.message);
-        }
-    }
 
     previewImportData(data) {
-        const preview = document.getElementById(ELEMENT_IDS.IMPORT_PREVIEW);
-        if (!preview) return;
+        if (!this.importWizard) return;
 
         try {
             const players = this.parseImportData(data);
 
             if (players.length === 0) {
-                preview.innerHTML = '';
+                this.importWizard.updatePreview('');
                 return;
             }
 
-            preview.innerHTML = `
+            const previewHTML = `
                 <div class="preview-success">
                     <strong>Found ${players.length} player(s)</strong>
                     <div class="preview-list">
@@ -721,12 +610,15 @@ class SettingsPage extends BasePage {
                     </div>
                 </div>
             `;
+
+            this.importWizard.updatePreview(previewHTML);
         } catch (error) {
-            preview.innerHTML = `
+            const errorHTML = `
                 <div class="preview-error">
                     <strong>Error:</strong> ${this.escape(error.message)}
                 </div>
             `;
+            this.importWizard.updatePreview(errorHTML);
         }
     }
 
@@ -768,15 +660,21 @@ class SettingsPage extends BasePage {
         return players;
     }
 
-    handleImportConfirm() {
-        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
-        if (!dataInput || !dataInput.value.trim()) {
-            toast.error('Please provide data to import');
+    async handleImportConfirm() {
+        if (!this.importWizard) {
+            toast.error('Import wizard not initialized');
             return false;
         }
 
         try {
-            const players = this.parseImportData(dataInput.value);
+            const data = await this.importWizard.getData();
+
+            if (!data || !data.trim()) {
+                toast.error('Please provide data to import');
+                return false;
+            }
+
+            const players = this.parseImportData(data);
             if (players.length === 0) {
                 toast.error('No players found');
                 return false;
