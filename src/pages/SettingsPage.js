@@ -572,6 +572,9 @@ class SettingsPage extends BasePage {
                     this.importWizard.unmount();
                     this.importWizard = null;
                 }
+                if (this.importModal) {
+                    this.importModal.destroy();
+                }
                 this.importModal = null;
             }
         });
