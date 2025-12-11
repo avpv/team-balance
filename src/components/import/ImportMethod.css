@@ -28,10 +28,9 @@
 
 .header-content h2 {
     margin: 0;
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    letter-spacing: -0.02em;
 }
 
 /* Content */
