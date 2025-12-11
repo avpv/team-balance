@@ -21,7 +21,6 @@ export default class FileImport extends Component {
         if (this.fileType === 'csv') {
             return {
                 title: 'Upload CSV File',
-                description: 'Select a CSV file with player data',
                 icon: 'table',
                 iconSize: 32,
                 accept: '.csv',
@@ -30,7 +29,6 @@ export default class FileImport extends Component {
         } else {
             return {
                 title: 'Upload JSON File',
-                description: 'Select a JSON file with player data',
                 icon: 'code',
                 iconSize: 32,
                 accept: '.json',
@@ -69,7 +67,6 @@ export default class FileImport extends Component {
                     </button>
                     <div class="header-content">
                         <h2>${config.title}</h2>
-                        <p>${config.description}</p>
                     </div>
                 </div>
 
