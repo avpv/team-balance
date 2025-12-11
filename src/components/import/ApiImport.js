@@ -1,5 +1,4 @@
 import Component from '../base/Component.js';
-import './ImportMethod.css';
 
 /**
  * API import component - allows users to fetch player data from a URL

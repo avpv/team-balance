@@ -1,5 +1,4 @@
 import Component from '../base/Component.js';
-import './ImportDataSourcePicker.css';
 
 /**
  * Data source picker component that displays tiles for different import methods
