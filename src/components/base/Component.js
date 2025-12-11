@@ -65,8 +65,15 @@ class Component {
     /**
      * Mount component
      */
-    mount() {
+    mount(container = null) {
         if (this.isMounted || this.isDestroyed) return;
+
+        // Allow passing container as parameter to mount()
+        if (container) {
+            this.container = typeof container === 'string'
+                ? document.querySelector(container)
+                : container;
+        }
 
         if (!this.container) {
             console.error('Cannot mount: container not found');
@@ -74,15 +81,17 @@ class Component {
         }
 
         this.onCreate();
-        
+
         const html = this.render();
         if (typeof html === 'string') {
             this.container.innerHTML = html;
+            // Store reference to mounted element for child components
+            this.element = this.container.firstElementChild || this.container;
         }
-        
+
         this.isMounted = true;
         this.onMount();
-        
+
         return this;
     }
 
