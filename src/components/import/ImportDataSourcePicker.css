@@ -1,27 +1,27 @@
-/* Import Data Source Picker Styles */
+/* Import Data Source Picker Styles - Dark Theme */
 
 .import-data-source-picker {
-    padding: 20px;
+    padding: var(--spacing-8);
     max-width: 800px;
     margin: 0 auto;
 }
 
 .picker-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--spacing-8);
 }
 
 .picker-header h2 {
-    margin: 0 0 10px 0;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-primary, #333);
+    margin: 0 0 var(--spacing-3) 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
 }
 
 .picker-header p {
     margin: 0;
-    font-size: 14px;
-    color: var(--text-secondary, #666);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
 }
 
 /* Data Sources Grid */
@@ -29,8 +29,8 @@
 .data-sources-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
 }
 
 /* Data Source Tile */
@@ -38,13 +38,13 @@
 .data-source-tile {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
-    background: white;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: var(--transition-default);
     text-align: left;
     width: 100%;
     position: relative;
@@ -56,17 +56,17 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 3px;
     height: 100%;
-    background: var(--tile-color);
+    background: var(--color-brand-primary);
     transform: scaleY(0);
-    transition: transform 0.2s ease;
+    transition: transform var(--duration-default) var(--ease-smooth);
 }
 
 .data-source-tile:hover {
-    border-color: var(--tile-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    background: var(--color-surface-overlay);
+    border-color: var(--color-border-emphasis);
+    box-shadow: var(--shadow-md);
 }
 
 .data-source-tile:hover::before {
@@ -75,22 +75,25 @@
 
 .data-source-tile:active {
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Tile Icon */
 
 .tile-icon {
-    font-size: 32px;
-    line-height: 1;
     flex-shrink: 0;
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.04);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+}
+
+.tile-icon svg {
+    width: 24px;
+    height: 24px;
 }
 
 /* Tile Content */
@@ -101,33 +104,41 @@
 }
 
 .tile-title {
-    margin: 0 0 4px 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary, #333);
+    margin: 0 0 var(--spacing-1) 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
 }
 
 .tile-description {
     margin: 0;
-    font-size: 13px;
-    color: var(--text-secondary, #666);
-    line-height: 1.4;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-normal);
 }
 
 /* Tile Arrow */
 
 .tile-arrow {
-    font-size: 20px;
-    color: var(--tile-color);
     flex-shrink: 0;
+    color: var(--color-text-secondary);
     opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
+    transform: translateX(-8px);
+    transition: all var(--duration-default) var(--ease-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-arrow svg {
+    width: 20px;
+    height: 20px;
 }
 
 .data-source-tile:hover .tile-arrow {
     opacity: 1;
     transform: translateX(0);
+    color: var(--color-brand-primary);
 }
 
 /* Responsive Design */
@@ -138,53 +149,24 @@
     }
 
     .data-source-tile {
-        padding: 16px;
+        padding: var(--spacing-4);
     }
 
     .tile-icon {
-        font-size: 28px;
         width: 40px;
         height: 40px;
     }
 
-    .tile-title {
-        font-size: 15px;
-    }
-
-    .tile-description {
-        font-size: 12px;
-    }
-}
-
-/* Dark mode support */
-
-@media (prefers-color-scheme: dark) {
-    .data-source-tile {
-        background: #2a2a2a;
-        border-color: #404040;
-    }
-
-    .data-source-tile:hover {
-        background: #333;
-    }
-
-    .tile-icon {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .picker-header h2 {
-        color: #fff;
-    }
-
-    .picker-header p {
-        color: #aaa;
+    .tile-icon svg {
+        width: 20px;
+        height: 20px;
     }
 
     .tile-title {
-        color: #fff;
+        font-size: var(--font-size-sm);
     }
 
     .tile-description {
-        color: #aaa;
+        font-size: var(--font-size-xs);
     }
 }
