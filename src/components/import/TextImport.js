@@ -40,7 +40,6 @@ export default class TextImport extends Component {
                     </button>
                     <div class="header-content">
                         <h2>Paste or Type Player Data</h2>
-                        <p>Enter player data in CSV or JSON format</p>
                     </div>
                 </div>
 

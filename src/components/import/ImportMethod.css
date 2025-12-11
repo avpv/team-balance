@@ -9,24 +9,29 @@
 /* Header */
 
 .import-method-header {
-    margin-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
 }
 
 .back-button {
-    margin-bottom: var(--spacing-4);
+    align-self: flex-start;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-4) 0;
+    border-bottom: 2px solid var(--color-border-default);
 }
 
 .header-content h2 {
-    margin: 0 0 var(--spacing-2) 0;
-    font-size: var(--font-size-xl);
+    margin: 0;
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-}
-
-.header-content p {
-    margin: 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    letter-spacing: -0.02em;
 }
 
 /* Content */

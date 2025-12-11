@@ -41,7 +41,6 @@ export default class ApiImport extends Component {
                     </button>
                     <div class="header-content">
                         <h2>Fetch from URL</h2>
-                        <p>Enter a URL to fetch player data in JSON format</p>
                     </div>
                 </div>
 
