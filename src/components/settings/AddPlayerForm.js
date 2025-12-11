@@ -4,7 +4,6 @@ import toast from '../base/Toast.js';
 import uiConfig from '../../config/ui.js';
 import { STORAGE_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
-import GoogleSheetsSection from '../GoogleSheetsSection.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ICON_SIZES, MESSAGES } = uiConfig;
 
@@ -15,8 +14,6 @@ class AddPlayerForm extends BaseComponent {
         this.onImportClick = props.onImportClick;
         this.onResetAllClick = props.onResetAllClick;
         this.onClearAllClick = props.onClearAllClick;
-
-        this.googleSheetsSection = null;
     }
 
     render() {
@@ -58,9 +55,6 @@ class AddPlayerForm extends BaseComponent {
                             </p>
                         </div>
                     </div>
-
-                    <!-- Google Sheets Integration Section (mounted separately) -->
-                    <div id="${ELEMENT_IDS.GOOGLE_SHEETS_SECTION}"></div>
 
                     <!-- Manual Add Players Section -->
                     <div class="player-section manual-add-section">
@@ -172,8 +166,6 @@ class AddPlayerForm extends BaseComponent {
     }
 
     onMount() {
-        this.mountGoogleSheetsSection();
-
         // Accordion toggle
         const accordionHeader = this.container.querySelector(`#${ELEMENT_IDS.ADD_PLAYER_ACCORDION_HEADER}`);
         if (accordionHeader) {
@@ -238,38 +230,11 @@ class AddPlayerForm extends BaseComponent {
     }
 
     onUpdate() {
-        this.mountGoogleSheetsSection();
+        // Component update logic
     }
 
     onDestroy() {
-        if (this.googleSheetsSection) {
-            this.googleSheetsSection.destroy();
-            this.googleSheetsSection = null;
-        }
-    }
-
-    mountGoogleSheetsSection() {
-        const googleSheetsContainer = this.container.querySelector(`#${ELEMENT_IDS.GOOGLE_SHEETS_SECTION}`);
-        if (!googleSheetsContainer) return;
-
-        // Check if component already exists and is properly mounted
-        if (this.googleSheetsSection && googleSheetsContainer.children.length > 0) {
-            // Component is already mounted, just update it
-            this.googleSheetsSection.update();
-            return;
-        }
-
-        // Destroy old component if it exists but is not mounted
-        if (this.googleSheetsSection) {
-            this.googleSheetsSection.destroy();
-        }
-
-        // Create new Google Sheets section component
-        this.googleSheetsSection = new GoogleSheetsSection(googleSheetsContainer, {
-            playerService: this.playerService
-        });
-
-        this.googleSheetsSection.mount();
+        // Cleanup logic
     }
 
     handleAddPlayer() {
