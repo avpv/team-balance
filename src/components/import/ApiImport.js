@@ -1,4 +1,5 @@
 import Component from '../base/Component.js';
+import { getIcon } from '../base/Icons.js';
 
 /**
  * API import component - allows users to fetch player data from a URL
@@ -34,11 +35,12 @@ export default class ApiImport extends Component {
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="back-button" data-action="back">
-                        ← Back
+                    <button class="btn btn-secondary back-button" data-action="back">
+                        ${getIcon('arrow-left', { size: 16 })}
+                        Back
                     </button>
                     <div class="header-content">
-                        <h2>🌐 Fetch from URL</h2>
+                        <h2>Fetch from URL</h2>
                         <p>Enter a URL to fetch player data in JSON format</p>
                     </div>
                 </div>
@@ -57,7 +59,7 @@ export default class ApiImport extends Component {
                                 placeholder="https://example.com/api/players.json"
                             />
                             <button
-                                class="fetch-button"
+                                class="btn btn-primary fetch-button"
                                 data-action="fetch"
                                 ${this.isLoading ? 'disabled' : ''}
                             >
@@ -72,13 +74,16 @@ export default class ApiImport extends Component {
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>Response Example</strong>
-                                <button class="copy-button" data-copy="json">Copy</button>
+                                <button class="btn btn-sm copy-button" data-copy="json">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
                             </div>
                             <pre class="code-block">${this.getExampleJSON()}</pre>
                         </div>
 
                         <div class="info-box">
-                            <h4>ℹ️ Notes</h4>
+                            <h4>${getIcon('info', { size: 18 })} Notes</h4>
                             <ul>
                                 <li>The URL must return JSON data</li>
                                 <li>Response should be an array of player objects</li>

@@ -1,4 +1,5 @@
 import Component from '../base/Component.js';
+import { getIcon } from '../base/Icons.js';
 
 /**
  * File import component - handles CSV and JSON file uploads
@@ -19,17 +20,19 @@ export default class FileImport extends Component {
     getConfig() {
         if (this.fileType === 'csv') {
             return {
-                title: '📊 Upload CSV File',
+                title: 'Upload CSV File',
                 description: 'Select a CSV file with player data',
-                icon: '📊',
+                icon: 'table',
+                iconSize: 32,
                 accept: '.csv',
                 example: this.getExampleCSV()
             };
         } else {
             return {
-                title: '{ } Upload JSON File',
+                title: 'Upload JSON File',
                 description: 'Select a JSON file with player data',
-                icon: '{ }',
+                icon: 'code',
+                iconSize: 32,
                 accept: '.json',
                 example: this.getExampleJSON()
             };
@@ -60,8 +63,9 @@ export default class FileImport extends Component {
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="back-button" data-action="back">
-                        ← Back
+                    <button class="btn btn-secondary back-button" data-action="back">
+                        ${getIcon('arrow-left', { size: 16 })}
+                        Back
                     </button>
                     <div class="header-content">
                         <h2>${config.title}</h2>
@@ -78,7 +82,9 @@ export default class FileImport extends Component {
                                 accept="${config.accept}"
                                 style="display: none;"
                             />
-                            <div class="upload-icon">${config.icon}</div>
+                            <div class="upload-icon">
+                                ${getIcon(config.icon, { size: config.iconSize })}
+                            </div>
                             <div class="upload-text">
                                 ${this.selectedFile
                                     ? `<strong>${this.selectedFile.name}</strong><br><span class="file-size">${this.formatFileSize(this.selectedFile.size)}</span>`
@@ -86,8 +92,8 @@ export default class FileImport extends Component {
                                 }
                             </div>
                             ${this.selectedFile
-                                ? '<button class="change-file-button" data-action="change-file">Change File</button>'
-                                : '<button class="browse-button">Browse Files</button>'
+                                ? `<button class="btn btn-secondary change-file-button" data-action="change-file">Change File</button>`
+                                : `<button class="btn btn-primary browse-button">Browse Files</button>`
                             }
                         </div>
                     </div>
@@ -97,7 +103,10 @@ export default class FileImport extends Component {
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>${this.fileType.toUpperCase()} Example</strong>
-                                <button class="copy-button" data-copy="example">Copy</button>
+                                <button class="btn btn-sm copy-button" data-copy="example">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
                             </div>
                             <pre class="code-block">${config.example}</pre>
                         </div>

@@ -1,4 +1,5 @@
 import Component from '../base/Component.js';
+import { getIcon } from '../base/Icons.js';
 
 /**
  * Data source picker component that displays tiles for different import methods
@@ -19,29 +20,29 @@ export default class ImportDataSourcePicker extends Component {
                 id: 'text',
                 title: 'Text / Paste',
                 description: 'Paste or type player data directly',
-                icon: '📝',
-                color: '#4CAF50'
+                icon: 'file-text',
+                iconColor: 'var(--color-info-text)'
             },
             {
                 id: 'csv',
                 title: 'CSV File',
                 description: 'Upload a CSV file with player data',
-                icon: '📊',
-                color: '#2196F3'
+                icon: 'table',
+                iconColor: 'var(--color-brand-primary)'
             },
             {
                 id: 'json',
                 title: 'JSON File',
                 description: 'Upload a JSON file with player data',
-                icon: '{ }',
-                color: '#FF9800'
+                icon: 'code',
+                iconColor: 'var(--color-brand-secondary)'
             },
             {
                 id: 'api',
                 title: 'From URL',
                 description: 'Fetch player data from a URL (JSON)',
-                icon: '🌐',
-                color: '#9C27B0'
+                icon: 'globe',
+                iconColor: 'var(--color-brand-primary)'
             }
         ];
     }
@@ -63,14 +64,17 @@ export default class ImportDataSourcePicker extends Component {
             <button
                 class="data-source-tile"
                 data-source="${source.id}"
-                style="--tile-color: ${source.color}"
             >
-                <div class="tile-icon">${source.icon}</div>
+                <div class="tile-icon">
+                    ${getIcon(source.icon, { size: 24, color: source.iconColor })}
+                </div>
                 <div class="tile-content">
                     <h3 class="tile-title">${source.title}</h3>
                     <p class="tile-description">${source.description}</p>
                 </div>
-                <div class="tile-arrow">→</div>
+                <div class="tile-arrow">
+                    ${getIcon('arrow-right', { size: 20 })}
+                </div>
             </button>
         `;
     }
@@ -81,7 +85,7 @@ export default class ImportDataSourcePicker extends Component {
         return `
             <div class="import-data-source-picker">
                 <div class="picker-header">
-                    <h2>Get Player Data</h2>
+                    <h2>Import Player Data</h2>
                     <p>Choose how you want to import players</p>
                 </div>
                 <div class="data-sources-grid">

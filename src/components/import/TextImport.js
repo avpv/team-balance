@@ -1,4 +1,5 @@
 import Component from '../base/Component.js';
+import { getIcon } from '../base/Icons.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
@@ -33,11 +34,12 @@ export default class TextImport extends Component {
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="back-button" data-action="back">
-                        ← Back
+                    <button class="btn btn-secondary back-button" data-action="back">
+                        ${getIcon('arrow-left', { size: 16 })}
+                        Back
                     </button>
                     <div class="header-content">
-                        <h2>📝 Paste or Type Player Data</h2>
+                        <h2>Paste or Type Player Data</h2>
                         <p>Enter player data in CSV or JSON format</p>
                     </div>
                 </div>
@@ -62,7 +64,10 @@ export default class TextImport extends Component {
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>CSV Format</strong>
-                                <button class="copy-button" data-copy="csv">Copy</button>
+                                <button class="btn btn-sm copy-button" data-copy="csv">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
                             </div>
                             <pre class="code-block">${this.getExampleCSV()}</pre>
                         </div>
@@ -70,7 +75,10 @@ export default class TextImport extends Component {
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>JSON Format</strong>
-                                <button class="copy-button" data-copy="json">Copy</button>
+                                <button class="btn btn-sm copy-button" data-copy="json">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
                             </div>
                             <pre class="code-block">${this.getExampleJSON()}</pre>
                         </div>
