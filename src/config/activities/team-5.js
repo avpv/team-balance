@@ -9,35 +9,35 @@
 export default {
     name: 'Team 5',
 
-    // Position abbreviations and full names
+    // Grade abbreviations and full names
     positions: {
-        'P1': 'Player 1',
-        'P2': 'Player 2',
-        'P3': 'Player 3',
-        'P4': 'Player 4',
-        'P5': 'Player 5'
+        'G1': 'Grade 1',
+        'G2': 'Grade 2',
+        'G3': 'Grade 3',
+        'G4': 'Grade 4',
+        'G5': 'Grade 5'
     },
 
-    // Position weights for team balancing
-    // Equal weight for all players
+    // Grade weights for team balancing
+    // Equal weight for all grades
     positionWeights: {
-        'P1': 1.0,  // Neutral weight - all players equal
-        'P2': 1.0,  // Neutral weight - all players equal
-        'P3': 1.0,  // Neutral weight - all players equal
-        'P4': 1.0,  // Neutral weight - all players equal
-        'P5': 1.0   // Neutral weight - all players equal
+        'G1': 1.0,  // Neutral weight - all grades equal
+        'G2': 1.0,  // Neutral weight - all grades equal
+        'G3': 1.0,  // Neutral weight - all grades equal
+        'G4': 1.0,  // Neutral weight - all grades equal
+        'G5': 1.0   // Neutral weight - all grades equal
     },
 
-    // Order in which positions should be displayed
-    positionOrder: ['P1', 'P2', 'P3', 'P4', 'P5'],
+    // Order in which grades should be displayed
+    positionOrder: ['G1', 'G2', 'G3', 'G4', 'G5'],
 
     // Default team composition
     defaultComposition: {
-        'P1': 1,  // 1 player in Position 1
-        'P2': 1,  // 1 player in Position 2
-        'P3': 1,  // 1 player in Position 3
-        'P4': 1,  // 1 player in Position 4
-        'P5': 1   // 1 player in Position 5
+        'G1': 1,  // 1 player in Grade 1
+        'G2': 1,  // 1 player in Grade 2
+        'G3': 1,  // 1 player in Grade 3
+        'G4': 1,  // 1 player in Grade 4
+        'G5': 1   // 1 player in Grade 5
     }
     // Total team size: 5 players
 };
