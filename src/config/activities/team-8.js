@@ -1,13 +1,13 @@
-// src/config/activities/team-7-8.js
-// Universal team configuration for 7-8 player teams
+// src/config/activities/team-8.js
+// Universal team configuration for 8-player teams
 
 /**
- * Team 7-8 - Universal configuration for 7-8 player teams
- * Simple configuration for generic team balancing with 7-8 players per team
- * Ideal for larger teams or any 7-8 player team activities
+ * Team 8 - Universal configuration for 8-player teams
+ * Simple configuration for generic team balancing with 8 players per team
+ * Ideal for octets, 8-person teams, or any 8-player team activities
  */
 export default {
-    name: 'Team 7-8',
+    name: 'Team 8',
 
     // Grade abbreviations and full names
     positions: {
