@@ -705,6 +705,8 @@ class SettingsPage extends BasePage {
         }
 
         try {
+            // Cache the delimiter before any async operations
+            const delimiter = this.importWizard.getDelimiter();
             const data = await this.importWizard.getData();
 
             if (!data || !data.trim()) {
@@ -712,8 +714,7 @@ class SettingsPage extends BasePage {
                 return false;
             }
 
-            // Get delimiter from import wizard
-            const delimiter = this.importWizard.getDelimiter();
+            // Use cached delimiter value
             const players = this.parseImportData(data, delimiter);
             if (players.length === 0) {
                 toast.error('No players found');
