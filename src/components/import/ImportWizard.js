@@ -68,6 +68,10 @@ export default class ImportWizard extends Component {
      * Get current delimiter
      */
     getDelimiter() {
+        // Get delimiter from current component if available
+        if (this.currentComponent && typeof this.currentComponent.getDelimiter === 'function') {
+            return this.currentComponent.getDelimiter();
+        }
         return this.currentDelimiter;
     }
 
@@ -104,7 +108,7 @@ export default class ImportWizard extends Component {
             case 'csv':
                 component = new FileImport(
                     'csv',
-                    (data) => this.handleDataChange(data),
+                    (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
                     this.positions
                 );
