@@ -18,7 +18,6 @@ export default class TextImport extends Component {
      */
     getExampleCSV(delimiter = ',') {
         const pos = this.positions.length > 0 ? this.positions : ['Position1', 'Position2'];
-        const delimiterDisplay = delimiter === '\t' ? '\\t' : delimiter;
         const actualDelim = delimiter;
 
         if (delimiter === ',') {
@@ -31,6 +30,16 @@ export default class TextImport extends Component {
 John Smith${actualDelim}${pos[0]},${pos[1] || pos[0]}
 Alice Johnson${actualDelim}${pos[0]}`;
         }
+    }
+
+    /**
+     * Generate example for names-only format
+     */
+    getExampleNamesOnly() {
+        return `name
+John Smith
+Alice Johnson
+Bob Williams`;
     }
 
     getExampleJSON() {
@@ -84,13 +93,25 @@ Alice Johnson${actualDelim}${pos[0]}`;
 
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>CSV Format</strong>
+                                <strong>CSV with Positions</strong>
                                 <button class="btn btn-sm copy-button" data-copy="csv">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>
                             </div>
                             <pre class="code-block" id="csvExample">${this.getExampleCSV(this.delimiter)}</pre>
+                        </div>
+
+                        <div class="example-block">
+                            <div class="example-header">
+                                <strong>Names Only</strong>
+                                <button class="btn btn-sm copy-button" data-copy="names">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
+                            </div>
+                            <pre class="code-block">${this.getExampleNamesOnly()}</pre>
+                            <p class="format-note">You can select a default position after pasting</p>
                         </div>
 
                         <div class="example-block">
@@ -148,7 +169,18 @@ Alice Johnson${actualDelim}${pos[0]}`;
      * Handle copy button click
      */
     handleCopy(format) {
-        const text = format === 'csv' ? this.getExampleCSV(this.delimiter) : this.getExampleJSON();
+        let text;
+        switch (format) {
+            case 'csv':
+                text = this.getExampleCSV(this.delimiter);
+                break;
+            case 'names':
+                text = this.getExampleNamesOnly();
+                break;
+            case 'json':
+            default:
+                text = this.getExampleJSON();
+        }
 
         navigator.clipboard.writeText(text).then(() => {
             // Show success feedback

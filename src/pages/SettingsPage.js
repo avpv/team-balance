@@ -603,18 +603,67 @@ class SettingsPage extends BasePage {
                 return;
             }
 
+            // Check if any players are missing positions
+            const hasMissingPositions = players.some(p => p._missingPositions);
+            const positions = this.playerService.positions;
+            const positionKeys = Object.keys(positions);
+
+            // Build position selector if needed
+            let positionSelectorHTML = '';
+            if (hasMissingPositions && positionKeys.length > 0) {
+                const defaultPos = this.defaultImportPosition || positionKeys[0];
+                positionSelectorHTML = `
+                    <div class="default-position-selector">
+                        <label for="defaultPositionSelect">
+                            <strong>Default Position</strong>
+                            <span class="hint">Assign to players without positions</span>
+                        </label>
+                        <select id="defaultPositionSelect" class="form-select">
+                            ${positionKeys.map(key => `
+                                <option value="${key}" ${key === defaultPos ? 'selected' : ''}>
+                                    ${positions[key]}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            // Get display positions for each player
+            const getDisplayPositions = (player) => {
+                if (player._missingPositions) {
+                    const defaultPos = this.defaultImportPosition || positionKeys[0];
+                    return `<span class="default-position">${positions[defaultPos] || defaultPos}</span>`;
+                }
+                return player.positions.join(', ');
+            };
+
             const previewHTML = `
                 <div class="preview-success">
                     <strong>Found ${players.length} player(s)</strong>
+                    ${positionSelectorHTML}
                     <div class="preview-list">
                         ${players.map(p => `
-                            <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
+                            <div class="preview-item">• ${this.escape(p.name)} - ${getDisplayPositions(p)}</div>
                         `).join('')}
                     </div>
                 </div>
             `;
 
             this.importWizard.updatePreview(previewHTML);
+
+            // Attach event listener for position selector
+            if (hasMissingPositions) {
+                setTimeout(() => {
+                    const select = document.getElementById('defaultPositionSelect');
+                    if (select) {
+                        select.addEventListener('change', (e) => {
+                            this.defaultImportPosition = e.target.value;
+                            this.previewImportData(data, delimiter);
+                        });
+                    }
+                }, 0);
+            }
         } catch (error) {
             const errorHTML = `
                 <div class="preview-error">
@@ -647,23 +696,33 @@ class SettingsPage extends BasePage {
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
         if (lines.length < 2) throw new Error('CSV must have header and data rows');
 
+        const headerLine = lines[0];
+        const headerParts = this.parseCSVLineSimple(headerLine, delimiter);
+        const hasPositionsColumn = headerParts.length >= 2 &&
+            headerParts[1].toLowerCase().includes('position');
+
         const dataLines = lines.slice(1);
         const players = [];
-
-        // Escape special regex characters in delimiter
-        const delimiterEscaped = delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
         for (const line of dataLines) {
             // Split by delimiter, handling quotes
             const parts = this.parseCSVLineSimple(line, delimiter);
 
-            if (parts.length < 2) {
-                throw new Error(`Invalid CSV line: ${line}`);
+            if (parts.length < 1 || !parts[0].trim()) {
+                continue; // Skip empty lines
+            }
+
+            const name = parts[0].trim();
+            let positions = [];
+
+            if (hasPositionsColumn && parts.length >= 2) {
+                positions = parts[1].split(',').map(p => p.trim()).filter(p => p);
             }
 
             players.push({
-                name: parts[0].trim(),
-                positions: parts[1].split(',').map(p => p.trim()).filter(p => p)
+                name: name,
+                positions: positions,
+                _missingPositions: positions.length === 0
             });
         }
 
@@ -721,16 +780,27 @@ class SettingsPage extends BasePage {
                 return false;
             }
 
+            // Get default position for players without positions
+            const positionKeys = Object.keys(this.playerService.positions);
+            const defaultPosition = this.defaultImportPosition || positionKeys[0];
+
             let imported = 0, skipped = 0;
             players.forEach(playerData => {
                 try {
-                    this.playerService.add(playerData.name, playerData.positions);
+                    // Apply default position if player has no positions
+                    const positions = playerData._missingPositions
+                        ? [defaultPosition]
+                        : playerData.positions;
+                    this.playerService.add(playerData.name, positions);
                     imported++;
                 } catch (error) {
                     skipped++;
                     // Player skipped due to error
                 }
             });
+
+            // Clear default position after import
+            this.defaultImportPosition = null;
 
             toast.success(`Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`);
             return true;

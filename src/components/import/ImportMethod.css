@@ -505,6 +505,37 @@ textarea.auth-input {
     font-family: var(--font-family-mono);
 }
 
+/* Default Position Selector - for importing players without positions */
+.default-position-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    margin: var(--spacing-3) 0;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-md);
+}
+
+.default-position-selector label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+}
+
+.default-position-selector .hint {
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-xs);
+}
+
+.default-position {
+    color: var(--color-warning-text);
+    font-style: italic;
+}
+
 .preview-error {
     padding: var(--spacing-4);
     background: var(--color-error-light);
