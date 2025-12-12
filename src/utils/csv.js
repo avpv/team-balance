@@ -7,48 +7,48 @@
 /**
  * Parse CSV string to array of objects
  */
-export function parseCSV(csvString) {
+export function parseCSV(csvString, delimiter = ',') {
     const lines = csvString.trim().split('\n');
-    
+
     if (lines.length < 2) {
         throw new Error('CSV must contain header and data rows');
     }
-    
+
     // Parse header
-    const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
-    
+    const headers = parseCSVLine(lines[0], delimiter).map(h => h.trim().toLowerCase());
+
     // Parse data rows
     const data = [];
-    
+
     for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
-        
-        const values = parseCSVLine(line);
+
+        const values = parseCSVLine(line, delimiter);
         const row = {};
-        
+
         headers.forEach((header, index) => {
             row[header] = values[index] ? values[index].trim() : '';
         });
-        
+
         data.push(row);
     }
-    
+
     return data;
 }
 
 /**
  * Parse single CSV line handling quotes
  */
-export function parseCSVLine(line) {
+export function parseCSVLine(line, delimiter = ',') {
     const values = [];
     let current = '';
     let inQuotes = false;
-    
+
     for (let i = 0; i < line.length; i++) {
         const char = line[i];
         const nextChar = line[i + 1];
-        
+
         if (char === '"') {
             if (inQuotes && nextChar === '"') {
                 current += '"';
@@ -56,14 +56,14 @@ export function parseCSVLine(line) {
             } else {
                 inQuotes = !inQuotes;
             }
-        } else if (char === ',' && !inQuotes) {
+        } else if (char === delimiter && !inQuotes) {
             values.push(current);
             current = '';
         } else {
             current += char;
         }
     }
-    
+
     values.push(current);
     return values.map(v => v.replace(/^"|"$/g, ''));
 }
@@ -140,24 +140,24 @@ export function detectDelimiter(csvString) {
 /**
  * Validate CSV structure
  */
-export function validateCSV(csvString) {
+export function validateCSV(csvString, delimiter = ',') {
     try {
         const lines = csvString.trim().split('\n');
-        
+
         if (lines.length < 2) {
             return {
                 isValid: false,
                 error: 'CSV must have at least header and one data row'
             };
         }
-        
-        const headerCount = parseCSVLine(lines[0]).length;
-        
+
+        const headerCount = parseCSVLine(lines[0], delimiter).length;
+
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
-            
-            const valueCount = parseCSVLine(line).length;
+
+            const valueCount = parseCSVLine(line, delimiter).length;
             if (valueCount !== headerCount) {
                 return {
                     isValid: false,
@@ -165,7 +165,7 @@ export function validateCSV(csvString) {
                 };
             }
         }
-        
+
         return { isValid: true };
     } catch (error) {
         return {
