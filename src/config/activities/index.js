@@ -62,7 +62,9 @@ const ACTIVITY_FILES = {
     team3: 'team-3.js',
     team4: 'team-4.js',
     team5: 'team-5.js',
-    team6: 'team-6.js'
+    team6: 'team-6.js',
+    team7: 'team-7.js',
+    team8: 'team-8.js'
 };
 
 /**
