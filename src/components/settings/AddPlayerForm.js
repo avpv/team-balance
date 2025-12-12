@@ -4,6 +4,7 @@ import toast from '../base/Toast.js';
 import uiConfig from '../../config/ui.js';
 import { STORAGE_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
+import { trackClick, trackEvent } from '../../config/analytics.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ICON_SIZES, MESSAGES } = uiConfig;
 
@@ -187,7 +188,10 @@ class AddPlayerForm extends BaseComponent {
         // Import button
         const importBtn = this.container.querySelector(`#${ELEMENT_IDS.IMPORT_BTN}`);
         if (importBtn && this.onImportClick) {
-            importBtn.addEventListener('click', () => this.onImportClick());
+            importBtn.addEventListener('click', () => {
+                trackClick('importBtn', 'settings', 'import_players');
+                this.onImportClick();
+            });
         }
 
         // Reset/Clear buttons
@@ -195,11 +199,17 @@ class AddPlayerForm extends BaseComponent {
         const clearAllBtn = this.container.querySelector(`#${ELEMENT_IDS.CLEAR_ALL_BTN}`);
 
         if (resetAllBtn && this.onResetAllClick) {
-            resetAllBtn.addEventListener('click', () => this.onResetAllClick());
+            resetAllBtn.addEventListener('click', () => {
+                trackClick('resetAllBtn', 'settings', 'reset_all_ratings');
+                this.onResetAllClick();
+            });
         }
 
         if (clearAllBtn && this.onClearAllClick) {
-            clearAllBtn.addEventListener('click', () => this.onClearAllClick());
+            clearAllBtn.addEventListener('click', () => {
+                trackClick('clearAllBtn', 'settings', 'clear_all_players');
+                this.onClearAllClick();
+            });
         }
 
         // Select All Checkbox Logic
@@ -252,6 +262,12 @@ class AddPlayerForm extends BaseComponent {
 
         try {
             this.playerService.add(name, positions);
+
+            // Track player addition
+            trackEvent('player_added', {
+                event_category: 'settings',
+                position_count: positions.length
+            });
 
             // Reset form
             nameInput.value = '';

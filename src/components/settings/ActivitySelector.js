@@ -6,6 +6,7 @@ import { activities } from '../../config/activities/index.js';
 import uiConfig from '../../config/ui.js';
 import { STORAGE_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
+import { trackEvent } from '../../config/analytics.js';
 
 const { ELEMENT_IDS, ANIMATION, TOAST } = uiConfig;
 
@@ -160,6 +161,13 @@ class ActivitySelector extends BaseComponent {
             return;
         }
 
+        // Track activity selection
+        trackEvent('activity_selected', {
+            event_category: 'settings',
+            activity: activityKey,
+            activity_name: selectedActivity.name
+        });
+
         // Store pending activity selection
         storage.set(STORAGE_KEYS.PENDING_ACTIVITY, activityKey);
 
@@ -218,6 +226,13 @@ class ActivitySelector extends BaseComponent {
             // Same activity, just create a new session
             const newSession = this.sessionService.createSession(currentActivity);
             storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+
+            // Track session creation
+            trackEvent('session_created', {
+                event_category: 'settings',
+                activity: currentActivity
+            });
+
             toast.success('New session created');
             // Page will auto-update via event bus
         } catch (error) {

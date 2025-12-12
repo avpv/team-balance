@@ -11,6 +11,7 @@ import Sidebar from '../components/Sidebar.js';
 import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
+import { trackClick, trackEvent } from '../config/analytics.js';
 
 const { ELEMENT_IDS, ICON_SIZES, MESSAGES } = uiConfig;
 
@@ -562,13 +563,17 @@ class TeamsPage extends BasePage {
         // Optimize button
         const optimizeBtn = this.$('#optimizeBtn');
         if (optimizeBtn) {
-            optimizeBtn.addEventListener('click', () => this.handleOptimize());
+            optimizeBtn.addEventListener('click', () => {
+                trackClick('optimizeBtn', 'teams', 'generate_teams');
+                this.handleOptimize();
+            });
         }
 
         // Show ELO toggle
         const showEloToggle = this.$('#showEloToggle');
         if (showEloToggle) {
             showEloToggle.addEventListener('change', (e) => {
+                trackClick('showEloToggle', 'teams', e.target.checked ? 'show_elo' : 'hide_elo');
                 this.setState({ showEloRatings: e.target.checked });
 
                 // Save settings to localStorage
@@ -579,7 +584,10 @@ class TeamsPage extends BasePage {
         // Export button
         const exportBtn = this.$('#exportTeamsBtn');
         if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.handleExport());
+            exportBtn.addEventListener('click', () => {
+                trackClick('exportTeamsBtn', 'teams', 'export_teams');
+                this.handleExport();
+            });
         }
     }
 
@@ -637,6 +645,14 @@ class TeamsPage extends BasePage {
 
                 // Save teams to active session
                 this.saveTeams(result);
+
+                // Track successful team generation
+                trackEvent('teams_generated', {
+                    event_category: 'teams',
+                    team_count: teamCount,
+                    player_count: players.length,
+                    balance_quality: weightedBalance
+                });
 
                 toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
             } finally {

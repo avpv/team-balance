@@ -36,6 +36,7 @@ import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
 import { STORAGE_KEYS } from './utils/constants.js';
 import AppInitializer from './core/AppInitializer.js';
+import { trackClick } from './config/analytics.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -348,6 +349,10 @@ class Application {
             link.addEventListener('click', (e) => {
                 const route = link.getAttribute(DATA_ATTRIBUTES.ROUTE);
                 const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+
+                // Track navigation click
+                const pageName = link.textContent.trim().toLowerCase();
+                trackClick(`nav_${pageName}`, 'navigation', route);
 
                 // Prevent navigation if no activity selected and route is disabled
                 if (!currentActivity && disabledRoutes.includes(route)) {
