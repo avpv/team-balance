@@ -10,30 +10,30 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'HAND': 'Handler',
-        'CUT': 'Cutter',
-        'DEEP': 'Deep',
-        'MID': 'Mid'
+        'H': 'Handler',
+        'C': 'Cutter',
+        'D': 'Deep',
+        'M': 'Mid'
     },
 
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'HAND': 1.0,  // Handler - primary thrower
-        'CUT': 1.0,    // Cutter
-        'DEEP': 1.0,  // Deep
-        'MID': 1.0    // Mid
+        'H': 1.0,  // Handler - primary thrower
+        'C': 1.0,    // Cutter
+        'D': 1.0,  // Deep
+        'M': 1.0    // Mid
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['HAND', 'CUT', 'MID', 'DEEP'],
+    positionOrder: ['H', 'C', 'M', 'D'],
 
     // Default team composition (7-player ultimate)
     defaultComposition: {
-        'HAND': 2,  // 2 Handlers
-        'CUT': 2,   // 2 Cutters
-        'MID': 2,   // 2 Mids
-        'DEEP': 1   // 1 Deep
+        'H': 2,  // 2 Handlers
+        'C': 2,   // 2 Cutters
+        'M': 2,   // 2 Mids
+        'D': 1   // 1 Deep
     }
     // Total team size: 7 players
 };

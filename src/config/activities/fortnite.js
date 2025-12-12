@@ -10,29 +10,29 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'FRAG': 'Frag',
-        'SUPPORT': 'Support',
+        'F': 'Frag',
+        'SP': 'Support',
         'IGL': 'IGL',
-        'ANCHOR': 'Anchor'
+        'A': 'Anchor'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'FRAG': 1.0,
-        'SUPPORT': 1.0,
+        'F': 1.0,
+        'SP': 1.0,
         'IGL': 1.0,
-        'ANCHOR': 1.0
+        'A': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['FRAG', 'SUPPORT', 'IGL', 'ANCHOR'],
+    positionOrder: ['F', 'SP', 'IGL', 'A'],
 
     // Default team composition (4-player squad)
     defaultComposition: {
-        'FRAG': 1,     // 1 Frag
-        'SUPPORT': 1,  // 1 Support
+        'F': 1,     // 1 Frag
+        'SP': 1,  // 1 Support
         'IGL': 1,      // 1 IGL
-        'ANCHOR': 1    // 1 Anchor
+        'A': 1    // 1 Anchor
     }
     // Total team size: 4 players (squad format)
 };

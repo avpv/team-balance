@@ -11,25 +11,25 @@ export default {
     // Position abbreviations and full names
     positions: {
         'IGL': 'IGL/Recon',
-        'FRAG': 'Fragger/Assault',
-        'SUP': 'Support/Controller'
+        'F': 'Fragger/Assault',
+        'S': 'Support/Controller'
     },
 
     // Position weights for team balancing
     positionWeights: {
         'IGL': 1.0,
-        'FRAG': 1.0,
-        'SUP': 1.0
+        'F': 1.0,
+        'S': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['IGL', 'FRAG', 'SUP'],
+    positionOrder: ['IGL', 'F', 'S'],
 
     // Default team composition (3-player team)
     defaultComposition: {
         'IGL': 1,  // 1 IGL/Recon
-        'FRAG': 1, // 1 Fragger/Assault
-        'SUP': 1   // 1 Support/Controller
+        'F': 1, // 1 Fragger/Assault
+        'S': 1   // 1 Support/Controller
     }
     // Total team size: 3 players
 };

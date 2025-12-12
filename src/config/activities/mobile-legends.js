@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'GOLD': 'Gold Lane',
-        'EXP': 'EXP Lane',
-        'MID': 'Mid Lane',
-        'JGL': 'Jungle',
-        'ROAM': 'Roam'
+        'G': 'Gold Lane',
+        'E': 'EXP Lane',
+        'M': 'Mid Lane',
+        'J': 'Jungle',
+        'R': 'Roam'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'GOLD': 1.0,
-        'EXP': 1.0,
-        'MID': 1.0,
-        'JGL': 1.0,
-        'ROAM': 1.0
+        'G': 1.0,
+        'E': 1.0,
+        'M': 1.0,
+        'J': 1.0,
+        'R': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['GOLD', 'EXP', 'MID', 'JGL', 'ROAM'],
+    positionOrder: ['G', 'E', 'M', 'J', 'R'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'GOLD': 1,  // 1 Gold Laner
-        'EXP': 1,   // 1 EXP Laner
-        'MID': 1,   // 1 Mid Laner
-        'JGL': 1,   // 1 Jungler
-        'ROAM': 1   // 1 Roamer
+        'G': 1,  // 1 Gold Laner
+        'E': 1,   // 1 EXP Laner
+        'M': 1,   // 1 Mid Laner
+        'J': 1,   // 1 Jungler
+        'R': 1   // 1 Roamer
     }
     // Total team size: 5 players
 };

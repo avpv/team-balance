@@ -11,21 +11,21 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'PLAYER 1': 'Player 1'
+        'P1': 'Player 1'
     },
 
     // Position weights for team balancing
     // Equal weight for all players
     positionWeights: {
-        'PLAYER 1': 1.0  // Neutral weight - all players equal
+        'P1': 1.0  // Neutral weight - all players equal
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['PLAYER 1'],
+    positionOrder: ['P1'],
 
     // Default team composition
     defaultComposition: {
-        'PLAYER 1': 1  // 1 player in Position 1
+        'P1': 1  // 1 player in Position 1
     }
     // Total team size: 1 player
 };

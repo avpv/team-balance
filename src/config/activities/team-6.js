@@ -11,36 +11,36 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'PLAYER 1': 'Player 1',
-        'PLAYER 2': 'Player 2',
-        'PLAYER 3': 'Player 3',
-        'PLAYER 4': 'Player 4',
-        'PLAYER 5': 'Player 5',
-        'PLAYER 6': 'Player 6'
+        'P1': 'Player 1',
+        'P2': 'Player 2',
+        'P3': 'Player 3',
+        'P4': 'Player 4',
+        'P5': 'Player 5',
+        'P6': 'Player 6'
     },
 
     // Position weights for team balancing
     // Equal weight for all players
     positionWeights: {
-        'PLAYER 1': 1.0,  // Neutral weight - all players equal
-        'PLAYER 2': 1.0,  // Neutral weight - all players equal
-        'PLAYER 3': 1.0,  // Neutral weight - all players equal
-        'PLAYER 4': 1.0,  // Neutral weight - all players equal
-        'PLAYER 5': 1.0,  // Neutral weight - all players equal
-        'PLAYER 6': 1.0   // Neutral weight - all players equal
+        'P1': 1.0,  // Neutral weight - all players equal
+        'P2': 1.0,  // Neutral weight - all players equal
+        'P3': 1.0,  // Neutral weight - all players equal
+        'P4': 1.0,  // Neutral weight - all players equal
+        'P5': 1.0,  // Neutral weight - all players equal
+        'P6': 1.0   // Neutral weight - all players equal
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['PLAYER 1', 'PLAYER 2', 'PLAYER 3', 'PLAYER 4', 'PLAYER 5', 'PLAYER 6'],
+    positionOrder: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
 
     // Default team composition
     defaultComposition: {
-        'PLAYER 1': 1,  // 1 player in Position 1
-        'PLAYER 2': 1,  // 1 player in Position 2
-        'PLAYER 3': 1,  // 1 player in Position 3
-        'PLAYER 4': 1,  // 1 player in Position 4
-        'PLAYER 5': 1,  // 1 player in Position 5
-        'PLAYER 6': 1   // 1 player in Position 6
+        'P1': 1,  // 1 player in Position 1
+        'P2': 1,  // 1 player in Position 2
+        'P3': 1,  // 1 player in Position 3
+        'P4': 1,  // 1 player in Position 4
+        'P5': 1,  // 1 player in Position 5
+        'P6': 1   // 1 player in Position 6
     }
     // Total team size: 6 players
 };

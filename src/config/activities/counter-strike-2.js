@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'ENTRY': 'Entry Fragger',
-        'LURK': 'Lurker',
+        'E': 'Entry Fragger',
+        'L': 'Lurker',
         'AWP': 'AWPer',
         'IGL': 'In-Game Leader',
-        'SUP': 'Support'
+        'S': 'Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'ENTRY': 1.0,
-        'LURK': 1.0,
+        'E': 1.0,
+        'L': 1.0,
         'AWP': 1.0,
         'IGL': 1.0,
-        'SUP': 1.0
+        'S': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['ENTRY', 'LURK', 'AWP', 'IGL', 'SUP'],
+    positionOrder: ['E', 'L', 'AWP', 'IGL', 'S'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'ENTRY': 1,  // 1 Entry Fragger
-        'LURK': 1,   // 1 Lurker
+        'E': 1,  // 1 Entry Fragger
+        'L': 1,   // 1 Lurker
         'AWP': 1,    // 1 AWPer
         'IGL': 1,    // 1 IGL
-        'SUP': 1     // 1 Support
+        'S': 1     // 1 Support
     }
     // Total team size: 5 players
 };

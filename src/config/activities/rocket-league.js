@@ -10,26 +10,26 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'STR': 'Striker',
-        'MID': 'Midfielder',
-        'DEF': 'Defender/Goalie'
+        'S': 'Striker',
+        'M': 'Midfielder',
+        'D': 'Defender/Goalie'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'STR': 1.0,
-        'MID': 1.0,
-        'DEF': 1.0
+        'S': 1.0,
+        'M': 1.0,
+        'D': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['STR', 'MID', 'DEF'],
+    positionOrder: ['S', 'M', 'D'],
 
     // Default team composition (3-player team)
     defaultComposition: {
-        'STR': 1,  // 1 Striker
-        'MID': 1,  // 1 Midfielder
-        'DEF': 1   // 1 Defender/Goalie
+        'S': 1,  // 1 Striker
+        'M': 1,  // 1 Midfielder
+        'D': 1   // 1 Defender/Goalie
     }
     // Total team size: 3 players
 };

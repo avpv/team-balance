@@ -10,26 +10,26 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'TANK': 'Tank',
+        'T': 'Tank',
         'DPS': 'DPS',
-        'SUP': 'Support'
+        'S': 'Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'TANK': 1.0,
+        'T': 1.0,
         'DPS': 1.0,
-        'SUP': 1.0
+        'S': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['TANK', 'DPS', 'SUP'],
+    positionOrder: ['T', 'DPS', 'S'],
 
     // Default team composition (5-player team: 1-2-2)
     defaultComposition: {
-        'TANK': 1,  // 1 Tank
+        'T': 1,  // 1 Tank
         'DPS': 2,   // 2 DPS
-        'SUP': 2    // 2 Supports
+        'S': 2    // 2 Supports
     }
     // Total team size: 5 players (1 Tank, 2 DPS, 2 Supports)
 };
