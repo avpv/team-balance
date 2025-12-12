@@ -6,6 +6,7 @@ import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
+import { trackClick, trackEvent } from '../config/analytics.js';
 
 // Components
 import PositionSelector from '../components/compare/PositionSelector.js';
@@ -262,6 +263,12 @@ class ComparePage extends BasePage {
         this.loadNextPair();
         this.update();
 
+        // Track position selection
+        trackEvent('position_selected', {
+            event_category: 'compare',
+            position: positionKey
+        });
+
         // Show notifications for position selection
         if (this.selectedPosition) {
             const status = this.comparisonService.checkStatus(this.selectedPosition);
@@ -289,6 +296,12 @@ class ComparePage extends BasePage {
         if (confirmed) {
             this.comparisonService.resetPosition(positionKey);
             toast.success(`${positionName} comparisons have been reset`);
+
+            // Track position reset
+            trackEvent('position_reset', {
+                event_category: 'compare',
+                position: positionKey
+            });
 
             // If this was the selected position, clear it
             if (this.selectedPosition === positionKey) {
@@ -326,6 +339,13 @@ class ComparePage extends BasePage {
     handleComparison(winnerId, loserId) {
         try {
             this.comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
+
+            // Track comparison event
+            trackEvent('player_compared', {
+                event_category: 'compare',
+                position: this.selectedPosition,
+                comparison_type: 'winner'
+            });
         } catch (error) {
             toast.error(error.message);
         }
@@ -335,6 +355,13 @@ class ComparePage extends BasePage {
         try {
             this.comparisonService.processDraw(player1Id, player2Id, this.selectedPosition);
             toast.success(MESSAGES.SUCCESS.WIN_WIN, TOAST.QUICK_DURATION);
+
+            // Track draw event
+            trackEvent('player_compared', {
+                event_category: 'compare',
+                position: this.selectedPosition,
+                comparison_type: 'draw'
+            });
         } catch (error) {
             toast.error(error.message);
         }
