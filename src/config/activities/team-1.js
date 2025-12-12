@@ -9,23 +9,23 @@
 export default {
     name: 'Team 1',
 
-    // Position abbreviations and full names
+    // Grade abbreviations and full names
     positions: {
-        'P1': 'Player 1'
+        'G1': 'Grade 1'
     },
 
-    // Position weights for team balancing
-    // Equal weight for all players
+    // Grade weights for team balancing
+    // Equal weight for all grades
     positionWeights: {
-        'P1': 1.0  // Neutral weight - all players equal
+        'G1': 1.0  // Neutral weight - all grades equal
     },
 
-    // Order in which positions should be displayed
-    positionOrder: ['P1'],
+    // Order in which grades should be displayed
+    positionOrder: ['G1'],
 
     // Default team composition
     defaultComposition: {
-        'P1': 1  // 1 player in Position 1
+        'G1': 1  // 1 player in Grade 1
     }
     // Total team size: 1 player
 };
