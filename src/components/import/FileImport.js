@@ -151,7 +151,6 @@ export default class FileImport extends Component {
             this.mount(container);
 
         } catch (error) {
-            console.error('Error reading file:', error);
             this.updatePreview(`
                 <div class="preview-error">
                     <strong>Error reading file</strong>
@@ -210,7 +209,7 @@ export default class FileImport extends Component {
                 button.classList.remove('copied');
             }, 2000);
         }).catch(err => {
-            console.error('Failed to copy:', err);
+            // Failed to copy
         });
     }
 
@@ -277,7 +276,6 @@ export default class FileImport extends Component {
             try {
                 return await this.selectedFile.text();
             } catch (error) {
-                console.error('Error reading file:', error);
                 return '';
             }
         }

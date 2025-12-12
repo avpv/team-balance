@@ -18,7 +18,7 @@ class PageHeader extends Component {
 
         // Validate required props
         if (!props.title) {
-            console.warn('PageHeader: title prop is required');
+            // Title prop is required
         }
     }
 

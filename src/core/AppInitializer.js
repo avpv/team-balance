@@ -82,7 +82,6 @@ class AppInitializer {
             }
 
         } catch (error) {
-            console.error('Failed to initialize application:', error);
             this.app.showFatalError(error);
         }
     }

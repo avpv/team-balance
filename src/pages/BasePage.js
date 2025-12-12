@@ -103,7 +103,7 @@ class BasePage extends Component {
                 try {
                     component.destroy();
                 } catch (error) {
-                    console.error('Error destroying component:', error);
+                    // Error destroying component
                 }
             }
         });

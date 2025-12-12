@@ -119,12 +119,10 @@ class Router {
                 handler(normalizedPath);
                 eventBus.emit('route:changed', normalizedPath);
             } catch (error) {
-                console.error('Route handler error:', error);
                 eventBus.emit('route:error', { path: normalizedPath, error });
             }
         } else {
             // 404 - redirect to home
-            console.warn('Route not found:', normalizedPath);
             this.navigate('/', true);
         }
         

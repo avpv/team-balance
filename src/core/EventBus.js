@@ -92,7 +92,7 @@ class EventBus {
                 try {
                     listener.callback.call(listener.context, data, event);
                 } catch (error) {
-                    console.error(`Error in event listener for "${event}":`, error);
+                    // Error in event listener
                 }
             });
         }
@@ -102,7 +102,7 @@ class EventBus {
             try {
                 listener.callback.call(listener.context, event, data);
             } catch (error) {
-                console.error(`Error in wildcard listener for "${event}":`, error);
+                // Error in wildcard listener
             }
         });
     }

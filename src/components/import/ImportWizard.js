@@ -119,7 +119,6 @@ export default class ImportWizard extends Component {
                 break;
 
             default:
-                console.error('Unknown step:', this.currentStep);
                 return;
         }
 

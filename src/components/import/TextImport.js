@@ -119,7 +119,7 @@ export default class TextImport extends Component {
                 button.classList.remove('copied');
             }, 2000);
         }).catch(err => {
-            console.error('Failed to copy:', err);
+            // Failed to copy
         });
     }
 

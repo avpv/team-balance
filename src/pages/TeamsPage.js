@@ -163,7 +163,6 @@ class TeamsPage extends BasePage {
                 positionWeights: saved.positionWeights
             };
         } catch (error) {
-            console.error('Error loading settings from session:', error);
             return {};
         }
     }
@@ -175,7 +174,6 @@ class TeamsPage extends BasePage {
         try {
             const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
             if (!activeSessionId) {
-                console.warn('No active session to save settings to');
                 return;
             }
 
@@ -189,7 +187,7 @@ class TeamsPage extends BasePage {
 
             this.sessionRepository.updateTeamBuilderSettings(this.activityKey, activeSessionId, settings);
         } catch (error) {
-            console.error('Error saving settings to session:', error);
+            // Error saving settings
         }
     }
 
@@ -205,7 +203,6 @@ class TeamsPage extends BasePage {
 
             return this.sessionRepository.getGeneratedTeams(this.activityKey, activeSessionId);
         } catch (error) {
-            console.error('Error loading teams from session:', error);
             return null;
         }
     }
@@ -217,13 +214,12 @@ class TeamsPage extends BasePage {
         try {
             const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
             if (!activeSessionId) {
-                console.warn('No active session to save teams to');
                 return;
             }
 
             this.sessionRepository.updateGeneratedTeams(this.activityKey, activeSessionId, teams);
         } catch (error) {
-            console.error('Error saving teams to session:', error);
+            // Error saving teams
         }
     }
 

@@ -141,7 +141,6 @@ class StateManager {
                 throw new Error('Failed to save state');
             }
         } catch (error) {
-            console.error('Error saving state:', error);
             eventBus.emit('state:save-error', error);
         }
     }
@@ -169,10 +168,9 @@ class StateManager {
 
                 return true;
             }
-            
+
             return false;
         } catch (error) {
-            console.error('Error loading state:', error);
             eventBus.emit('state:load-error', error);
             return false;
         }
@@ -380,9 +378,8 @@ class StateManager {
                 playersImported: migrated.players?.length || 0
             };
         } catch (error) {
-            console.error('Import failed:', error);
             eventBus.emit('state:import-error', error);
-            
+
             return {
                 success: false,
                 error: error.message
