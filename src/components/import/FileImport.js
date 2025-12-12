@@ -71,7 +71,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="btn btn-secondary back-button" data-action="back">
+                    <button id="fileImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
                         Back
                     </button>
@@ -113,8 +113,8 @@ Alice Johnson${actualDelim}${pos[0]}`;
                                 }
                             </div>
                             ${this.selectedFile
-                                ? `<button class="btn btn-secondary change-file-button" data-action="change-file">Change File</button>`
-                                : `<button class="btn btn-primary browse-button">Browse Files</button>`
+                                ? `<button id="changeFileBtn" class="btn btn-secondary change-file-button" data-action="change-file">Change File</button>`
+                                : `<button id="browseFilesBtn" class="btn btn-primary browse-button">Browse Files</button>`
                             }
                         </div>
                     </div>
@@ -124,7 +124,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>${this.fileType.toUpperCase()} Example</strong>
-                                <button class="btn btn-sm copy-button" data-copy="example">
+                                <button id="copyFileExampleBtn" class="btn btn-sm copy-button" data-copy="example">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>

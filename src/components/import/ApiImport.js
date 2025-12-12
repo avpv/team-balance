@@ -146,7 +146,7 @@ export default class ApiImport extends Component {
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="btn btn-secondary back-button" data-action="back">
+                    <button id="apiImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
                         Back
                     </button>
@@ -169,6 +169,7 @@ export default class ApiImport extends Component {
                                 placeholder="https://example.com/api/players.json"
                             />
                             <button
+                                id="fetchDataBtn"
                                 class="btn btn-primary fetch-button"
                                 data-action="fetch"
                                 ${this.isLoading ? 'disabled' : ''}
@@ -199,7 +200,7 @@ export default class ApiImport extends Component {
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>Response Example</strong>
-                                <button class="btn btn-sm copy-button" data-copy="json">
+                                <button id="copyApiExampleBtn" class="btn btn-sm copy-button" data-copy="json">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>

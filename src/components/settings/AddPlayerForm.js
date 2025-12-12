@@ -89,6 +89,7 @@ class AddPlayerForm extends BaseComponent {
                             <div class="form-actions">
                                 <button
                                     type="submit"
+                                    id="addPlayerSubmitBtn"
                                     class="btn btn-primary"
                                     ${!currentActivity ? 'disabled' : ''}
                                     aria-label="Add player to roster">

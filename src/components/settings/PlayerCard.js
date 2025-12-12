@@ -50,15 +50,15 @@ class PlayerCard extends BaseComponent {
                 </div>
 
                 <div class="player-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="edit" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
+                    <button id="editPlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="edit" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="reset" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
+                    <button id="resetPlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="reset" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="remove" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
+                    <button id="removePlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="remove" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
