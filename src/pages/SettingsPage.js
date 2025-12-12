@@ -645,9 +645,13 @@ class SettingsPage extends BasePage {
 
         // Try CSV - using the provided delimiter
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
-        if (lines.length < 2) throw new Error('CSV must have header and data rows');
+        if (lines.length < 1) throw new Error('No data to import');
 
-        const dataLines = lines.slice(1);
+        // Check if first line is a header (contains "name" or "positions")
+        const firstLine = lines[0].toLowerCase();
+        const hasHeader = firstLine.includes('name') || firstLine.includes('position');
+
+        const dataLines = hasHeader ? lines.slice(1) : lines;
         const players = [];
 
         // Escape special regex characters in delimiter
@@ -657,13 +661,22 @@ class SettingsPage extends BasePage {
             // Split by delimiter, handling quotes
             const parts = this.parseCSVLineSimple(line, delimiter);
 
-            if (parts.length < 2) {
-                throw new Error(`Invalid CSV line: ${line}`);
+            if (parts.length < 1 || !parts[0].trim()) {
+                continue; // Skip empty lines
+            }
+
+            let positions;
+            if (parts.length < 2 || !parts[1] || !parts[1].trim()) {
+                // No positions provided - assign all available positions
+                positions = Object.keys(this.playerService.positions);
+            } else {
+                // Parse provided positions
+                positions = parts[1].split(',').map(p => p.trim()).filter(p => p);
             }
 
             players.push({
                 name: parts[0].trim(),
-                positions: parts[1].split(',').map(p => p.trim()).filter(p => p)
+                positions: positions
             });
         }
 
