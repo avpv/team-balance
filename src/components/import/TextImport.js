@@ -52,7 +52,7 @@ Chris Brown`;
         return `
             <div class="import-method-container">
                 <div class="import-method-header">
-                    <button class="btn btn-secondary back-button" data-action="back">
+                    <button id="textImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
                         Back
                     </button>
@@ -92,7 +92,7 @@ Chris Brown`;
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>CSV Format</strong>
-                                <button class="btn btn-sm copy-button" data-copy="csv">
+                                <button id="copyCsvExampleBtn" class="btn btn-sm copy-button" data-copy="csv">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>
@@ -103,7 +103,7 @@ Chris Brown`;
                         <div class="example-block">
                             <div class="example-header">
                                 <strong>JSON Format</strong>
-                                <button class="btn btn-sm copy-button" data-copy="json">
+                                <button id="copyJsonExampleBtn" class="btn btn-sm copy-button" data-copy="json">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>
@@ -115,7 +115,7 @@ Chris Brown`;
                             <div class="example-header">
                                 <strong>Names Only</strong>
                                 <span class="hint">All positions will be assigned</span>
-                                <button class="btn btn-sm copy-button" data-copy="names">
+                                <button id="copyNamesExampleBtn" class="btn btn-sm copy-button" data-copy="names">
                                     ${getIcon('copy', { size: 14 })}
                                     Copy
                                 </button>

@@ -62,6 +62,7 @@ export default class ImportDataSourcePicker extends Component {
     renderSourceTile(source) {
         return `
             <button
+                id="importSource-${source.id}Btn"
                 class="data-source-tile"
                 data-source="${source.id}"
             >

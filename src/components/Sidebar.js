@@ -118,7 +118,8 @@ class Sidebar extends Component {
                         <span class="session-item__players">${playerCount} players</span>
                     </div>
                 </div>
-                <button class="session-item__delete"
+                <button id="deleteSessionBtn-${session.id}"
+                        class="session-item__delete"
                         ${DATA_ATTRIBUTES.SESSION_ID}="${session.id}"
                         ${DATA_ATTRIBUTES.ACTIVITY_KEY}="${activityKey}"
                         title="Delete session">
