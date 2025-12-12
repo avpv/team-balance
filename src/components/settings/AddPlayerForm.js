@@ -39,7 +39,7 @@ class AddPlayerForm extends BaseComponent {
                     aria-hidden="${!isOpen}">
                     <!-- Import Players Section -->
                     <div class="player-section import-section">
-                        <h4 class="section-title">Import Players from File</h4>
+                        <h4 class="section-title">Import Players</h4>
                         <div class="section-content">
                             <button
                                 type="button"
@@ -48,7 +48,7 @@ class AddPlayerForm extends BaseComponent {
                                 ${!currentActivity ? 'disabled' : ''}
                                 aria-label="Import players from CSV or JSON file">
                                 ${getIcon('arrow-down', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                Import from File
+                                Import
                             </button>
                             <p class="form-help-text mt-2">
                                 Upload a CSV or JSON file with your players' names and positions
