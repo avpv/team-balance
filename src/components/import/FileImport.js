@@ -12,6 +12,7 @@ export default class FileImport extends Component {
         this.onBack = onBack;
         this.positions = positions;
         this.selectedFile = null;
+        this.delimiter = ','; // Default delimiter for CSV
     }
 
     /**
@@ -24,7 +25,7 @@ export default class FileImport extends Component {
                 icon: 'table',
                 iconSize: 32,
                 accept: '.csv',
-                example: this.getExampleCSV()
+                example: this.getExampleCSV(this.delimiter)
             };
         } else {
             return {
@@ -40,11 +41,20 @@ export default class FileImport extends Component {
     /**
      * Generate example data
      */
-    getExampleCSV() {
+    getExampleCSV(delimiter = ',') {
         const pos = this.positions.length > 0 ? this.positions : ['Position1', 'Position2'];
-        return `name,positions
+        const actualDelim = delimiter;
+
+        if (delimiter === ',') {
+            return `name${actualDelim}positions
 "John Smith","${pos[0]},${pos[1] || pos[0]}"
 "Alice Johnson","${pos[0]}"`;
+        } else {
+            // For tab and semicolon, no need to quote if no special chars
+            return `name${actualDelim}positions
+John Smith${actualDelim}${pos[0]},${pos[1] || pos[0]}
+Alice Johnson${actualDelim}${pos[0]}`;
+        }
     }
 
     getExampleJSON() {
@@ -71,6 +81,20 @@ export default class FileImport extends Component {
                 </div>
 
                 <div class="import-method-content">
+                    ${this.fileType === 'csv' ? `
+                    <div class="delimiter-selector">
+                        <label for="fileDelimiterSelect">
+                            <strong>Field Delimiter</strong>
+                            <span class="hint">Choose how fields are separated</span>
+                        </label>
+                        <select id="fileDelimiterSelect" class="form-select">
+                            <option value="," ${this.delimiter === ',' ? 'selected' : ''}>Comma (,)</option>
+                            <option value="\\t" ${this.delimiter === '\t' ? 'selected' : ''}>Tab (\\t)</option>
+                            <option value=";" ${this.delimiter === ';' ? 'selected' : ''}>Semicolon (;)</option>
+                        </select>
+                    </div>
+                    ` : ''}
+
                     <div class="file-upload-section">
                         <div class="upload-area ${this.selectedFile ? 'has-file' : ''}" data-action="click-upload">
                             <input
@@ -131,6 +155,30 @@ export default class FileImport extends Component {
     }
 
     /**
+     * Handle delimiter change
+     */
+    handleDelimiterChange() {
+        const select = this.element.querySelector('#fileDelimiterSelect');
+        if (select) {
+            // Handle escaped tab character
+            this.delimiter = select.value === '\\t' ? '\t' : select.value;
+
+            // Update example
+            const exampleBlock = this.element.querySelector('.code-block');
+            if (exampleBlock) {
+                exampleBlock.textContent = this.getExampleCSV(this.delimiter);
+            }
+
+            // Re-trigger data change if file is already selected
+            if (this.selectedFile && this.onDataChange) {
+                this.selectedFile.text().then(text => {
+                    this.onDataChange(text, this.delimiter);
+                });
+            }
+        }
+    }
+
+    /**
      * Handle file selection
      */
     async handleFileSelect(file) {
@@ -142,7 +190,12 @@ export default class FileImport extends Component {
             const text = await file.text();
 
             if (this.onDataChange) {
-                this.onDataChange(text);
+                // Pass delimiter for CSV files
+                if (this.fileType === 'csv') {
+                    this.onDataChange(text, this.delimiter);
+                } else {
+                    this.onDataChange(text);
+                }
             }
 
             // Re-render to show selected file
@@ -222,6 +275,12 @@ export default class FileImport extends Component {
             });
         }
 
+        // Delimiter selector (CSV only)
+        const delimiterSelect = this.element.querySelector('#fileDelimiterSelect');
+        if (delimiterSelect) {
+            delimiterSelect.addEventListener('change', () => this.handleDelimiterChange());
+        }
+
         // File input
         const fileInput = this.element.querySelector('#fileImportInput');
         if (fileInput) {
@@ -280,6 +339,13 @@ export default class FileImport extends Component {
             }
         }
         return '';
+    }
+
+    /**
+     * Get current delimiter
+     */
+    getDelimiter() {
+        return this.delimiter;
     }
 
     mount(container) {
