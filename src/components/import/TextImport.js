@@ -41,6 +41,13 @@ Alice Johnson${actualDelim}${pos[0]}`;
 ]`;
     }
 
+    getExampleNamesOnly() {
+        return `John Smith
+Mike Johnson
+Tom Williams
+Chris Brown`;
+    }
+
     render() {
         return `
             <div class="import-method-container">
@@ -103,6 +110,18 @@ Alice Johnson${actualDelim}${pos[0]}`;
                             </div>
                             <pre class="code-block">${this.getExampleJSON()}</pre>
                         </div>
+
+                        <div class="example-block">
+                            <div class="example-header">
+                                <strong>Names Only</strong>
+                                <span class="hint">All positions will be assigned</span>
+                                <button class="btn btn-sm copy-button" data-copy="names">
+                                    ${getIcon('copy', { size: 14 })}
+                                    Copy
+                                </button>
+                            </div>
+                            <pre class="code-block">${this.getExampleNamesOnly()}</pre>
+                        </div>
                     </div>
 
                     <div id="textImportPreview" class="preview-container"></div>
@@ -148,7 +167,14 @@ Alice Johnson${actualDelim}${pos[0]}`;
      * Handle copy button click
      */
     handleCopy(format) {
-        const text = format === 'csv' ? this.getExampleCSV(this.delimiter) : this.getExampleJSON();
+        let text;
+        if (format === 'csv') {
+            text = this.getExampleCSV(this.delimiter);
+        } else if (format === 'json') {
+            text = this.getExampleJSON();
+        } else if (format === 'names') {
+            text = this.getExampleNamesOnly();
+        }
 
         navigator.clipboard.writeText(text).then(() => {
             // Show success feedback
