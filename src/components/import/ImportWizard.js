@@ -95,7 +95,7 @@ export default class ImportWizard extends Component {
 
             case 'text':
                 component = new TextImport(
-                    (data) => this.handleDataChange(data),
+                    (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
                     this.positions
                 );
