@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'SOLO': 'Solo Lane',
-        'JGL': 'Jungle',
-        'MID': 'Mid Lane',
-        'FARM': 'Farm Lane',
-        'ROAM': 'Roam/Support'
+        'SO': 'Solo Lane',
+        'J': 'Jungle',
+        'M': 'Mid Lane',
+        'F': 'Farm Lane',
+        'R': 'Roam/Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'SOLO': 1.0,
-        'JGL': 1.0,
-        'MID': 1.0,
-        'FARM': 1.0,
-        'ROAM': 1.0
+        'SO': 1.0,
+        'J': 1.0,
+        'M': 1.0,
+        'F': 1.0,
+        'R': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['SOLO', 'JGL', 'MID', 'FARM', 'ROAM'],
+    positionOrder: ['SO', 'J', 'M', 'F', 'R'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'SOLO': 1,  // 1 Solo Laner
-        'JGL': 1,   // 1 Jungler
-        'MID': 1,   // 1 Mid Laner
-        'FARM': 1,  // 1 Farm Lane
-        'ROAM': 1   // 1 Roam/Support
+        'SO': 1,  // 1 Solo Laner
+        'J': 1,   // 1 Jungler
+        'M': 1,   // 1 Mid Laner
+        'F': 1,  // 1 Farm Lane
+        'R': 1   // 1 Roam/Support
     }
     // Total team size: 5 players
 };

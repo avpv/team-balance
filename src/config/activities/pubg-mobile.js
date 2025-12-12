@@ -11,28 +11,28 @@ export default {
     // Position abbreviations and full names
     positions: {
         'IGL': 'In-Game Leader',
-        'FRAG': 'Fragger',
-        'SCOUT': 'Scout',
-        'SUP': 'Support'
+        'F': 'Fragger',
+        'SC': 'Scout',
+        'S': 'Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
         'IGL': 1.0,
-        'FRAG': 1.0,
-        'SCOUT': 1.0,
-        'SUP': 1.0
+        'F': 1.0,
+        'SC': 1.0,
+        'S': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['IGL', 'FRAG', 'SCOUT', 'SUP'],
+    positionOrder: ['IGL', 'F', 'SC', 'S'],
 
     // Default team composition (4-player team)
     defaultComposition: {
         'IGL': 1,   // 1 IGL
-        'FRAG': 1,  // 1 Fragger
-        'SCOUT': 1, // 1 Scout
-        'SUP': 1    // 1 Support
+        'F': 1,  // 1 Fragger
+        'SC': 1, // 1 Scout
+        'S': 1    // 1 Support
     }
     // Total team size: 4 players
 };

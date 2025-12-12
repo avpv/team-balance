@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'CARRY': 'Carry',
-        'MID': 'Mid',
-        'OFF': 'Offlane',
-        'SSUP': 'Soft Support',
-        'HSUP': 'Hard Support'
+        'C': 'Carry',
+        'M': 'Mid',
+        'O': 'Offlane',
+        'SS': 'Soft Support',
+        'HS': 'Hard Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'CARRY': 1.0,
-        'MID': 1.0,
-        'OFF': 1.0,
-        'SSUP': 1.0,
-        'HSUP': 1.0
+        'C': 1.0,
+        'M': 1.0,
+        'O': 1.0,
+        'SS': 1.0,
+        'HS': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['CARRY', 'MID', 'OFF', 'SSUP', 'HSUP'],
+    positionOrder: ['C', 'M', 'O', 'SS', 'HS'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'CARRY': 1,  // 1 Carry
-        'MID': 1,    // 1 Mid
-        'OFF': 1,    // 1 Offlane
-        'SSUP': 1,   // 1 Soft Support
-        'HSUP': 1    // 1 Hard Support
+        'C': 1,  // 1 Carry
+        'M': 1,    // 1 Mid
+        'O': 1,    // 1 Offlane
+        'SS': 1,   // 1 Soft Support
+        'HS': 1    // 1 Hard Support
     }
     // Total team size: 5 players
 };

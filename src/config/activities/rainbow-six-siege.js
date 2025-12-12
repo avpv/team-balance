@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'ENTRY': 'Entry Fragger',
-        'BREACH': 'Hard Breacher',
-        'SUP': 'Support',
-        'FLEX': 'Flex',
-        'ANCHOR': 'Roamer/Anchor'
+        'E': 'Entry Fragger',
+        'B': 'Hard Breacher',
+        'S': 'Support',
+        'FL': 'Flex',
+        'A': 'Roamer/Anchor'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'ENTRY': 1.0,
-        'BREACH': 1.0,
-        'SUP': 1.0,
-        'FLEX': 1.0,
-        'ANCHOR': 1.0
+        'E': 1.0,
+        'B': 1.0,
+        'S': 1.0,
+        'FL': 1.0,
+        'A': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['ENTRY', 'BREACH', 'SUP', 'FLEX', 'ANCHOR'],
+    positionOrder: ['E', 'B', 'S', 'FL', 'A'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'ENTRY': 1,   // 1 Entry Fragger
-        'BREACH': 1,  // 1 Hard Breacher
-        'SUP': 1,     // 1 Support
-        'FLEX': 1,    // 1 Flex
-        'ANCHOR': 1   // 1 Roamer/Anchor
+        'E': 1,   // 1 Entry Fragger
+        'B': 1,  // 1 Hard Breacher
+        'S': 1,     // 1 Support
+        'FL': 1,    // 1 Flex
+        'A': 1   // 1 Roamer/Anchor
     }
     // Total team size: 5 players
 };

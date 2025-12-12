@@ -11,10 +11,10 @@ export default {
     // Position abbreviations and full names
     positions: {
         'WK': 'Wicket-keeper',
-        'BAT': 'Batsman',
+        'B': 'Batsman',
         'AR': 'All-rounder',
-        'FAST': 'Fast Bowler',
-        'SPIN': 'Spin Bowler'
+        'FB': 'Fast Bowler',
+        'SB': 'Spin Bowler'
     },
 
     // Position weights for team balancing
@@ -22,21 +22,21 @@ export default {
     positionWeights: {
         'WK': 1.0,    // Wicket-keeper
         'AR': 1.0,   // All-rounder - most versatile
-        'FAST': 1.0,  // Fast Bowler
-        'SPIN': 1.0, // Spin Bowler
-        'BAT': 1.0    // Batsman
+        'FB': 1.0,  // Fast Bowler
+        'SB': 1.0, // Spin Bowler
+        'B': 1.0    // Batsman
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['WK', 'BAT', 'AR', 'FAST', 'SPIN'],
+    positionOrder: ['WK', 'B', 'AR', 'FB', 'SB'],
 
     // Default team composition (11-player cricket)
     defaultComposition: {
         'WK': 1,    // 1 Wicket-keeper
-        'BAT': 4,   // 4 Batsmen
+        'B': 4,   // 4 Batsmen
         'AR': 2,    // 2 All-rounders
-        'FAST': 2,  // 2 Fast Bowlers
-        'SPIN': 2   // 2 Spin Bowlers
+        'FB': 2,  // 2 Fast Bowlers
+        'SB': 2   // 2 Spin Bowlers
     }
     // Total team size: 11 players
 };

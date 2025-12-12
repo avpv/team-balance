@@ -10,32 +10,32 @@ export default {
 
     // Position abbreviations and full names
     positions: {
-        'TOP': 'Top Lane',
-        'JGL': 'Jungle',
-        'MID': 'Mid Lane',
+        'T': 'Top Lane',
+        'J': 'Jungle',
+        'M': 'Mid Lane',
         'ADC': 'ADC',
-        'SUP': 'Support'
+        'S': 'Support'
     },
 
     // Position weights for team balancing
     positionWeights: {
-        'TOP': 1.0,
-        'JGL': 1.0,
-        'MID': 1.0,
+        'T': 1.0,
+        'J': 1.0,
+        'M': 1.0,
         'ADC': 1.0,
-        'SUP': 1.0
+        'S': 1.0
     },
 
     // Order in which positions should be displayed
-    positionOrder: ['TOP', 'JGL', 'MID', 'ADC', 'SUP'],
+    positionOrder: ['T', 'J', 'M', 'ADC', 'S'],
 
     // Default team composition (5-player team)
     defaultComposition: {
-        'TOP': 1,  // 1 Top Laner
-        'JGL': 1,  // 1 Jungler
-        'MID': 1,  // 1 Mid Laner
+        'T': 1,  // 1 Top Laner
+        'J': 1,  // 1 Jungler
+        'M': 1,  // 1 Mid Laner
         'ADC': 1,  // 1 ADC
-        'SUP': 1   // 1 Support
+        'S': 1   // 1 Support
     }
     // Total team size: 5 players
 };
