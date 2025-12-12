@@ -16,6 +16,7 @@ export default class ImportWizard extends Component {
         this.positions = positions;
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
+        this.currentDelimiter = ','; // Default delimiter
         this.currentComponent = null;
         this.onDataChangeCallback = null;
     }
@@ -53,13 +54,21 @@ export default class ImportWizard extends Component {
     /**
      * Handle data change from import method
      */
-    handleDataChange(data) {
+    handleDataChange(data, delimiter = ',') {
         this.currentData = data;
+        this.currentDelimiter = delimiter;
 
         // Notify parent component
         if (this.onDataChangeCallback) {
-            this.onDataChangeCallback(data);
+            this.onDataChangeCallback(data, delimiter);
         }
+    }
+
+    /**
+     * Get current delimiter
+     */
+    getDelimiter() {
+        return this.currentDelimiter;
     }
 
     /**

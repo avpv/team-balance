@@ -554,8 +554,8 @@ class SettingsPage extends BasePage {
         this.importWizard = new ImportWizard(positionKeys);
 
         // Set up data change callback
-        this.importWizard.setDataChangeCallback((data) => {
-            this.previewImportData(data);
+        this.importWizard.setDataChangeCallback((data, delimiter) => {
+            this.previewImportData(data, delimiter);
         });
 
         this.importModal = new Modal({
@@ -592,11 +592,11 @@ class SettingsPage extends BasePage {
     }
 
 
-    previewImportData(data) {
+    previewImportData(data, delimiter = ',') {
         if (!this.importWizard) return;
 
         try {
-            const players = this.parseImportData(data);
+            const players = this.parseImportData(data, delimiter);
 
             if (players.length === 0) {
                 this.importWizard.updatePreview('');
@@ -625,7 +625,7 @@ class SettingsPage extends BasePage {
         }
     }
 
-    parseImportData(data) {
+    parseImportData(data, delimiter = ',') {
         if (!data || !data.trim()) return [];
         data = data.trim();
 
@@ -643,24 +643,59 @@ class SettingsPage extends BasePage {
             }
         }
 
-        // Try CSV
+        // Try CSV - using the provided delimiter
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
         if (lines.length < 2) throw new Error('CSV must have header and data rows');
 
         const dataLines = lines.slice(1);
         const players = [];
 
+        // Escape special regex characters in delimiter
+        const delimiterEscaped = delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
         for (const line of dataLines) {
-            const match = line.match(/^"?([^,"]+)"?\s*,\s*"?([^"]+)"?$/);
-            if (!match) throw new Error(`Invalid CSV line: ${line}`);
+            // Split by delimiter, handling quotes
+            const parts = this.parseCSVLineSimple(line, delimiter);
+
+            if (parts.length < 2) {
+                throw new Error(`Invalid CSV line: ${line}`);
+            }
 
             players.push({
-                name: match[1].trim(),
-                positions: match[2].split(',').map(p => p.trim())
+                name: parts[0].trim(),
+                positions: parts[1].split(',').map(p => p.trim()).filter(p => p)
             });
         }
 
         return players;
+    }
+
+    /**
+     * Simple CSV line parser that handles basic quotes
+     */
+    parseCSVLineSimple(line, delimiter) {
+        const parts = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === delimiter && !inQuotes) {
+                parts.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+
+        if (current) {
+            parts.push(current.trim());
+        }
+
+        return parts.map(p => p.replace(/^"|"$/g, ''));
     }
 
     async handleImportConfirm() {
@@ -677,7 +712,9 @@ class SettingsPage extends BasePage {
                 return false;
             }
 
-            const players = this.parseImportData(data);
+            // Get delimiter from import wizard
+            const delimiter = this.importWizard.getDelimiter();
+            const players = this.parseImportData(data, delimiter);
             if (players.length === 0) {
                 toast.error('No players found');
                 return false;

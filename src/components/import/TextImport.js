@@ -10,16 +10,27 @@ export default class TextImport extends Component {
         this.onDataChange = onDataChange;
         this.onBack = onBack;
         this.positions = positions;
+        this.delimiter = ','; // Default delimiter
     }
 
     /**
      * Generate example data based on available positions
      */
-    getExampleCSV() {
+    getExampleCSV(delimiter = ',') {
         const pos = this.positions.length > 0 ? this.positions : ['Position1', 'Position2'];
-        return `name,positions
+        const delimiterDisplay = delimiter === '\t' ? '\\t' : delimiter;
+        const actualDelim = delimiter;
+
+        if (delimiter === ',') {
+            return `name${actualDelim}positions
 "John Smith","${pos[0]},${pos[1] || pos[0]}"
 "Alice Johnson","${pos[0]}"`;
+        } else {
+            // For tab and semicolon, no need to quote if no special chars
+            return `name${actualDelim}positions
+John Smith${actualDelim}${pos[0]},${pos[1] || pos[0]}
+Alice Johnson${actualDelim}${pos[0]}`;
+        }
     }
 
     getExampleJSON() {
@@ -45,6 +56,17 @@ export default class TextImport extends Component {
 
                 <div class="import-method-content">
                     <div class="input-section">
+                        <div class="delimiter-selector">
+                            <label for="delimiterSelect">
+                                <strong>Field Delimiter</strong>
+                                <span class="hint">Choose how fields are separated</span>
+                            </label>
+                            <select id="delimiterSelect" class="form-select">
+                                <option value=",">Comma (,)</option>
+                                <option value="\t">Tab (\\t)</option>
+                                <option value=";">Semicolon (;)</option>
+                            </select>
+                        </div>
                         <label for="textImportInput">
                             <strong>Player Data</strong>
                             <span class="hint">Paste your data below</span>
@@ -68,7 +90,7 @@ export default class TextImport extends Component {
                                     Copy
                                 </button>
                             </div>
-                            <pre class="code-block">${this.getExampleCSV()}</pre>
+                            <pre class="code-block" id="csvExample">${this.getExampleCSV(this.delimiter)}</pre>
                         </div>
 
                         <div class="example-block">
@@ -97,7 +119,28 @@ export default class TextImport extends Component {
         const data = textarea.value.trim();
 
         if (this.onDataChange) {
-            this.onDataChange(data);
+            // Pass both data and delimiter
+            this.onDataChange(data, this.delimiter);
+        }
+    }
+
+    /**
+     * Handle delimiter change
+     */
+    handleDelimiterChange() {
+        const select = this.element.querySelector('#delimiterSelect');
+        if (select) {
+            // Handle escaped tab character
+            this.delimiter = select.value === '\\t' ? '\t' : select.value;
+
+            // Update example
+            const exampleBlock = this.element.querySelector('#csvExample');
+            if (exampleBlock) {
+                exampleBlock.textContent = this.getExampleCSV(this.delimiter);
+            }
+
+            // Trigger data change to update preview
+            this.handleInputChange();
         }
     }
 
@@ -105,7 +148,7 @@ export default class TextImport extends Component {
      * Handle copy button click
      */
     handleCopy(format) {
-        const text = format === 'csv' ? this.getExampleCSV() : this.getExampleJSON();
+        const text = format === 'csv' ? this.getExampleCSV(this.delimiter) : this.getExampleJSON();
 
         navigator.clipboard.writeText(text).then(() => {
             // Show success feedback
@@ -130,6 +173,12 @@ export default class TextImport extends Component {
             backButton.addEventListener('click', () => {
                 if (this.onBack) this.onBack();
             });
+        }
+
+        // Delimiter selector
+        const delimiterSelect = this.element.querySelector('#delimiterSelect');
+        if (delimiterSelect) {
+            delimiterSelect.addEventListener('change', () => this.handleDelimiterChange());
         }
 
         // Textarea input
