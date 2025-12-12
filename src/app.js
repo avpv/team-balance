@@ -114,7 +114,6 @@ class Application {
         const activityConfig = activities[selectedActivity];
 
         if (!activityConfig) {
-            console.warn(`Activity '${selectedActivity}' not found`);
             return null;
         }
 
@@ -218,7 +217,7 @@ class Application {
             try {
                 this.currentPage.destroy();
             } catch (error) {
-                console.error('[ERROR] Error destroying page:', error);
+                // Error destroying page
             }
             this.currentPage = null;
         }
@@ -226,7 +225,6 @@ class Application {
         // Step 2: Get main container element
         const container = document.getElementById(ELEMENT_IDS.APP_MAIN);
         if (!container) {
-            console.error('[ERROR] App container #appMain not found!');
             return;
         }
 
@@ -250,7 +248,6 @@ class Application {
             // Update cached activity config
             this.activityConfig = currentActivityConfig;
         } catch (error) {
-            console.error('[ERROR] Error creating page:', error);
             container.innerHTML = `
                 <div class="error-state">
                     <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
@@ -265,7 +262,6 @@ class Application {
             page.mount();
             this.currentPage = page;
         } catch (error) {
-            console.error('[ERROR] Error mounting page:', error);
             container.innerHTML = `
                 <div class="error-state">
                     <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
@@ -484,13 +480,11 @@ class Application {
     setupErrorHandling() {
         // Global synchronous error handler
         window.addEventListener('error', (event) => {
-            console.error('[Global Error]', event.error);
             toast.error('An unexpected error occurred', TOAST.DEFAULT_DURATION);
         });
 
         // Unhandled promise rejection handler
         window.addEventListener('unhandledrejection', (event) => {
-            console.error('[Unhandled Promise Rejection]', event.reason);
             toast.error('An unexpected error occurred', TOAST.DEFAULT_DURATION);
         });
     }

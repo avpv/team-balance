@@ -78,37 +78,37 @@ const logger = {
     /**
      * Log informational message
      * Always visible, used for important flow information
-     * 
+     *
      * @param {string} message - Log message
      * @param {...*} args - Additional arguments to log
      * @returns {void}
      */
     info(message, ...args) {
-        console.info(`[Redirect] ${message}`, ...args);
+        // Logging disabled
     },
     
     /**
      * Log warning message
      * Used for non-critical issues or fallback scenarios
-     * 
+     *
      * @param {string} message - Warning message
      * @param {...*} args - Additional arguments to log
      * @returns {void}
      */
     warn(message, ...args) {
-        console.warn(`[Redirect] ${message}`, ...args);
+        // Logging disabled
     },
     
     /**
      * Log error message
      * Used for errors and exceptions
-     * 
+     *
      * @param {string} message - Error message
      * @param {...*} args - Additional arguments to log
      * @returns {void}
      */
     error(message, ...args) {
-        console.error(`[Redirect] ${message}`, ...args);
+        // Logging disabled
     },
     
     /**

@@ -293,7 +293,6 @@ export function initializeServices(activityConfig = null) {
     // Validate configuration
     const validation = registry.validate();
     if (!validation.valid) {
-        console.error('[Services] Validation failed:', validation.errors);
         throw new Error('Service configuration is invalid');
     }
 

@@ -690,7 +690,7 @@ class SettingsPage extends BasePage {
                     imported++;
                 } catch (error) {
                     skipped++;
-                    console.warn(`Skipped ${playerData.name}:`, error.message);
+                    // Player skipped due to error
                 }
             });
 

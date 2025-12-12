@@ -172,7 +172,7 @@ class ServiceRegistry {
 
         // Warn if overwriting existing service
         if (this.services.has(name)) {
-            console.warn(`[ServiceRegistry] Overwriting existing service: ${name}`);
+            // Service is being overwritten
         }
 
         // Create and store registration
@@ -385,7 +385,7 @@ class ServiceRegistry {
                 try {
                     registration.instance.dispose();
                 } catch (error) {
-                    console.error(`Error disposing service ${registration.name}:`, error);
+                    // Error disposing service
                 }
             }
         });

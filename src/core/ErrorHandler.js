@@ -275,16 +275,7 @@ class ErrorHandlerService {
      * Log error to console
      */
     logToConsole(error) {
-        const prefix = `[${error.category.toUpperCase()}:${error.severity.toUpperCase()}]`;
-        const style = this.getConsoleStyle(error.severity);
-
-        if (error.severity === ErrorSeverity.CRITICAL) {
-            console.error(prefix, error.message, error);
-        } else if (error.severity === ErrorSeverity.ERROR) {
-            console.error(prefix, error.message, error);
-        } else if (error.severity === ErrorSeverity.WARNING) {
-            console.warn(prefix, error.message, error);
-        }
+        // Logging disabled
     }
 
     /**
@@ -334,7 +325,6 @@ class ErrorHandlerService {
      * These may require app restart or significant user intervention
      */
     handleCriticalError(error) {
-        console.error('[CRITICAL ERROR]', error);
         // In a real app, might show a modal or error page
     }
 
@@ -343,7 +333,6 @@ class ErrorHandlerService {
      * Should be reported to user
      */
     handleError(error) {
-        console.error('[ERROR]', error);
         // Could show a toast notification
     }
 
@@ -352,7 +341,7 @@ class ErrorHandlerService {
      * Logged but may not be shown to user
      */
     handleWarning(error) {
-        console.warn('[WARNING]', error);
+        // Warning logged
     }
 
     /**
@@ -377,7 +366,7 @@ class ErrorHandlerService {
             try {
                 callback(error);
             } catch (err) {
-                console.error('Error in error listener:', err);
+                // Error in error listener
             }
         });
     }

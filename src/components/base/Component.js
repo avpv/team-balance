@@ -76,7 +76,6 @@ class Component {
         }
 
         if (!this.container) {
-            console.error('Cannot mount: container not found');
             return;
         }
 

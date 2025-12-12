@@ -400,8 +400,6 @@ export default class ApiImport extends Component {
             `);
 
         } catch (error) {
-            console.error('Error fetching data:', error);
-
             let errorMessage = error.message;
             if (error.message.includes('Failed to fetch')) {
                 errorMessage = 'Network error. Please check:\n• The URL is correct\n• CORS is enabled on the server\n• You have internet connection';
@@ -447,7 +445,7 @@ export default class ApiImport extends Component {
                 button.classList.remove('copied');
             }, 2000);
         }).catch(err => {
-            console.error('Failed to copy:', err);
+            // Failed to copy
         });
     }
 

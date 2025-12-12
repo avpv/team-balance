@@ -21,7 +21,6 @@ class StorageAdapter {
             localStorage.removeItem(test);
             return true;
         } catch (e) {
-            console.warn('localStorage not available, using memory cache');
             return false;
         }
     }
@@ -62,7 +61,6 @@ class StorageAdapter {
                 return defaultValue;
             }
         } catch (error) {
-            console.error(`Error reading from storage (${key}):`, error);
             return defaultValue;
         }
     }
@@ -86,13 +84,10 @@ class StorageAdapter {
             this.cache.set(fullKey, value);
             return true;
         } catch (error) {
-            console.error(`Error writing to storage (${key}):`, error);
-            
             // Check if quota exceeded
             if (error.name === 'QuotaExceededError') {
-                console.warn('Storage quota exceeded, clearing old data');
                 this.clearOldEntries();
-                
+
                 // Retry once
                 try {
                     if (this.isAvailable) {
@@ -101,10 +96,10 @@ class StorageAdapter {
                     this.cache.set(fullKey, value);
                     return true;
                 } catch (retryError) {
-                    console.error('Retry failed:', retryError);
+                    // Retry failed
                 }
             }
-            
+
             return false;
         }
     }
@@ -122,7 +117,6 @@ class StorageAdapter {
             this.cache.delete(fullKey);
             return true;
         } catch (error) {
-            console.error(`Error removing from storage (${key}):`, error);
             return false;
         }
     }
@@ -165,7 +159,6 @@ class StorageAdapter {
             this.cache.clear();
             return true;
         } catch (error) {
-            console.error('Error clearing storage:', error);
             return false;
         }
     }
@@ -201,7 +194,7 @@ class StorageAdapter {
                 localStorage.removeItem(entries[i].key);
             }
         } catch (error) {
-            console.error('Error clearing old entries:', error);
+            // Error clearing old entries
         }
     }
 
