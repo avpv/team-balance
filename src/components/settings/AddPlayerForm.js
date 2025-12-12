@@ -43,7 +43,7 @@ class AddPlayerForm extends BaseComponent {
                         <div class="section-content">
                             <button
                                 type="button"
-                                class="btn btn-secondary"
+                                class="btn btn-primary"
                                 id="${ELEMENT_IDS.IMPORT_BTN}"
                                 ${!currentActivity ? 'disabled' : ''}
                                 aria-label="Import players from CSV or JSON file">
