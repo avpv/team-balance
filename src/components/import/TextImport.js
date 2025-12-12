@@ -1,6 +1,5 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
-import { detectDelimiter } from '../../utils/csv.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
@@ -118,25 +117,6 @@ Alice Johnson${actualDelim}${pos[0]}`;
     handleInputChange() {
         const textarea = this.element.querySelector('#textImportInput');
         const data = textarea.value.trim();
-
-        // Auto-detect delimiter if data looks like CSV (has newlines)
-        if (data && data.includes('\n') && !data.startsWith('[') && !data.startsWith('{')) {
-            const detected = detectDelimiter(data);
-            if (detected !== this.delimiter) {
-                this.delimiter = detected;
-                // Update the dropdown to match
-                const select = this.element.querySelector('#delimiterSelect');
-                if (select) {
-                    // Convert tab to escaped version for the select value
-                    select.value = detected === '\t' ? '\t' : detected;
-                }
-                // Update example
-                const exampleBlock = this.element.querySelector('#csvExample');
-                if (exampleBlock) {
-                    exampleBlock.textContent = this.getExampleCSV(this.delimiter);
-                }
-            }
-        }
 
         if (this.onDataChange) {
             // Pass both data and delimiter
