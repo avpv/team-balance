@@ -390,10 +390,18 @@ class RedirectManager {
                 return;
             }
 
-            // Step 4: Skip static HTML files (not SPA routes)
-            // Static files should be served directly by the server
-            // If they don't exist, the user should see a 404 error
-            if (appPath.match(/\.html\/?$/i)) {
+            // Step 4: Handle static HTML files
+            // If path ends with .html/ (trailing slash), redirect to version without slash
+            // If path ends with .html (no trailing slash), don't redirect (show 404)
+            if (appPath.match(/\.html\/$/i)) {
+                // Remove trailing slash and redirect to correct HTML path
+                const correctedPath = appPath.replace(/\/$/, '');
+                const correctedUrl = this.config.BASE_URL + correctedPath;
+                logger.info('HTML file with trailing slash, redirecting to:', correctedUrl);
+                window.location.replace(correctedUrl);
+                return;
+            } else if (appPath.match(/\.html$/i)) {
+                // Static HTML file without trailing slash - show 404
                 logger.info('Static HTML file requested, not redirecting:', appPath);
                 return;
             }
