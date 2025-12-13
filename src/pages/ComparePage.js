@@ -376,7 +376,8 @@ class ComparePage extends BasePage {
             return;
         }
 
-        const modal = new Modal({
+        let modal;
+        modal = new Modal({
             title: 'Reset All Comparisons',
             content: this.renderResetAllContent(),
             showCancel: true,
@@ -406,6 +407,9 @@ class ComparePage extends BasePage {
                     toast.error(error.message);
                     return false;
                 }
+            },
+            onClose: () => {
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 
