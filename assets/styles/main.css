@@ -555,6 +555,14 @@ a:hover {
     color: var(--color-text-tertiary);
 }
 
+/* Page loading state for lazy-loaded pages */
+.page-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
 .loading-spinner {
     width: 2rem;
     height: 2rem;
@@ -564,6 +572,10 @@ a:hover {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: var(--spacing-4);
+}
+
+.page-loading .loading-spinner {
+    margin-bottom: 0;
 }
 
 @keyframes spin {
