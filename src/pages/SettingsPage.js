@@ -302,7 +302,7 @@ class SettingsPage extends BasePage {
             confirmText: 'Save',
             cancelText: 'Cancel',
             onConfirm: () => {
-                const selected = this.getSelectedModalPositions('editPositions');
+                const selected = this.getSelectedModalPositions('editPositions', modal);
                 if (selected.length === 0) {
                     toast.error('Please select at least one position');
                     return false;
@@ -363,7 +363,7 @@ class SettingsPage extends BasePage {
             confirmText: 'Reset',
             cancelText: 'Cancel',
             onConfirm: () => {
-                const selected = this.getSelectedModalPositions('resetPositions');
+                const selected = this.getSelectedModalPositions('resetPositions', modal);
                 if (selected.length === 0) {
                     toast.error('Please select at least one position');
                     return false;
@@ -429,7 +429,7 @@ class SettingsPage extends BasePage {
             confirmText: 'Reset All',
             cancelText: 'Cancel',
             onConfirm: () => {
-                const selected = this.getSelectedModalPositions('resetAllPositions');
+                const selected = this.getSelectedModalPositions('resetAllPositions', modal);
                 if (selected.length === 0) {
                     toast.error('Please select at least one position');
                     return false;
@@ -490,7 +490,7 @@ class SettingsPage extends BasePage {
             confirmText: 'Remove All',
             cancelText: 'Cancel',
             onConfirm: () => {
-                const selected = this.getSelectedModalPositions('clearAllPositions');
+                const selected = this.getSelectedModalPositions('clearAllPositions', modal);
                 if (selected.length === 0) {
                     toast.error('Please select at least one position');
                     return false;
@@ -753,8 +753,10 @@ class SettingsPage extends BasePage {
         }
     }
 
-    getSelectedModalPositions(inputName) {
-        const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
+    getSelectedModalPositions(inputName, modal) {
+        // Search within the modal container to avoid conflicts with other elements
+        const container = modal && modal.container ? modal.container : document;
+        const checkboxes = container.querySelectorAll(`input[name="${inputName}"]:checked`);
         return Array.from(checkboxes).map(cb => cb.value);
     }
 }
