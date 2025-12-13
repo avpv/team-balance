@@ -31,6 +31,7 @@ class ActivitySelector extends BaseComponent {
 
         const otherOptions = allActivitiesEntries
             .filter(([key]) => !recentActivitySet.has(key))
+            .filter(([key, config]) => config) // Filter out any invalid/unloaded activities
             .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
         return `
