@@ -1,0 +1,18 @@
+/* Export Format Picker Styles - Dark Theme */
+/* Extends/reuses styles from ImportDataSourcePicker */
+
+.export-format-picker {
+    padding: var(--spacing-8);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Use same picker-header and data-sources-grid styles from ImportDataSourcePicker.css */
+/* The .data-source-tile class is already defined there and works for both import and export */
+
+/* Export-specific tile styling (optional overrides) */
+.export-format-tile {
+    /* Inherits all styles from .data-source-tile */
+}
+
+/* Export format specific icon colors can be customized here if needed */
