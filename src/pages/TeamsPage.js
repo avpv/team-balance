@@ -700,11 +700,12 @@ class TeamsPage extends BasePage {
         try {
             const { teams } = this.state.teams;
             const showElo = this.state.showEloRatings;
+            const showPositions = this.state.showPositions;
 
             const lines = [];
-            const header = showElo ?
-                ['Team', 'Player', 'Position', 'ELO Rating'] :
-                ['Team', 'Player', 'Position'];
+            const header = ['Team', 'Player'];
+            if (showPositions) header.push('Position');
+            if (showElo) header.push('ELO Rating');
 
             lines.push(header.join(','));
 
@@ -716,9 +717,12 @@ class TeamsPage extends BasePage {
 
                     const row = [
                         `Team ${teamIndex + 1}`,
-                        `"${player.name.replace(/"/g, '""')}"`,
-                        posName
+                        `"${player.name.replace(/"/g, '""')}"`
                     ];
+
+                    if (showPositions) {
+                        row.push(posName);
+                    }
 
                     if (showElo) {
                         row.push(rating);
