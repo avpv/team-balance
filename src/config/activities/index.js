@@ -143,56 +143,32 @@ export function getActivityConfig(activityName) {
 export const activities = {};
 
 /**
- * Initialize activities with optimized loading
+ * Initialize activities - loads all activities immediately
  *
- * Performance optimization:
- * - Only loads the selected activity immediately (critical path)
- * - Loads remaining activities in background after page is interactive
- * - Uses requestIdleCallback for non-critical loading
+ * Loads all activity configurations to ensure the activity selector
+ * displays all available options immediately.
  *
- * @param {string|null} selectedActivity - Currently selected activity key from storage
+ * @param {string|null} selectedActivity - Currently selected activity key from storage (unused, kept for API compatibility)
  * @returns {Promise<Object>} Loaded activities object
  */
 export async function initializeActivities(selectedActivity = null) {
-    // Step 1: Load selected activity immediately (critical for app to work)
-    if (selectedActivity && ACTIVITY_FILES[selectedActivity]) {
-        try {
-            const config = await loadActivity(selectedActivity);
-            activities[selectedActivity] = config;
-        } catch (error) {
-            // Selected activity failed to load, continue with others
-        }
-    }
+    // Load all activities at once to ensure they're available for the selector
+    const activityNames = Object.keys(ACTIVITY_FILES);
 
-    // Step 2: Load remaining activities in background for selector
-    // Use requestIdleCallback if available, otherwise setTimeout
-    const loadRemaining = async () => {
-        const remainingActivities = Object.keys(ACTIVITY_FILES).filter(
-            name => name !== selectedActivity
+    // Load in batches to maintain some performance optimization
+    const batchSize = 10;
+    for (let i = 0; i < activityNames.length; i += batchSize) {
+        const batch = activityNames.slice(i, i + batchSize);
+        await Promise.all(
+            batch.map(async name => {
+                try {
+                    const config = await loadActivity(name);
+                    activities[name] = config;
+                } catch (error) {
+                    console.warn(`Failed to load activity '${name}':`, error);
+                }
+            })
         );
-
-        // Load in batches to avoid blocking
-        const batchSize = 5;
-        for (let i = 0; i < remainingActivities.length; i += batchSize) {
-            const batch = remainingActivities.slice(i, i + batchSize);
-            await Promise.all(
-                batch.map(async name => {
-                    try {
-                        const config = await loadActivity(name);
-                        activities[name] = config;
-                    } catch (error) {
-                        // Silent fail for background loading
-                    }
-                })
-            );
-        }
-    };
-
-    // Schedule background loading
-    if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => loadRemaining(), { timeout: 3000 });
-    } else {
-        setTimeout(loadRemaining, 100);
     }
 
     return activities;
