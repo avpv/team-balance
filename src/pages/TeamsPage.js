@@ -45,6 +45,7 @@ class TeamsPage extends BasePage {
             teams: savedTeams,
             isOptimizing: false,
             showEloRatings: savedSettings.showEloRatings ?? true,
+            showPositions: savedSettings.showPositions ?? true,
             teamCount: savedSettings.teamCount ?? 2,
             composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
             positionWeights: savedSettings.positionWeights ?? initialWeights
@@ -64,6 +65,7 @@ class TeamsPage extends BasePage {
             this.setState({
                 teams: savedTeams,
                 showEloRatings: savedSettings.showEloRatings ?? true,
+                showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
                 composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
                 positionWeights: this.getInitialWeights()
@@ -76,6 +78,7 @@ class TeamsPage extends BasePage {
             this.setState({
                 teams: savedTeams,
                 showEloRatings: savedSettings.showEloRatings ?? true,
+                showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
                 composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
                 positionWeights: this.getInitialWeights()
@@ -159,6 +162,7 @@ class TeamsPage extends BasePage {
 
             return {
                 showEloRatings: saved.showEloRatings,
+                showPositions: saved.showPositions,
                 teamCount: saved.teamCount,
                 composition: saved.composition,
                 positionWeights: saved.positionWeights
@@ -180,6 +184,7 @@ class TeamsPage extends BasePage {
 
             const settings = {
                 showEloRatings: this.state.showEloRatings,
+                showPositions: this.state.showPositions,
                 teamCount: this.state.teamCount,
                 composition: this.state.composition,
                 positionWeights: this.state.positionWeights,
@@ -377,6 +382,16 @@ class TeamsPage extends BasePage {
                             <span class="toggle-slider"></span>
                             <span class="toggle-label">Show ELO Ratings</span>
                         </label>
+                        <label class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                id="showPositionsToggle"
+                                ${this.state.showPositions ? 'checked' : ''}
+                                aria-label="Toggle player positions visibility"
+                            >
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Show Positions</span>
+                        </label>
                         <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);" aria-hidden="true"></div>
                         <button
                             class="btn btn-primary btn-sm"
@@ -437,6 +452,7 @@ class TeamsPage extends BasePage {
         const strength = this.eloService.calculateTeamStrength(team);
         const weightedRating = this.calculateWeightedTeamRating(team);
         const showElo = this.state.showEloRatings;
+        const showPositions = this.state.showPositions;
 
         return `
             <div class="team-card">
@@ -446,7 +462,7 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="team-players">
-                    ${team.map((player, playerIndex) => this.renderTeamPlayer(player, showElo, playerIndex)).join('')}
+                    ${team.map((player, playerIndex) => this.renderTeamPlayer(player, showElo, showPositions, playerIndex)).join('')}
                 </div>
             </div>
         `;
@@ -470,7 +486,7 @@ class TeamsPage extends BasePage {
         return Math.round(weightedTotal);
     }
 
-    renderTeamPlayer(player, showElo, playerIndex) {
+    renderTeamPlayer(player, showElo, showPositions, playerIndex) {
         const position = player.assignedPosition;
         const rating = Math.round(player.positionRating);
         const posName = this.playerService.positions[position];
@@ -486,7 +502,7 @@ class TeamsPage extends BasePage {
                     <div class="player-name font-medium mb-1">
                         ${this.escape(player.name)}
                     </div>
-                    <div class="player-position text-sm text-secondary">${posName}</div>
+                    ${showPositions ? `<div class="player-position text-sm text-secondary">${posName}</div>` : ''}
                 </div>
                 ${showElo ? `
                     <div class="player-rating font-semibold text-brand">${rating}</div>
@@ -575,6 +591,18 @@ class TeamsPage extends BasePage {
             showEloToggle.addEventListener('change', (e) => {
                 trackClick('showEloToggle', 'teams', e.target.checked ? 'show_elo' : 'hide_elo');
                 this.setState({ showEloRatings: e.target.checked });
+
+                // Save settings to localStorage
+                this.saveSettings();
+            });
+        }
+
+        // Show positions toggle
+        const showPositionsToggle = this.$('#showPositionsToggle');
+        if (showPositionsToggle) {
+            showPositionsToggle.addEventListener('change', (e) => {
+                trackClick('showPositionsToggle', 'teams', e.target.checked ? 'show_positions' : 'hide_positions');
+                this.setState({ showPositions: e.target.checked });
 
                 // Save settings to localStorage
                 this.saveSettings();
