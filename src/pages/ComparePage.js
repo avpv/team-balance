@@ -409,7 +409,7 @@ class ComparePage extends BasePage {
                 }
             },
             onClose: () => {
-                modal.destroy();
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 

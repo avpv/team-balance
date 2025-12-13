@@ -318,7 +318,8 @@ class SettingsPage extends BasePage {
                 }
             },
             onClose: () => {
-                modal.destroy();
+                // Delay destroy to allow close() to complete first
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 
@@ -383,7 +384,7 @@ class SettingsPage extends BasePage {
                 }
             },
             onClose: () => {
-                modal.destroy();
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 
@@ -453,7 +454,7 @@ class SettingsPage extends BasePage {
                 }
             },
             onClose: () => {
-                modal.destroy();
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 
@@ -518,7 +519,7 @@ class SettingsPage extends BasePage {
                 }
             },
             onClose: () => {
-                modal.destroy();
+                setTimeout(() => modal.destroy(), 0);
             }
         });
 
