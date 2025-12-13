@@ -129,6 +129,16 @@ class PositionSelector extends BaseComponent {
                     <div class="position-card__actions">
                         <button
                             type="button"
+                            class="btn btn-sm btn-primary position-card__compare-btn"
+                            data-position-compare="${key}"
+                            aria-label="Compare ${name} players"
+                            title="Start comparing ${name} players"
+                            onclick="event.stopPropagation();">
+                            ${getIcon('scale', { size: 14, className: 'btn-icon' })}
+                            Compare
+                        </button>
+                        <button
+                            type="button"
                             class="btn btn-sm btn-secondary position-card__reset-btn"
                             data-position-reset="${key}"
                             aria-label="Reset ${name} comparisons"
@@ -173,6 +183,20 @@ class PositionSelector extends BaseComponent {
                 } else if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     card.click();
+                }
+            });
+        });
+
+        // Position card compare buttons
+        const compareButtons = this.container.querySelectorAll('.position-card__compare-btn');
+        compareButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                const positionKey = btn.getAttribute('data-position-compare');
+                if (positionKey && this.onSelect) {
+                    this.onSelect(positionKey);
                 }
             });
         });
