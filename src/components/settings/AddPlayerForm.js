@@ -120,7 +120,7 @@ class AddPlayerForm extends BaseComponent {
                                     class="btn btn-secondary"
                                     id="${ELEMENT_IDS.CLEAR_ALL_BTN}"
                                     ${!currentActivity ? 'disabled' : ''}
-                                    aria-label="Remove all players from current session">
+                                    aria-label="Remove all players from current team">
                                     ${getIcon('trash', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
                                     Remove All Players
                                 </button>
