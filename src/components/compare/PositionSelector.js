@@ -1,6 +1,7 @@
 import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
+import { trackClick } from '../../config/analytics.js';
 
 const { ELEMENT_IDS } = uiConfig;
 
@@ -196,6 +197,7 @@ class PositionSelector extends BaseComponent {
 
                 const positionKey = btn.getAttribute('data-position-compare');
                 if (positionKey && this.onSelect) {
+                    trackClick('compare_position', 'compare', positionKey);
                     this.onSelect(positionKey);
                 }
             });
