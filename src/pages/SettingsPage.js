@@ -294,7 +294,8 @@ class SettingsPage extends BasePage {
             return;
         }
 
-        const modal = new Modal({
+        let modal;
+        modal = new Modal({
             title: `Edit Positions - ${player.name}`,
             content: this.renderEditPositionsContent(player),
             showCancel: true,
@@ -315,6 +316,9 @@ class SettingsPage extends BasePage {
                     toast.error(error.message);
                     return false;
                 }
+            },
+            onClose: () => {
+                modal.destroy();
             }
         });
 
@@ -355,7 +359,8 @@ class SettingsPage extends BasePage {
             return;
         }
 
-        const modal = new Modal({
+        let modal;
+        modal = new Modal({
             title: `Reset Player - ${player.name}`,
             content: this.renderResetPlayerContent(player),
             showCancel: true,
@@ -376,6 +381,9 @@ class SettingsPage extends BasePage {
                     toast.error(error.message);
                     return false;
                 }
+            },
+            onClose: () => {
+                modal.destroy();
             }
         });
 
@@ -421,7 +429,8 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Reset All =====
     showResetAllModal() {
-        const modal = new Modal({
+        let modal;
+        modal = new Modal({
             title: 'Reset All Player Ratings',
             content: this.renderResetAllContent(),
             showCancel: true,
@@ -442,6 +451,9 @@ class SettingsPage extends BasePage {
                     toast.error(error.message);
                     return false;
                 }
+            },
+            onClose: () => {
+                modal.destroy();
             }
         });
 
@@ -482,7 +494,8 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Clear All =====
     showClearAllModal() {
-        const modal = new Modal({
+        let modal;
+        modal = new Modal({
             title: 'Remove All Players',
             content: this.renderClearAllContent(),
             showCancel: true,
@@ -503,6 +516,9 @@ class SettingsPage extends BasePage {
                     toast.error(error.message);
                     return false;
                 }
+            },
+            onClose: () => {
+                modal.destroy();
             }
         });
 
