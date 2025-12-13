@@ -14,30 +14,66 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" sizes="96x96">
     <link rel="apple-touch-icon" href="assets/images/logo.svg" sizes="180x180">
 
+    <!-- DNS Prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="assets/styles/main.css" as="style">
+    <link rel="preload" href="assets/styles/page-structure.css" as="style">
+
     <!-- Minimal inline style for seamless loading -->
     <style>
         body {
             background-color: #0d1117;
         }
+        /* Critical loading spinner for lazy-loaded pages */
+        .page-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(47, 129, 247, 0.2);
+            border-top-color: #2f81f7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 
-    <!-- GitHub-inspired Styles -->
+    <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="assets/styles/main.css">
-    <link rel="stylesheet" href="assets/styles/components.css">
     <link rel="stylesheet" href="assets/styles/page-structure.css">
-    <link rel="stylesheet" href="assets/styles/pages.css">
-    <link rel="stylesheet" href="assets/styles/utilities.css">
-    <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css">
-    <link rel="stylesheet" href="src/components/import/ImportMethod.css">
+    <link rel="stylesheet" href="assets/styles/components.css">
 
-    <!-- Preload critical resources -->
+    <!-- Non-critical CSS (non-blocking with print media trick) -->
+    <link rel="stylesheet" href="assets/styles/pages.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/styles/utilities.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="src/components/import/ImportMethod.css" media="print" onload="this.media='all'">
+    <!-- Fallback for browsers with JS disabled -->
+    <noscript>
+        <link rel="stylesheet" href="assets/styles/pages.css">
+        <link rel="stylesheet" href="assets/styles/utilities.css">
+        <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css">
+        <link rel="stylesheet" href="src/components/import/ImportMethod.css">
+    </noscript>
+
+    <!-- Preload critical JS modules -->
     <link rel="modulepreload" href="src/app.js" crossorigin="anonymous">
     <link rel="modulepreload" href="src/core/PreloadInit.js" crossorigin="anonymous">
+    <link rel="modulepreload" href="src/core/Router.js" crossorigin="anonymous">
+    <link rel="modulepreload" href="src/core/StateManager.js" crossorigin="anonymous">
 
     <!-- FOUC Prevention - Critical initialization -->
     <script type="module" src="src/core/PreloadInit.js"></script>
 
-    <!-- Google Analytics -->
+    <!-- Google Analytics (deferred internally) -->
     <script type="module" src="src/config/analytics.js"></script>
 </head>
 
