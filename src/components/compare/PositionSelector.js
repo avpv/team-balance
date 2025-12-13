@@ -133,8 +133,9 @@ class PositionSelector extends BaseComponent {
                             class="btn btn-sm btn-primary position-card__compare-btn"
                             data-position-compare="${key}"
                             aria-label="Compare ${name} players"
-                            title="Start comparing ${name} players"
-                            onclick="event.stopPropagation();">
+                            title="${isComplete ? 'All comparisons complete' : 'Start comparing ' + name + ' players'}"
+                            onclick="event.stopPropagation();"
+                            ${isComplete ? 'disabled' : ''}>
                             ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
                             Compare
                         </button>
