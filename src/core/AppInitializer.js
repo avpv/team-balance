@@ -29,8 +29,11 @@ class AppInitializer {
      */
     async run() {
         try {
-            // Step 0: Initialize activities (load all activity configs)
-            await initializeActivities();
+            // Step 0: Get selected activity from storage for optimized loading
+            const selectedActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+
+            // Step 1: Initialize activities (loads selected activity first, others in background)
+            await initializeActivities(selectedActivity);
 
             // Reload activity config after activities are initialized
             this.app.activityConfig = this.app.loadActivityConfig();

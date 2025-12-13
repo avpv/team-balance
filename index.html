@@ -14,30 +14,44 @@
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg" sizes="96x96">
     <link rel="apple-touch-icon" href="assets/images/logo.svg" sizes="180x180">
 
-    <!-- Minimal inline style for seamless loading -->
-    <style>
-        body {
-            background-color: #0d1117;
-        }
-    </style>
+    <!-- DNS Prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-    <!-- GitHub-inspired Styles -->
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="assets/styles/main.css" as="style">
+    <link rel="preload" href="assets/styles/page-structure.css" as="style">
+
+    <!-- Prevent white flash on dark theme before CSS loads -->
+    <style>body{background:#0d1117}</style>
+
+    <!-- Critical CSS (render-blocking) -->
     <link rel="stylesheet" href="assets/styles/main.css">
-    <link rel="stylesheet" href="assets/styles/components.css">
     <link rel="stylesheet" href="assets/styles/page-structure.css">
-    <link rel="stylesheet" href="assets/styles/pages.css">
-    <link rel="stylesheet" href="assets/styles/utilities.css">
-    <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css">
-    <link rel="stylesheet" href="src/components/import/ImportMethod.css">
+    <link rel="stylesheet" href="assets/styles/components.css">
 
-    <!-- Preload critical resources -->
+    <!-- Non-critical CSS (non-blocking with print media trick) -->
+    <link rel="stylesheet" href="assets/styles/pages.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/styles/utilities.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="src/components/import/ImportMethod.css" media="print" onload="this.media='all'">
+    <!-- Fallback for browsers with JS disabled -->
+    <noscript>
+        <link rel="stylesheet" href="assets/styles/pages.css">
+        <link rel="stylesheet" href="assets/styles/utilities.css">
+        <link rel="stylesheet" href="src/components/import/ImportDataSourcePicker.css">
+        <link rel="stylesheet" href="src/components/import/ImportMethod.css">
+    </noscript>
+
+    <!-- Preload critical JS modules -->
     <link rel="modulepreload" href="src/app.js" crossorigin="anonymous">
     <link rel="modulepreload" href="src/core/PreloadInit.js" crossorigin="anonymous">
+    <link rel="modulepreload" href="src/core/Router.js" crossorigin="anonymous">
+    <link rel="modulepreload" href="src/core/StateManager.js" crossorigin="anonymous">
 
     <!-- FOUC Prevention - Critical initialization -->
     <script type="module" src="src/core/PreloadInit.js"></script>
 
-    <!-- Google Analytics -->
+    <!-- Google Analytics (deferred internally) -->
     <script type="module" src="src/config/analytics.js"></script>
 </head>
 

@@ -40,12 +40,18 @@ import { trackClick } from './config/analytics.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
-// Page imports
-import SettingsPage from './pages/SettingsPage.js';
-import ComparePage from './pages/ComparePage.js';
-import RankingsPage from './pages/RankingsPage.js';
-import TeamsPage from './pages/TeamsPage.js';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage.js';
+// Lazy-loaded page modules for better initial load performance
+// Pages are loaded dynamically only when needed
+const pageModules = {
+    settings: () => import('./pages/SettingsPage.js'),
+    compare: () => import('./pages/ComparePage.js'),
+    rankings: () => import('./pages/RankingsPage.js'),
+    teams: () => import('./pages/TeamsPage.js'),
+    'privacy-policy': () => import('./pages/PrivacyPolicyPage.js')
+};
+
+// Cache for loaded page classes to avoid re-importing
+const pageCache = new Map();
 
 /**
  * Application configuration constants
@@ -157,38 +163,87 @@ class Application {
     registerRoutes() {
         // Home/Settings page
         router.register('/', () => {
-            this.renderPage('settings', SettingsPage);
+            this.renderPageLazy('settings');
         });
 
         // Player comparison page
         router.register('/compare/', () => {
-            this.renderPage('compare', ComparePage);
+            this.renderPageLazy('compare');
         });
 
         // Player rankings page
         router.register('/rankings/', () => {
-            this.renderPage('rankings', RankingsPage);
+            this.renderPageLazy('rankings');
         });
 
         // Team builder page
         router.register('/teams/', () => {
-            this.renderPage('teams', TeamsPage);
+            this.renderPageLazy('teams');
         });
 
         // Privacy policy page
         router.register('/privacy-policy.html/', () => {
-            this.renderPage('privacy-policy', PrivacyPolicyPage);
+            this.renderPageLazy('privacy-policy');
         });
 
         // Also handle /privacy-policy/ without the .html extension
         router.register('/privacy-policy/', () => {
-            this.renderPage('privacy-policy', PrivacyPolicyPage);
+            this.renderPageLazy('privacy-policy');
         });
     }
 
     /**
+     * Lazy load and render a page component
+     *
+     * Dynamically imports page modules for better initial load performance.
+     * Uses caching to avoid re-importing already loaded pages.
+     *
+     * @private
+     * @async
+     * @param {string} pageKey - Page identifier matching pageModules keys
+     * @returns {Promise<void>}
+     */
+    async renderPageLazy(pageKey) {
+        const container = document.getElementById(ELEMENT_IDS.APP_MAIN);
+        if (!container) {
+            return;
+        }
+
+        // Show loading state only if page is not cached
+        if (!pageCache.has(pageKey)) {
+            container.innerHTML = '<div class="page-loading"><div class="loading-spinner"></div></div>';
+        }
+
+        try {
+            // Get PageClass from cache or load dynamically
+            let PageClass;
+            if (pageCache.has(pageKey)) {
+                PageClass = pageCache.get(pageKey);
+            } else {
+                const module = await pageModules[pageKey]();
+                PageClass = module.default;
+                pageCache.set(pageKey, PageClass);
+            }
+
+            // Render the page
+            this.renderPage(pageKey, PageClass);
+        } catch (error) {
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
+                    <p>Failed to load page: ${this.escape(error.message)}</p>
+                    <button onclick="location.reload()" class="btn btn-primary">
+                        ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                        Reload Page
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    /**
      * Render a page component
-     * 
+     *
      * Complete page lifecycle management:
      * 1. Destroy current page (cleanup, event unsubscribe)
      * 2. Clear container DOM
@@ -196,17 +251,17 @@ class Application {
      * 4. Mount page to DOM (render, attach events)
      * 5. Update navigation active state
      * 6. Scroll to top of page
-     * 
+     *
      * Error Handling:
      * - Creation errors: Show error state in container
      * - Mount errors: Show reload button
      * - All errors logged to console
-     * 
+     *
      * Performance:
      * - No page caching (always fresh instance)
      * - Automatic cleanup prevents memory leaks
      * - Smooth transitions via scroll-to-top
-     * 
+     *
      * @private
      * @param {string} name - Internal page identifier for logging
      * @param {Class} PageClass - Page component class to instantiate
