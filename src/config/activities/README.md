@@ -86,14 +86,29 @@ export default {
 ```
 
 **Step 2:** Add to `index.js`:
+
+1. Add a static import at the top:
+```javascript
+import tennis from './tennis.js';
+```
+
+2. Add to `ACTIVITY_FILES`:
 ```javascript
 const ACTIVITY_FILES = {
     // ... existing activities
-    tennis: 'tennis.js'  // Add this line!
+    tennis: 'tennis.js'
 };
 ```
 
-**That's it!** The activity will be automatically loaded at app startup. No need to manually import or add to the activities object.
+3. Add to `ACTIVITY_CONFIGS`:
+```javascript
+const ACTIVITY_CONFIGS = {
+    // ... existing activities
+    tennis
+};
+```
+
+**That's it!** The activity will be available immediately at app startup.
 
 ## Position Weight Guidelines
 
