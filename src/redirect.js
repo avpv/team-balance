@@ -390,10 +390,20 @@ class RedirectManager {
                 return;
             }
 
-            // Step 4: Skip static HTML files (not SPA routes)
-            // Static files should be served directly by the server
+            // Step 4: Handle static HTML files
+            // If path ends with .html/ (trailing slash), redirect to path without trailing slash
+            // This fixes the infinite redirect issue when accessing /privacy-policy.html/
+            if (appPath.match(/\.html\/$/i)) {
+                const cleanPath = appPath.slice(0, -1); // Remove trailing slash
+                logger.info('HTML file with trailing slash, redirecting to:', cleanPath);
+                window.location.replace(this.config.BASE_URL + cleanPath);
+                return;
+            }
+
+            // Skip static HTML files without trailing slash (not SPA routes)
+            // These should be served directly by the server
             // If they don't exist, the user should see a 404 error
-            if (appPath.match(/\.html\/?$/i)) {
+            if (appPath.match(/\.html$/i)) {
                 logger.info('Static HTML file requested, not redirecting:', appPath);
                 return;
             }
