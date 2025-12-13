@@ -134,7 +134,7 @@ export function getIcon(name, options = {}) {
         copy: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
 
         // Arrows Swap / Compare / Exchange
-        'arrows-swap': `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><path d="M4 8h12"/><path d="M12 4l4 4-4 4"/><path d="M20 16H8"/><path d="M12 20l-4-4 4-4"/></svg>`
+        'arrows-swap': `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><path d="M4 6h12"/><path d="M12 2l4 4-4 4"/><path d="M20 18H8"/><path d="M12 22l-4-4 4-4"/></svg>`
     };
 
     return icons[name] || icons.info;
