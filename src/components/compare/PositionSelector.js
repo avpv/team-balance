@@ -135,7 +135,7 @@ class PositionSelector extends BaseComponent {
                             aria-label="Compare ${name} players"
                             title="Start comparing ${name} players"
                             onclick="event.stopPropagation();">
-                            ${getIcon('scale', { size: 14, className: 'btn-icon' })}
+                            ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
                             Compare
                         </button>
                         <button
