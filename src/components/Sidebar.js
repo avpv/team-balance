@@ -74,7 +74,7 @@ class Sidebar extends Component {
         return `
             <div class="sidebar">
                 <div class="sidebar__header">
-                    <h3 class="sidebar__title">Recents</h3>
+                    <h3 class="sidebar__title">Recent Teams</h3>
                 </div>
 
                 <div class="sidebar__list">
@@ -88,8 +88,8 @@ class Sidebar extends Component {
     renderEmptyState() {
         return `
             <div class="sidebar__empty">
-                <p>No sessions</p>
-                <p class="text-muted">Create your first teams</p>
+                <p>No teams yet</p>
+                <p class="text-muted">Create your first team</p>
             </div>
         `;
     }
@@ -122,7 +122,7 @@ class Sidebar extends Component {
                         class="session-item__delete"
                         ${DATA_ATTRIBUTES.SESSION_ID}="${session.id}"
                         ${DATA_ATTRIBUTES.ACTIVITY_KEY}="${activityKey}"
-                        title="Delete session">
+                        title="Delete team">
                     ${getIcon('trash')}
                 </button>
             </div>
@@ -229,9 +229,9 @@ class Sidebar extends Component {
         const session = this.sessionService.getSession(activityKey, sessionId);
         const playerCount = session?.players?.length || 0;
 
-        let confirmMessage = 'Delete this session?';
+        let confirmMessage = 'Delete this team?';
         if (playerCount > 0) {
-            confirmMessage = `Delete session with ${playerCount} players?`;
+            confirmMessage = `Delete team with ${playerCount} players?`;
         }
 
         if (confirm(confirmMessage)) {
@@ -263,7 +263,7 @@ class Sidebar extends Component {
                     storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                     // Show message
-                    toast.info('All sessions deleted. Please select an activity to continue.');
+                    toast.info('All teams deleted. Please select an activity to continue.');
 
                     // Force immediate save before navigation/reload to ensure deletion persists
                     this.sessionService.sessionRepository.stateManager.save();
@@ -289,9 +289,9 @@ class Sidebar extends Component {
 
                     // Show appropriate message
                     if (totalSessionCount > 0) {
-                        toast.info('Session deleted. Select a session from the sidebar to continue.');
+                        toast.info('Team deleted. Select a team from the sidebar to continue.');
                     } else {
-                        toast.info('Session deleted. Please select an activity to continue.');
+                        toast.info('Team deleted. Please select an activity to continue.');
                     }
 
                     // Force immediate save before navigation/reload

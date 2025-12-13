@@ -68,15 +68,15 @@ class ActivitySelector extends BaseComponent {
                                 type="button"
                                 class="btn btn--secondary"
                                 id="createSessionBtn"
-                                title="Create a new team session"
-                                aria-label="Create new team session">
+                                title="Create a new team with its own player list"
+                                aria-label="Create new team">
                                 ${getIcon('plus', { size: 16, className: 'btn-icon' })}
-                                New Session
+                                New Team
                             </button>
                         </div>
                         <p class="form-help-text" id="activity-help-text">
-                            Choose your sport or activity, then click "New Session" to start building teams.
-                            Your previous sessions are saved in the sidebar.
+                            Choose your sport or activity, then click "New Team" to start.
+                            Each team has its own player list and is saved in the sidebar.
                         </p>
                     </div>
                 </div>
@@ -178,7 +178,7 @@ class ActivitySelector extends BaseComponent {
 
         // Show info toast
         if (currentActivity !== activityKey) {
-            toast.info(`${selectedActivity.name} will be applied when you create a new session`);
+            toast.info(`${selectedActivity.name} will be applied when you create a new team`);
         }
     }
 
@@ -233,7 +233,7 @@ class ActivitySelector extends BaseComponent {
                 activity: currentActivity
             });
 
-            toast.success('New session created');
+            toast.success('New team created');
             // Page will auto-update via event bus
         } catch (error) {
             toast.error(error.message);
