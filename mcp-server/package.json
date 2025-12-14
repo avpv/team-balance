@@ -1,0 +1,40 @@
+{
+  "name": "team-balance-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server for TeamBalance - AI-powered team balancing with ELO ratings",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "team-balance-mcp": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "dev": "npx tsx src/index.ts",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "team-balance",
+    "elo-rating",
+    "team-optimization",
+    "claude"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
