@@ -855,12 +855,7 @@ class TeamsPage extends BasePage {
      * Generate JSON export
      */
     generateJsonExport(teams, showElo, showPositions) {
-        const weightedBalance = this.calculateWeightedBalance(teams);
-
         const exportData = {
-            generatedAt: new Date().toISOString(),
-            balance: weightedBalance,
-            teamCount: teams.length,
             teams: teams.map((team, teamIndex) => ({
                 name: `Team ${teamIndex + 1}`,
                 totalRating: showElo ? this.calculateWeightedTeamRating(team) : undefined,
