@@ -100,9 +100,9 @@ export default class ExportContent extends Component {
                             ${getIcon('download', { size: 16 })}
                             Download
                         </button>
-                        <button class="btn btn-secondary copy-btn" type="button">
-                            ${getIcon('copy', { size: 16 })}
-                            Copy to Clipboard
+                        <button class="btn btn-sm copy-button copy-btn" type="button">
+                            ${getIcon('copy', { size: 14 })}
+                            Copy
                         </button>
                     </div>
                 </div>
