@@ -15,4 +15,37 @@
     /* Inherits all styles from .data-source-tile */
 }
 
+/* Copy to clipboard button */
+.copy-clipboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: var(--spacing-3);
+    z-index: 1;
+}
+
+.copy-clipboard-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary);
+}
+
+.copy-clipboard-btn:active {
+    transform: scale(0.95);
+}
+
+.copy-clipboard-btn.copied {
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+    border-color: var(--color-success-border);
+}
+
 /* Export format specific icon colors can be customized here if needed */

@@ -700,12 +700,15 @@ class TeamsPage extends BasePage {
         if (!this.state.teams) return;
 
         // Create export format picker
-        this.exportFormatPicker = new ExportFormatPicker((format) => {
-            this.executeExport(format);
-            if (this.exportModal) {
-                this.exportModal.close();
-            }
-        });
+        this.exportFormatPicker = new ExportFormatPicker(
+            (format) => {
+                this.executeExport(format);
+                if (this.exportModal) {
+                    this.exportModal.close();
+                }
+            },
+            () => this.copyTextToClipboard()
+        );
 
         // Create and show modal
         this.exportModal = new Modal({
@@ -898,6 +901,25 @@ class TeamsPage extends BasePage {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Copy plain text export to clipboard
+     */
+    copyTextToClipboard() {
+        const { teams } = this.state.teams;
+        const showElo = this.state.showEloRatings;
+        const showPositions = this.state.showPositions;
+
+        const content = this.generateTextExport(teams, showElo, showPositions);
+
+        return navigator.clipboard.writeText(content).then(() => {
+            trackEvent('teams_copied_to_clipboard', {
+                event_category: 'teams',
+                team_count: teams.length
+            });
+            toast.success('Copied to clipboard!');
+        });
     }
 }
 
