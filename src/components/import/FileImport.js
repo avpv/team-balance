@@ -253,12 +253,12 @@ Alice Johnson${actualDelim}${pos[0]}`;
 
         navigator.clipboard.writeText(config.example).then(() => {
             const button = this.element.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = '✓ Copied!';
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '✓ Copied!';
             button.classList.add('copied');
 
             setTimeout(() => {
-                button.textContent = originalText;
+                button.innerHTML = originalHTML;
                 button.classList.remove('copied');
             }, 2000);
         }).catch(err => {
