@@ -180,7 +180,7 @@ Chris Brown`;
             // Show success feedback
             const button = this.element.querySelector(`[data-copy="${format}"]`);
             const originalHTML = button.innerHTML;
-            button.innerHTML = '✓ Copied!';
+            button.innerHTML = `${getIcon('check', { size: 14 })} Copied!`;
             button.classList.add('copied');
 
             setTimeout(() => {
