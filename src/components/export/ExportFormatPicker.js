@@ -6,10 +6,12 @@ import { getIcon } from '../base/Icons.js';
  * Similar to ImportDataSourcePicker interface
  */
 export default class ExportFormatPicker extends Component {
-    constructor(onFormatSelect) {
+    constructor(onFormatSelect, onCopyToClipboard) {
         super();
         this.onFormatSelect = onFormatSelect;
+        this.onCopyToClipboard = onCopyToClipboard;
         this.selectedFormat = null;
+        this.copyButtonState = 'idle'; // 'idle' | 'copied'
     }
 
     /**
@@ -52,6 +54,39 @@ export default class ExportFormatPicker extends Component {
     }
 
     /**
+     * Handle copy to clipboard click
+     */
+    handleCopyClick(event) {
+        event.stopPropagation();
+        if (this.onCopyToClipboard) {
+            this.onCopyToClipboard()
+                .then(() => {
+                    this.showCopySuccess();
+                })
+                .catch(() => {
+                    // Silent fail
+                });
+        }
+    }
+
+    /**
+     * Show copy success feedback
+     */
+    showCopySuccess() {
+        const button = this.element.querySelector('.copy-clipboard-btn');
+        if (button) {
+            const originalText = button.textContent;
+            button.textContent = '✓ Copied!';
+            button.classList.add('copied');
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+        }
+    }
+
+    /**
      * Get selected format
      */
     getSelectedFormat() {
@@ -62,6 +97,8 @@ export default class ExportFormatPicker extends Component {
      * Render a single export format tile
      */
     renderFormatTile(format) {
+        const showCopyButton = format.id === 'text';
+
         return `
             <button
                 id="exportFormat-${format.id}Btn"
@@ -75,6 +112,12 @@ export default class ExportFormatPicker extends Component {
                     <h3 class="tile-title">${format.title}</h3>
                     <p class="tile-description">${format.description}</p>
                 </div>
+                ${showCopyButton ? `
+                    <button class="copy-clipboard-btn" type="button" title="Copy to clipboard">
+                        ${getIcon('copy', { size: 16 })}
+                        <span>Copy</span>
+                    </button>
+                ` : ''}
                 <div class="tile-arrow">
                     ${getIcon('arrow-right', { size: 20 })}
                 </div>
@@ -106,6 +149,12 @@ export default class ExportFormatPicker extends Component {
                 this.handleFormatClick(formatId);
             });
         });
+
+        // Copy to clipboard button
+        const copyBtn = this.element.querySelector('.copy-clipboard-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', (e) => this.handleCopyClick(e));
+        }
     }
 
     mount(container) {
