@@ -31,6 +31,7 @@ class Modal extends Component {
             showConfirm = true,
             cancelText = 'Cancel',
             confirmText = 'Confirm',
+            confirmIcon = 'check',
             size = 'medium'
         } = this.props;
 
@@ -53,7 +54,7 @@ class Modal extends Component {
                     ` : ''}
                     ${showConfirm ? `
                         <button id="modalConfirmBtn" class="btn btn-primary" data-action="confirm">
-                            ${getIcon('check', { size: 16, className: 'btn-icon' })}
+                            ${getIcon(confirmIcon, { size: 16, className: 'btn-icon' })}
                             ${this.escape(confirmText)}
                         </button>
                     ` : ''}
@@ -162,6 +163,17 @@ class Modal extends Component {
     setTitle(title) {
         this.props.title = title;
         this.update();
+    }
+
+    /**
+     * Show or hide confirm button without re-rendering
+     */
+    setConfirmVisible(visible) {
+        const confirmBtn = this.$('[data-action="confirm"]');
+        if (confirmBtn) {
+            confirmBtn.style.display = visible ? '' : 'none';
+        }
+        this.props.showConfirm = visible;
     }
 
     /**
