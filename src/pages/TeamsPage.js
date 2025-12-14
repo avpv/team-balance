@@ -787,14 +787,6 @@ class TeamsPage extends BasePage {
      */
     generateTextExport(teams, showElo, showPositions) {
         const lines = [];
-        const weightedBalance = this.calculateWeightedBalance(teams);
-
-        lines.push('='.repeat(40));
-        lines.push('TEAM BALANCE RESULTS');
-        lines.push(`Generated: ${new Date().toLocaleDateString()}`);
-        lines.push(`Balance: ${weightedBalance} ELO difference`);
-        lines.push('='.repeat(40));
-        lines.push('');
 
         teams.forEach((team, teamIndex) => {
             const teamRating = this.calculateWeightedTeamRating(team);
