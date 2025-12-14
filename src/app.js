@@ -37,6 +37,7 @@ import storage from './core/StorageAdapter.js';
 import { STORAGE_KEYS } from './utils/constants.js';
 import AppInitializer from './core/AppInitializer.js';
 import { trackClick } from './config/analytics.js';
+import agentAPI from './api/AgentAPI.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -691,6 +692,13 @@ window.app = app;
  * @global
  */
 window.toast = toast;
+
+/**
+ * Expose TeamBalanceAPI for AI agents
+ * Provides programmatic access for browser-based AI agents
+ * @global
+ */
+window.TeamBalanceAPI = agentAPI;
 
 // =============================================================================
 // Module Export
