@@ -90,7 +90,6 @@ export default class ExportContent extends Component {
                     <div class="export-preview-section">
                         <div class="example-header">
                             <strong>Preview</strong>
-                            <span class="hint">Review your export data</span>
                             <button id="exportCopyBtn" class="btn btn-sm copy-button copy-btn" type="button">
                                 ${getIcon('copy', { size: 14 })}
                                 Copy
