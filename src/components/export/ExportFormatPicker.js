@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { trackClick } from '../../config/analytics.js';
 
 /**
  * Export format picker component that displays tiles for different export formats
@@ -44,6 +45,7 @@ export default class ExportFormatPicker extends Component {
      * Handle format selection
      */
     handleFormatClick(formatId) {
+        trackClick(`exportFormat-${formatId}Btn`, 'teams', `export_format_${formatId}`);
         if (this.onFormatSelect) {
             this.onFormatSelect(formatId);
         }
