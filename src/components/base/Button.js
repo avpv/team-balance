@@ -13,6 +13,7 @@ class Button extends Component {
 
     render() {
         const {
+            id = null,
             text = 'Button',
             type = 'primary',
             size = 'medium',
@@ -31,7 +32,7 @@ class Button extends Component {
         ].filter(Boolean).join(' ');
 
         return `
-            <button class="${classes}" ${disabled || loading ? 'disabled' : ''}>
+            <button ${id ? `id="${id}"` : ''} class="${classes}" ${disabled || loading ? 'disabled' : ''}>
                 ${loading ? '<span class="btn-spinner"></span>' : ''}
                 ${icon && !loading ? `<span class="btn-icon">${icon}</span>` : ''}
                 <span class="btn-text">${this.escape(text)}</span>

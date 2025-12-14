@@ -60,9 +60,9 @@ class Toast {
     createToast(message, type) {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        
+
         const icon = this.getIcon(type);
-        
+
         toast.innerHTML = `
             <div class="toast-icon">${icon}</div>
             <div class="toast-message">${this.escape(message)}</div>
