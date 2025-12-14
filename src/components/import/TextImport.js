@@ -179,12 +179,12 @@ Chris Brown`;
         navigator.clipboard.writeText(text).then(() => {
             // Show success feedback
             const button = this.element.querySelector(`[data-copy="${format}"]`);
-            const originalText = button.textContent;
-            button.textContent = '✓ Copied!';
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '✓ Copied!';
             button.classList.add('copied');
 
             setTimeout(() => {
-                button.textContent = originalText;
+                button.innerHTML = originalHTML;
                 button.classList.remove('copied');
             }, 2000);
         }).catch(err => {
