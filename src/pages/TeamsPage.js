@@ -8,6 +8,8 @@ import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
 import storage from '../core/StorageAdapter.js';
 import Sidebar from '../components/Sidebar.js';
+import Modal from '../components/base/Modal.js';
+import ExportFormatPicker from '../components/export/ExportFormatPicker.js';
 import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
@@ -697,57 +699,218 @@ class TeamsPage extends BasePage {
     handleExport() {
         if (!this.state.teams) return;
 
+        // Create export format picker
+        this.exportFormatPicker = new ExportFormatPicker((format) => {
+            this.executeExport(format);
+            if (this.exportModal) {
+                this.exportModal.close();
+            }
+        });
+
+        // Create and show modal
+        this.exportModal = new Modal({
+            title: 'Export Teams',
+            content: '<div id="exportFormatContainer"></div>',
+            showCancel: true,
+            showConfirm: false,
+            cancelText: 'Cancel',
+            size: 'medium',
+            onClose: () => {
+                if (this.exportFormatPicker) {
+                    this.exportFormatPicker.destroy();
+                    this.exportFormatPicker = null;
+                }
+                if (this.exportModal) {
+                    this.exportModal.destroy();
+                    this.exportModal = null;
+                }
+            }
+        });
+
+        this.exportModal.mount();
+        this.exportModal.open();
+
+        // Mount the format picker inside the modal
+        const container = document.getElementById('exportFormatContainer');
+        if (container) {
+            this.exportFormatPicker.mount(container);
+        }
+    }
+
+    /**
+     * Execute export in the selected format
+     */
+    executeExport(format) {
         try {
             const { teams } = this.state.teams;
             const showElo = this.state.showEloRatings;
             const showPositions = this.state.showPositions;
 
-            const lines = [];
-            const header = ['Team', 'Player'];
-            if (showPositions) header.push('Position');
-            if (showElo) header.push('ELO Rating');
+            let content, filename, mimeType;
 
-            lines.push(header.join(','));
+            switch (format) {
+                case 'text':
+                    content = this.generateTextExport(teams, showElo, showPositions);
+                    filename = `teams-${new Date().toISOString().split('T')[0]}.txt`;
+                    mimeType = 'text/plain';
+                    break;
+                case 'csv':
+                    content = this.generateCsvExport(teams, showElo, showPositions);
+                    filename = `teams-${new Date().toISOString().split('T')[0]}.csv`;
+                    mimeType = 'text/csv';
+                    break;
+                case 'json':
+                    content = this.generateJsonExport(teams, showElo, showPositions);
+                    filename = `teams-${new Date().toISOString().split('T')[0]}.json`;
+                    mimeType = 'application/json';
+                    break;
+                default:
+                    throw new Error('Unknown export format');
+            }
 
-            teams.forEach((team, teamIndex) => {
-                team.forEach(player => {
-                    const position = player.assignedPosition;
-                    const posName = this.playerService.positions[position];
-                    const rating = Math.round(player.positionRating);
+            this.downloadFile(content, filename, mimeType);
 
-                    const row = [
-                        `Team ${teamIndex + 1}`,
-                        `"${player.name.replace(/"/g, '""')}"`
-                    ];
-
-                    if (showPositions) {
-                        row.push(posName);
-                    }
-
-                    if (showElo) {
-                        row.push(rating);
-                    }
-
-                    lines.push(row.join(','));
-                });
+            trackEvent('teams_exported', {
+                event_category: 'teams',
+                export_format: format,
+                team_count: teams.length
             });
-
-            const csv = lines.join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `teams-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
 
             toast.success(MESSAGES.SUCCESS.EXPORT_COMPLETE);
         } catch (error) {
             toast.error(MESSAGES.ERRORS.EXPORT_FAILED);
         }
+    }
+
+    /**
+     * Generate plain text export
+     */
+    generateTextExport(teams, showElo, showPositions) {
+        const lines = [];
+        const weightedBalance = this.calculateWeightedBalance(teams);
+
+        lines.push('='.repeat(40));
+        lines.push('TEAM BALANCE RESULTS');
+        lines.push(`Generated: ${new Date().toLocaleDateString()}`);
+        lines.push(`Balance: ${weightedBalance} ELO difference`);
+        lines.push('='.repeat(40));
+        lines.push('');
+
+        teams.forEach((team, teamIndex) => {
+            const teamRating = this.calculateWeightedTeamRating(team);
+            lines.push(`TEAM ${teamIndex + 1}${showElo ? ` (${teamRating} ELO)` : ''}`);
+            lines.push('-'.repeat(30));
+
+            team.forEach(player => {
+                const position = player.assignedPosition;
+                const posName = this.playerService.positions[position];
+                const rating = Math.round(player.positionRating);
+
+                let playerLine = `  • ${player.name}`;
+                if (showPositions) {
+                    playerLine += ` - ${posName}`;
+                }
+                if (showElo) {
+                    playerLine += ` (${rating})`;
+                }
+                lines.push(playerLine);
+            });
+
+            lines.push('');
+        });
+
+        return lines.join('\n');
+    }
+
+    /**
+     * Generate CSV export
+     */
+    generateCsvExport(teams, showElo, showPositions) {
+        const lines = [];
+        const header = ['Team', 'Player'];
+        if (showPositions) header.push('Position');
+        if (showElo) header.push('ELO Rating');
+
+        lines.push(header.join(','));
+
+        teams.forEach((team, teamIndex) => {
+            team.forEach(player => {
+                const position = player.assignedPosition;
+                const posName = this.playerService.positions[position];
+                const rating = Math.round(player.positionRating);
+
+                const row = [
+                    `Team ${teamIndex + 1}`,
+                    `"${player.name.replace(/"/g, '""')}"`
+                ];
+
+                if (showPositions) {
+                    row.push(posName);
+                }
+
+                if (showElo) {
+                    row.push(rating);
+                }
+
+                lines.push(row.join(','));
+            });
+        });
+
+        return lines.join('\n');
+    }
+
+    /**
+     * Generate JSON export
+     */
+    generateJsonExport(teams, showElo, showPositions) {
+        const weightedBalance = this.calculateWeightedBalance(teams);
+
+        const exportData = {
+            generatedAt: new Date().toISOString(),
+            balance: weightedBalance,
+            teamCount: teams.length,
+            teams: teams.map((team, teamIndex) => ({
+                name: `Team ${teamIndex + 1}`,
+                totalRating: showElo ? this.calculateWeightedTeamRating(team) : undefined,
+                players: team.map(player => {
+                    const position = player.assignedPosition;
+                    const posName = this.playerService.positions[position];
+                    const rating = Math.round(player.positionRating);
+
+                    const playerData = {
+                        name: player.name
+                    };
+
+                    if (showPositions) {
+                        playerData.position = posName;
+                    }
+
+                    if (showElo) {
+                        playerData.rating = rating;
+                    }
+
+                    return playerData;
+                })
+            }))
+        };
+
+        return JSON.stringify(exportData, null, 2);
+    }
+
+    /**
+     * Download file helper
+     */
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
 }
 
