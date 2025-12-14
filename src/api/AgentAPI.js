@@ -93,6 +93,24 @@ class AgentAPI {
     }
 
     /**
+     * List positions for current activity
+     * IMPORTANT: Use this to select a position before comparing players
+     * @returns {Array<{code: string, name: string, playerCount: number}>}
+     */
+    listPositions() {
+        this._ensureActivity();
+        const activity = this.getCurrentActivity();
+        const playerRepo = this._getService('playerRepository');
+        const players = playerRepo.getAllPlayers();
+
+        return activity.positionOrder.map(code => ({
+            code,
+            name: activity.positions[code],
+            playerCount: players.filter(p => p.positions.includes(code)).length
+        }));
+    }
+
+    /**
      * Select an activity (sport/esport)
      * @param {string} activityId - Activity ID (e.g., "volleyball", "basketball")
      * @returns {{success: boolean, activity: object}}
@@ -218,19 +236,35 @@ class AgentAPI {
     // =========================================================================
 
     /**
-     * Get next recommended comparison pair
-     * @param {string} [position] - Optional specific position
-     * @returns {{player1: object, player2: object, position: string, reason: string}|null}
+     * Get next recommended comparison pair for a position
+     *
+     * WORKFLOW:
+     * 1. listPositions() - see available positions
+     * 2. getNextComparison('OH') - get pair for specific position
+     * 3. compare('Player1', 'Player2', 'Winner', 'OH') - record result
+     *
+     * @param {string} position - Position code (REQUIRED). Use listPositions() to see available.
+     * @returns {{player1: object, player2: object, position: string}|{hasMore: false}}
      */
-    getNextComparison(position = null) {
+    getNextComparison(position) {
         this._ensureActivity();
-        const comparisonService = this._getService('comparisonService');
 
+        if (!position) {
+            const positions = this.listPositions();
+            return {
+                error: 'Position is required. Use listPositions() first.',
+                availablePositions: positions.map(p => `${p.code} (${p.name}) - ${p.playerCount} players`)
+            };
+        }
+
+        const comparisonService = this._getService('comparisonService');
         const next = comparisonService.getNextComparison(position);
+
         if (!next) {
             return {
                 hasMore: false,
-                message: 'No more comparisons needed or not enough players'
+                position,
+                message: `No more comparisons needed for ${this._getPositionName(position)} or not enough players`
             };
         }
 
@@ -246,14 +280,31 @@ class AgentAPI {
 
     /**
      * Record a comparison result
+     *
+     * @param {string} position - Position code (REQUIRED first!)
      * @param {string} player1Name - First player name
      * @param {string} player2Name - Second player name
      * @param {string|null} winnerName - Winner name (null for draw)
-     * @param {string} position - Position code
      * @returns {{success: boolean, ratingChanges: object}}
+     *
+     * @example
+     * // First get positions
+     * TeamBalanceAPI.listPositions()
+     * // Then compare for specific position
+     * await TeamBalanceAPI.compare('OH', 'John', 'Mary', 'John')
      */
-    async compare(player1Name, player2Name, winnerName, position) {
+    async compare(position, player1Name, player2Name, winnerName) {
         this._ensureActivity();
+
+        if (!position) {
+            throw new Error('Position is required. Use listPositions() to see available positions.');
+        }
+
+        const activity = this.getCurrentActivity();
+        if (!activity.positionOrder.includes(position)) {
+            throw new Error(`Invalid position "${position}". Available: ${activity.positionOrder.join(', ')}`);
+        }
+
         const comparisonService = this._getService('comparisonService');
         const playerRepo = this._getService('playerRepository');
 
@@ -306,12 +357,12 @@ class AgentAPI {
 
     /**
      * Record a win-win (draw) comparison
+     * @param {string} position - Position code (REQUIRED first!)
      * @param {string} player1Name
      * @param {string} player2Name
-     * @param {string} position
      */
-    async draw(player1Name, player2Name, position) {
-        return this.compare(player1Name, player2Name, null, position);
+    async draw(position, player1Name, player2Name) {
+        return this.compare(position, player1Name, player2Name, null);
     }
 
     /**
@@ -449,11 +500,20 @@ class AgentAPI {
         return {
             version: this.version,
             description: 'TeamBalance API for AI Agents',
+            workflow: [
+                '1. selectActivity(activityId) - Choose sport/esport',
+                '2. addPlayer(name, positions[]) - Add players',
+                '3. listPositions() - See available positions',
+                '4. getNextComparison(position) - Get pair for position',
+                '5. compare(position, player1, player2, winner) - Record result',
+                '6. generateTeams(count) - Create balanced teams'
+            ],
             methods: {
-                // Activities
+                // Activities & Positions
                 listActivities: 'List all available activities',
                 getCurrentActivity: 'Get current selected activity',
                 selectActivity: 'selectActivity(activityId) - Select an activity',
+                listPositions: 'listPositions() - List positions for current activity (USE FIRST!)',
 
                 // Players
                 addPlayer: 'addPlayer(name, positions[]) - Add a player',
@@ -462,10 +522,10 @@ class AgentAPI {
                 getPlayer: 'getPlayer(name) - Get player by name',
                 removePlayer: 'removePlayer(name) - Remove a player',
 
-                // Comparisons
-                getNextComparison: 'getNextComparison(position?) - Get next pair to compare',
-                compare: 'compare(player1, player2, winner, position) - Record comparison',
-                draw: 'draw(player1, player2, position) - Record a draw',
+                // Comparisons (position FIRST!)
+                getNextComparison: 'getNextComparison(position) - Get next pair for position',
+                compare: 'compare(position, player1, player2, winner) - Record comparison',
+                draw: 'draw(position, player1, player2) - Record a draw',
                 getComparisonStats: 'Get comparison statistics',
 
                 // Rankings & Teams
@@ -480,8 +540,12 @@ class AgentAPI {
 await TeamBalanceAPI.selectActivity('volleyball')
 await TeamBalanceAPI.addPlayer('John', ['OH', 'MB'])
 await TeamBalanceAPI.addPlayer('Mary', ['S', 'OH'])
-const next = TeamBalanceAPI.getNextComparison()
-await TeamBalanceAPI.compare(next.player1.name, next.player2.name, 'John', next.position)
+
+// IMPORTANT: First get positions, then compare by position
+TeamBalanceAPI.listPositions()  // → [{code: 'OH', name: 'Outside Hitter', ...}]
+const next = TeamBalanceAPI.getNextComparison('OH')  // position required!
+await TeamBalanceAPI.compare('OH', next.player1.name, next.player2.name, 'John')
+
 const teams = await TeamBalanceAPI.generateTeams(2)
             `.trim()
         };

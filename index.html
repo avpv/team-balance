@@ -130,40 +130,41 @@
         "name": "TeamBalance",
         "description": "Universal team builder with ELO ratings for sports, esports, and work teams",
         "api": "window.TeamBalanceAPI",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "capabilities": [
             "Create balanced teams for any activity",
             "ELO-based skill rating system",
-            "Compare players to determine skill levels",
+            "Compare players by position to determine skill levels",
             "Support for 10+ activities (volleyball, basketball, LoL, Valorant, etc.)"
         ],
-        "quickStart": [
-            "1. TeamBalanceAPI.listActivities() - see available activities",
-            "2. TeamBalanceAPI.selectActivity('volleyball') - select activity",
-            "3. TeamBalanceAPI.addPlayer('Name', ['OH','MB']) - add players with positions",
-            "4. TeamBalanceAPI.getNextComparison() - get pair to compare",
-            "5. TeamBalanceAPI.compare('Player1','Player2','Winner','Position') - record result",
-            "6. TeamBalanceAPI.generateTeams(2) - generate balanced teams"
+        "workflow": [
+            "1. selectActivity('volleyball') - Choose activity",
+            "2. addPlayer('Name', ['OH','MB']) - Add players with positions",
+            "3. listPositions() - Get available positions (IMPORTANT!)",
+            "4. getNextComparison('OH') - Get pair for SPECIFIC position",
+            "5. compare('OH', 'Player1', 'Player2', 'Winner') - Record result (position FIRST!)",
+            "6. generateTeams(2) - Generate balanced teams"
         ],
         "methods": {
             "listActivities": {"args": [], "returns": "array", "description": "List all activities"},
             "getCurrentActivity": {"args": [], "returns": "object|null", "description": "Get current activity"},
             "selectActivity": {"args": ["activityId"], "returns": "object", "description": "Select activity (reloads page)"},
+            "listPositions": {"args": [], "returns": "array", "description": "List positions for current activity - USE BEFORE COMPARING!"},
             "addPlayer": {"args": ["name", "positions[]"], "returns": "object", "description": "Add a player"},
             "addPlayers": {"args": ["[{name, positions}]"], "returns": "object", "description": "Add multiple players"},
             "listPlayers": {"args": [], "returns": "array", "description": "List all players"},
             "getPlayer": {"args": ["name"], "returns": "object|null", "description": "Get player by name"},
             "removePlayer": {"args": ["name"], "returns": "object", "description": "Remove a player"},
-            "getNextComparison": {"args": ["position?"], "returns": "object", "description": "Get next comparison pair"},
-            "compare": {"args": ["player1", "player2", "winner|null", "position"], "returns": "object", "description": "Record comparison (null winner = draw)"},
-            "draw": {"args": ["player1", "player2", "position"], "returns": "object", "description": "Record a draw"},
+            "getNextComparison": {"args": ["position"], "returns": "object", "description": "Get next pair for SPECIFIC position (required!)"},
+            "compare": {"args": ["position", "player1", "player2", "winner|null"], "returns": "object", "description": "Record comparison - POSITION FIRST! (null winner = draw)"},
+            "draw": {"args": ["position", "player1", "player2"], "returns": "object", "description": "Record a draw - position first!"},
             "getRankings": {"args": ["position?"], "returns": "array", "description": "Get player rankings"},
             "generateTeams": {"args": ["teamCount", "composition?"], "returns": "object", "description": "Generate balanced teams"},
             "exportData": {"args": [], "returns": "object", "description": "Export session data"},
-            "help": {"args": [], "returns": "object", "description": "Get API documentation"}
+            "help": {"args": [], "returns": "object", "description": "Get API documentation with examples"}
         },
         "activities": ["volleyball", "basketball", "soccer", "leagueOfLegends", "valorant", "counterStrike2", "dota2", "workProject", "team1", "team2", "team3"],
-        "example": "const teams = await TeamBalanceAPI.generateTeams(2)"
+        "example": "TeamBalanceAPI.listPositions(); const next = TeamBalanceAPI.getNextComparison('OH'); await TeamBalanceAPI.compare('OH', next.player1.name, next.player2.name, 'John')"
     }
     </script>
 
