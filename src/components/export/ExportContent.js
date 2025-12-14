@@ -96,11 +96,11 @@ export default class ExportContent extends Component {
                     </div>
 
                     <div class="export-actions">
-                        <button class="btn btn-primary download-btn" type="button">
+                        <button id="exportDownloadBtn" class="btn btn-primary download-btn" type="button">
                             ${getIcon('download', { size: 16 })}
                             Download
                         </button>
-                        <button class="btn btn-sm copy-button copy-btn" type="button">
+                        <button id="exportCopyBtn" class="btn btn-sm copy-button copy-btn" type="button">
                             ${getIcon('copy', { size: 14 })}
                             Copy
                         </button>

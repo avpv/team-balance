@@ -130,6 +130,7 @@ class PositionSelector extends BaseComponent {
                     <div class="position-card__actions">
                         <button
                             type="button"
+                            id="comparePositionBtn-${key}"
                             class="btn btn-sm btn-primary position-card__compare-btn"
                             data-position-compare="${key}"
                             aria-label="Compare ${name} players"
@@ -141,6 +142,7 @@ class PositionSelector extends BaseComponent {
                         </button>
                         <button
                             type="button"
+                            id="resetPositionBtn-${key}"
                             class="btn btn-sm btn-secondary position-card__reset-btn"
                             data-position-reset="${key}"
                             aria-label="Reset ${name} comparisons"
