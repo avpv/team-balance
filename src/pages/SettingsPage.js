@@ -568,7 +568,14 @@ class SettingsPage extends BasePage {
         const positions = this.playerService.positions;
         const positionKeys = Object.keys(positions);
 
-        this.importWizard = new ImportWizard(positionKeys);
+        this.importWizard = new ImportWizard(positionKeys, {
+            onStepChange: (step, isContentStep) => {
+                // Show Import button only after format is selected
+                if (this.importModal) {
+                    this.importModal.setConfirmVisible(isContentStep);
+                }
+            }
+        });
 
         // Set up data change callback
         this.importWizard.setDataChangeCallback((data, delimiter) => {
@@ -597,6 +604,7 @@ class SettingsPage extends BasePage {
         });
 
         this.importModal.mount();
+        this.importModal.setConfirmVisible(false); // Hide Import initially (picker step)
         this.importModal.open();
 
         // Mount the wizard after modal is rendered
