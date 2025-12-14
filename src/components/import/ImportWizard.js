@@ -11,7 +11,7 @@ import ApiImport from './ApiImport.js';
  * Step 3: Preview and confirmation (handled by parent)
  */
 export default class ImportWizard extends Component {
-    constructor(positions = []) {
+    constructor(positions = [], options = {}) {
         super();
         this.positions = positions;
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
@@ -19,6 +19,9 @@ export default class ImportWizard extends Component {
         this.currentDelimiter = ','; // Default delimiter
         this.currentComponent = null;
         this.onDataChangeCallback = null;
+
+        // Callback when step changes (for modal to show/hide Import button)
+        this.onStepChange = options.onStepChange;
     }
 
     /**
@@ -137,6 +140,11 @@ export default class ImportWizard extends Component {
 
         this.currentComponent = component;
         component.mount(this.element);
+
+        // Notify about step change
+        if (this.onStepChange) {
+            this.onStepChange(this.currentStep, this.currentStep !== 'picker');
+        }
     }
 
     /**
