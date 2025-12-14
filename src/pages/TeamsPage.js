@@ -9,7 +9,7 @@ import { getIcon } from '../components/base/Icons.js';
 import storage from '../core/StorageAdapter.js';
 import Sidebar from '../components/Sidebar.js';
 import Modal from '../components/base/Modal.js';
-import ExportFormatPicker from '../components/export/ExportFormatPicker.js';
+import ExportWizard from '../components/export/ExportWizard.js';
 import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
@@ -699,29 +699,37 @@ class TeamsPage extends BasePage {
     handleExport() {
         if (!this.state.teams) return;
 
-        // Create export format picker
-        this.exportFormatPicker = new ExportFormatPicker(
-            (format) => {
-                this.executeExport(format);
-                if (this.exportModal) {
-                    this.exportModal.close();
-                }
-            },
-            () => this.copyTextToClipboard()
-        );
+        const { teams } = this.state.teams;
+        const showElo = this.state.showEloRatings;
+        const showPositions = this.state.showPositions;
+
+        // Create export wizard
+        this.exportWizard = new ExportWizard({
+            generateTextExport: () => this.generateTextExport(teams, showElo, showPositions),
+            generateCsvExport: () => this.generateCsvExport(teams, showElo, showPositions),
+            generateJsonExport: () => this.generateJsonExport(teams, showElo, showPositions),
+            onExportComplete: (format, action) => {
+                trackEvent(action === 'copy' ? 'teams_copied_to_clipboard' : 'teams_exported', {
+                    event_category: 'teams',
+                    export_format: format,
+                    team_count: teams.length
+                });
+                toast.success(action === 'copy' ? 'Copied to clipboard!' : MESSAGES.SUCCESS.EXPORT_COMPLETE);
+            }
+        });
 
         // Create and show modal
         this.exportModal = new Modal({
             title: 'Export Teams',
-            content: '<div id="exportFormatContainer"></div>',
+            content: '<div id="exportWizardContainer"></div>',
             showCancel: true,
             showConfirm: false,
-            cancelText: 'Cancel',
+            cancelText: 'Close',
             size: 'medium',
             onClose: () => {
-                if (this.exportFormatPicker) {
-                    this.exportFormatPicker.destroy();
-                    this.exportFormatPicker = null;
+                if (this.exportWizard) {
+                    this.exportWizard.destroy();
+                    this.exportWizard = null;
                 }
                 if (this.exportModal) {
                     this.exportModal.destroy();
@@ -733,55 +741,10 @@ class TeamsPage extends BasePage {
         this.exportModal.mount();
         this.exportModal.open();
 
-        // Mount the format picker inside the modal
-        const container = document.getElementById('exportFormatContainer');
+        // Mount the wizard inside the modal
+        const container = document.getElementById('exportWizardContainer');
         if (container) {
-            this.exportFormatPicker.mount(container);
-        }
-    }
-
-    /**
-     * Execute export in the selected format
-     */
-    executeExport(format) {
-        try {
-            const { teams } = this.state.teams;
-            const showElo = this.state.showEloRatings;
-            const showPositions = this.state.showPositions;
-
-            let content, filename, mimeType;
-
-            switch (format) {
-                case 'text':
-                    content = this.generateTextExport(teams, showElo, showPositions);
-                    filename = `teams-${new Date().toISOString().split('T')[0]}.txt`;
-                    mimeType = 'text/plain';
-                    break;
-                case 'csv':
-                    content = this.generateCsvExport(teams, showElo, showPositions);
-                    filename = `teams-${new Date().toISOString().split('T')[0]}.csv`;
-                    mimeType = 'text/csv';
-                    break;
-                case 'json':
-                    content = this.generateJsonExport(teams, showElo, showPositions);
-                    filename = `teams-${new Date().toISOString().split('T')[0]}.json`;
-                    mimeType = 'application/json';
-                    break;
-                default:
-                    throw new Error('Unknown export format');
-            }
-
-            this.downloadFile(content, filename, mimeType);
-
-            trackEvent('teams_exported', {
-                event_category: 'teams',
-                export_format: format,
-                team_count: teams.length
-            });
-
-            toast.success(MESSAGES.SUCCESS.EXPORT_COMPLETE);
-        } catch (error) {
-            toast.error(MESSAGES.ERRORS.EXPORT_FAILED);
+            this.exportWizard.mount(container);
         }
     }
 
@@ -887,40 +850,6 @@ class TeamsPage extends BasePage {
         return JSON.stringify(exportData, null, 2);
     }
 
-    /**
-     * Download file helper
-     */
-    downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-
-    /**
-     * Copy plain text export to clipboard
-     */
-    copyTextToClipboard() {
-        const { teams } = this.state.teams;
-        const showElo = this.state.showEloRatings;
-        const showPositions = this.state.showPositions;
-
-        const content = this.generateTextExport(teams, showElo, showPositions);
-
-        return navigator.clipboard.writeText(content).then(() => {
-            trackEvent('teams_copied_to_clipboard', {
-                event_category: 'teams',
-                team_count: teams.length
-            });
-            toast.success('Copied to clipboard!');
-        });
-    }
 }
 
 export default TeamsPage;
