@@ -63,12 +63,12 @@ export default class ExportContent extends Component {
         const button = this.element.querySelector(`.${buttonType}-btn`);
         if (button) {
             const originalHTML = button.innerHTML;
-            button.innerHTML = `${getIcon('check', { size: 16 })} Done!`;
-            button.classList.add('success');
+            button.innerHTML = '✓ Copied!';
+            button.classList.add('copied');
 
             setTimeout(() => {
                 button.innerHTML = originalHTML;
-                button.classList.remove('success');
+                button.classList.remove('copied');
             }, 2000);
         }
     }
