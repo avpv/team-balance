@@ -20,6 +20,9 @@ export default class ExportWizard extends Component {
 
         // Callback when export is complete
         this.onExportComplete = options.onExportComplete;
+
+        // Callback when step changes (for modal to show/hide Download button)
+        this.onStepChange = options.onStepChange;
     }
 
     /**
@@ -120,6 +123,11 @@ export default class ExportWizard extends Component {
 
         this.currentComponent = component;
         component.mount(this.element);
+
+        // Notify about step change
+        if (this.onStepChange) {
+            this.onStepChange(this.currentStep, this.currentStep !== 'picker');
+        }
     }
 
     /**
@@ -128,6 +136,23 @@ export default class ExportWizard extends Component {
     reset() {
         this.currentStep = 'picker';
         this.renderCurrentStep();
+    }
+
+    /**
+     * Trigger download from current content component
+     * Called from Modal confirm button
+     */
+    triggerDownload() {
+        if (this.currentComponent && typeof this.currentComponent.handleDownload === 'function') {
+            this.currentComponent.handleDownload();
+        }
+    }
+
+    /**
+     * Check if currently on content step (not picker)
+     */
+    isOnContentStep() {
+        return this.currentStep !== 'picker';
     }
 
     render() {

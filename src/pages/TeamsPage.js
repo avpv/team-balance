@@ -715,6 +715,12 @@ class TeamsPage extends BasePage {
                     team_count: teams.length
                 });
                 toast.success(action === 'copy' ? 'Copied to clipboard!' : MESSAGES.SUCCESS.EXPORT_COMPLETE);
+            },
+            onStepChange: (step, isContentStep) => {
+                // Show Download button only on content step
+                if (this.exportModal) {
+                    this.exportModal.setConfirmVisible(isContentStep);
+                }
             }
         });
 
@@ -723,9 +729,17 @@ class TeamsPage extends BasePage {
             title: 'Export Teams',
             content: '<div id="exportWizardContainer"></div>',
             showCancel: true,
-            showConfirm: false,
+            showConfirm: true,
             cancelText: 'Close',
+            confirmText: 'Download',
+            confirmIcon: 'download',
             size: 'medium',
+            onConfirm: () => {
+                if (this.exportWizard) {
+                    this.exportWizard.triggerDownload();
+                }
+                return false; // Don't close modal after download
+            },
             onClose: () => {
                 if (this.exportWizard) {
                     this.exportWizard.destroy();
@@ -739,6 +753,7 @@ class TeamsPage extends BasePage {
         });
 
         this.exportModal.mount();
+        this.exportModal.setConfirmVisible(false); // Hide Download initially (picker step)
         this.exportModal.open();
 
         // Mount the wizard inside the modal

@@ -88,22 +88,15 @@ export default class ExportContent extends Component {
 
                 <div class="export-method-content">
                     <div class="export-preview-section">
-                        <label>
+                        <div class="example-header">
                             <strong>Preview</strong>
                             <span class="hint">Review your export data</span>
-                        </label>
+                            <button id="exportCopyBtn" class="btn btn-sm copy-button copy-btn" type="button">
+                                ${getIcon('copy', { size: 14 })}
+                                Copy
+                            </button>
+                        </div>
                         <pre class="export-preview-content">${this.escapeHtml(this.content)}</pre>
-                    </div>
-
-                    <div class="export-actions">
-                        <button id="exportDownloadBtn" class="btn btn-primary download-btn" type="button">
-                            ${getIcon('download', { size: 16 })}
-                            Download
-                        </button>
-                        <button id="exportCopyBtn" class="btn btn-sm copy-button copy-btn" type="button">
-                            ${getIcon('copy', { size: 14 })}
-                            Copy
-                        </button>
                     </div>
                 </div>
             </div>
@@ -126,12 +119,6 @@ export default class ExportContent extends Component {
             backBtn.addEventListener('click', () => {
                 if (this.onBack) this.onBack();
             });
-        }
-
-        // Download button
-        const downloadBtn = this.element.querySelector('.download-btn');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => this.handleDownload());
         }
 
         // Copy button
