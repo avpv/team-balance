@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { trackClick } from '../../config/analytics.js';
 
 /**
  * Export Content component - displays export preview with Download and Copy buttons
@@ -21,6 +22,7 @@ export default class ExportContent extends Component {
      * Handle download
      */
     handleDownload() {
+        trackClick('exportDownloadBtn', 'teams', `export_download_${this.format}`);
         const blob = new Blob([this.content], { type: this.mimeType });
         const url = URL.createObjectURL(blob);
 
@@ -44,6 +46,7 @@ export default class ExportContent extends Component {
      * Handle copy to clipboard
      */
     async handleCopy() {
+        trackClick('exportCopyBtn', 'teams', `export_copy_${this.format}`);
         try {
             await navigator.clipboard.writeText(this.content);
             this.showButtonSuccess('copy');
