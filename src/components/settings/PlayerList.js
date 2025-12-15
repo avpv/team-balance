@@ -1,6 +1,7 @@
 import BaseComponent from '../BaseComponent.js';
 import PlayerCard from './PlayerCard.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 
 class PlayerList extends BaseComponent {
     constructor(container, props = {}) {
@@ -19,15 +20,15 @@ class PlayerList extends BaseComponent {
             return `
                 <div class="empty-state animate-fade-in">
                     <div class="empty-state__icon">${emptyIcon}</div>
-                    <h3 class="empty-state__title">No Players Yet</h3>
-                    <p class="empty-state__message">Add your first player using the form above to get started.</p>
+                    <h3 class="empty-state__title">${t('settings.playerList.noPlayers')}</h3>
+                    <p class="empty-state__message">${t('settings.playerList.addPlayersPrompt')}</p>
                 </div>
             `;
         }
 
         return `
             <div class="players-section">
-                <h3 class="text-xl font-semibold mb-4">Current Players (${this.players.length})</h3>
+                <h3 class="text-xl font-semibold mb-4">${t('settings.playerList.title')} (${this.players.length})</h3>
                 <div class="players-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" id="playersGrid">
                     <!-- Player cards will be mounted here -->
                 </div>

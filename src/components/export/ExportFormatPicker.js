@@ -1,6 +1,7 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { trackClick } from '../../config/analytics.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * Export format picker component that displays tiles for different export formats
@@ -19,22 +20,22 @@ export default class ExportFormatPicker extends Component {
         return [
             {
                 id: 'text',
-                title: 'Plain Text',
-                description: 'Simple text format, easy to copy and share',
+                title: t('teams.export.formatText'),
+                description: t('import.textInputDesc'),
                 icon: 'file-text',
                 iconColor: 'var(--color-info-text)'
             },
             {
                 id: 'csv',
-                title: 'CSV File',
-                description: 'Comma-separated values for spreadsheets',
+                title: t('teams.export.formatCsv'),
+                description: t('import.fileUploadDesc'),
                 icon: 'table',
                 iconColor: 'var(--color-brand-primary)'
             },
             {
                 id: 'json',
-                title: 'JSON File',
-                description: 'Structured data format for developers',
+                title: t('teams.export.formatJson'),
+                description: t('import.fileUploadDesc'),
                 icon: 'code',
                 iconColor: 'var(--color-brand-secondary)'
             }
@@ -81,8 +82,8 @@ export default class ExportFormatPicker extends Component {
         return `
             <div class="export-format-picker">
                 <div class="picker-header">
-                    <h2>Export Teams</h2>
-                    <p>Choose your preferred export format</p>
+                    <h2>${t('teams.export.title')}</h2>
+                    <p>${t('import.selectSource')}</p>
                 </div>
                 <div class="data-sources-grid">
                     ${formats.map(format => this.renderFormatTile(format)).join('')}

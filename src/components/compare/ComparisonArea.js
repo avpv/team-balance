@@ -2,6 +2,7 @@ import BaseComponent from '../BaseComponent.js';
 import ComparisonCard from './ComparisonCard.js';
 import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
+import { t } from '../../core/I18nManager.js';
 
 const { ICON_SIZES, COLORS, MESSAGES, ANIMATION } = uiConfig;
 
@@ -40,9 +41,9 @@ class ComparisonArea extends BaseComponent {
                     ${isComplete ? `
                         <div class="comparison-complete">
                             <div class="comparison-complete__icon">${icon}</div>
-                            <h3 class="comparison-complete__title">Position Complete!</h3>
+                            <h3 class="comparison-complete__title">${t('compare.comparison.positionComplete')}</h3>
                             <p class="comparison-complete__message">
-                                All ${positionName} comparisons are finished (${progress.completed}/${progress.total}).
+                                ${t('compare.comparison.allCompleteDetail', { position: positionName })} (${progress.completed}/${progress.total}).
                                 <span id="suggestionContainer"></span>
                             </p>
                         </div>
@@ -78,20 +79,20 @@ class ComparisonArea extends BaseComponent {
         const progressPercent = Math.round(progress.percentage);
 
         return `
-            <div class="comparison-area comparison-area--active" role="region" aria-label="Player comparison">
+            <div class="comparison-area comparison-area--active" role="region" aria-label="${t('compare.title')}">
                 <div class="comparison-header">
                     <div class="comparison-info">
-                        <p class="comparison-question">Who is better at <strong>${positionName}</strong>?</p>
+                        <p class="comparison-question">${t('compare.comparison.whoIsBetter')} <strong>${positionName}</strong>?</p>
                         <div class="comparison-progress-indicator">
                             <div class="progress-mini">
                                 <div class="progress-mini__fill" style="width: ${progressPercent}%"></div>
                             </div>
-                            <span class="comparison-progress-text">${progress.completed}/${progress.total} comparisons · ${progressPercent}% complete</span>
+                            <span class="comparison-progress-text">${progress.completed}/${progress.total} ${t('common.comparisons')} · ${progressPercent}%</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="comparison-cards" role="group" aria-label="Choose the better player">
+                <div class="comparison-cards" role="group" aria-label="${t('compare.title')}">
                     <div id="leftCardContainer"></div>
 
                     <div class="vs-divider" aria-hidden="true">
@@ -101,10 +102,10 @@ class ComparisonArea extends BaseComponent {
                             id="drawButton"
                             data-player1-id="${player1.id}"
                             data-player2-id="${player2.id}"
-                            aria-label="Mark as equal skill level (keyboard: W)"
-                            title="Both players have equal skill">
+                            aria-label="${t('compare.comparison.drawTooltip')}"
+                            title="${t('compare.comparison.draw')}">
                             <span class="keyboard-hint-button" aria-hidden="true">W</span>
-                            Equal Skill
+                            ${t('compare.comparison.draw')}
                         </button>
                     </div>
 

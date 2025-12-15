@@ -7,6 +7,7 @@ import uiConfig from '../../config/ui.js';
 import { STORAGE_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
 import { trackEvent } from '../../config/analytics.js';
+import { t } from '../../core/I18nManager.js';
 
 const { ELEMENT_IDS, ANIMATION, TOAST } = uiConfig;
 
@@ -35,19 +36,19 @@ class ActivitySelector extends BaseComponent {
             .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
         return `
-            <div class="activity-selector-section" role="region" aria-label="Activity selection">
+            <div class="activity-selector-section" role="region" aria-label="${t('settings.activity.label')}">
                 <div class="player-form">
                     <div class="form-group">
-                        <label for="${ELEMENT_IDS.ACTIVITY_SELECT}">Activity Type</label>
+                        <label for="${ELEMENT_IDS.ACTIVITY_SELECT}">${t('settings.activity.label')}</label>
                         <div class="activity-selector-row form-row">
                             <select
                                 id="${ELEMENT_IDS.ACTIVITY_SELECT}"
                                 class="activity-select"
-                                aria-label="Select activity type"
+                                aria-label="${t('settings.activity.label')}"
                                 aria-describedby="activity-help-text">
-                                <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select a sport or activity...</option>
+                                <option value="" ${!currentActivity ? 'selected' : ''} disabled>${t('settings.activity.placeholder')}</option>
                                 ${recentOptions.length > 0 ? `
-                                    <optgroup label="Recent Activities">
+                                    <optgroup label="${t('settings.activity.recentActivities')}">
                                         ${recentOptions.map(([key, config]) => `
                                             <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
                                                 ${config.name}
@@ -56,7 +57,7 @@ class ActivitySelector extends BaseComponent {
                                     </optgroup>
                                 ` : ''}
                                 ${otherOptions.length > 0 ? `
-                                    <optgroup label="All Activities">
+                                    <optgroup label="${t('settings.activity.allActivities')}">
                                         ${otherOptions.map(([key, config]) => `
                                             <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
                                                 ${config.name}
@@ -69,15 +70,14 @@ class ActivitySelector extends BaseComponent {
                                 type="button"
                                 class="btn btn--secondary"
                                 id="createSessionBtn"
-                                title="Create a new team with its own player list"
-                                aria-label="Create new team">
+                                title="${t('settings.activity.newTeamTitle')}"
+                                aria-label="${t('settings.activity.newTeam')}">
                                 ${getIcon('plus', { size: 16, className: 'btn-icon' })}
-                                New Team
+                                ${t('settings.activity.newTeam')}
                             </button>
                         </div>
                         <p class="form-help-text" id="activity-help-text">
-                            Choose your sport or activity, then click "New Team" to start.
-                            Each team has its own player list and is saved in the sidebar.
+                            ${t('settings.activity.helpText')}
                         </p>
                     </div>
                 </div>
@@ -158,7 +158,7 @@ class ActivitySelector extends BaseComponent {
 
         const selectedActivity = activities[activityKey];
         if (!selectedActivity) {
-            toast.error('Invalid activity selected');
+            toast.error(t('settings.activity.invalidActivity'));
             return;
         }
 
@@ -179,7 +179,7 @@ class ActivitySelector extends BaseComponent {
 
         // Show info toast
         if (currentActivity !== activityKey) {
-            toast.info(`${selectedActivity.name} will be applied when you create a new team`);
+            toast.info(t('settings.activity.willBeApplied', { activity: selectedActivity.name }));
         }
     }
 
@@ -193,7 +193,7 @@ class ActivitySelector extends BaseComponent {
         const targetActivity = pendingActivity || currentActivity;
 
         if (!targetActivity) {
-            toast.error('Please select an activity first');
+            toast.error(t('settings.activity.selectFirst'));
             // Notify parent to scroll to activity selector (though we are already here)
             if (this.onActivityChange) this.onActivityChange('select-activity');
 
@@ -216,7 +216,7 @@ class ActivitySelector extends BaseComponent {
                 storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                 const selectedActivity = activities[targetActivity];
-                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, TOAST.QUICK_DURATION);
+                toast.success(t('settings.activity.switchingTo', { activity: selectedActivity.name }), TOAST.QUICK_DURATION);
 
                 setTimeout(() => {
                     window.location.reload();
@@ -234,7 +234,7 @@ class ActivitySelector extends BaseComponent {
                 activity: currentActivity
             });
 
-            toast.success('New team created');
+            toast.success(t('settings.activity.newTeamCreated'));
             // Page will auto-update via event bus
         } catch (error) {
             toast.error(error.message);

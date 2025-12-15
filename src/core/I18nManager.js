@@ -12,6 +12,7 @@ import storage from './StorageAdapter.js';
  */
 export const SUPPORTED_LANGUAGES = {
     en: { name: 'English', nativeName: 'English', flag: '🇺🇸' },
+    ru: { name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
     es: { name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
     fr: { name: 'French', nativeName: 'Français', flag: '🇫🇷' },
     de: { name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },

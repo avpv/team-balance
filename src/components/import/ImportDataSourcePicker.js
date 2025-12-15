@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * Data source picker component that displays tiles for different import methods
@@ -18,29 +19,29 @@ export default class ImportDataSourcePicker extends Component {
         return [
             {
                 id: 'text',
-                title: 'Text / Paste',
-                description: 'Paste or type player data directly',
+                title: t('import.textInput'),
+                description: t('import.textInputDesc'),
                 icon: 'file-text',
                 iconColor: 'var(--color-info-text)'
             },
             {
                 id: 'csv',
-                title: 'CSV File',
-                description: 'Upload a CSV file with player data',
+                title: t('import.fileUpload') + ' (CSV)',
+                description: t('import.fileUploadDesc'),
                 icon: 'table',
                 iconColor: 'var(--color-brand-primary)'
             },
             {
                 id: 'json',
-                title: 'JSON File',
-                description: 'Upload a JSON file with player data',
+                title: t('import.fileUpload') + ' (JSON)',
+                description: t('import.fileUploadDesc'),
                 icon: 'code',
                 iconColor: 'var(--color-brand-secondary)'
             },
             {
                 id: 'api',
-                title: 'From URL',
-                description: 'Fetch player data from a URL (JSON)',
+                title: t('import.apiImport'),
+                description: t('import.apiImportDesc'),
                 icon: 'globe',
                 iconColor: 'var(--color-brand-primary)'
             }
@@ -86,8 +87,8 @@ export default class ImportDataSourcePicker extends Component {
         return `
             <div class="import-data-source-picker">
                 <div class="picker-header">
-                    <h2>Import Player Data</h2>
-                    <p>Choose how you want to import players</p>
+                    <h2>${t('settings.addPlayers.importPlayers')}</h2>
+                    <p>${t('import.selectSource')}</p>
                 </div>
                 <div class="data-sources-grid">
                     ${sources.map(source => this.renderSourceTile(source)).join('')}
