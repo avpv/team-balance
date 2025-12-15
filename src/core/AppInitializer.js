@@ -15,6 +15,8 @@ import { initializeActivities, activities } from '../config/activities/index.js'
 import { initializeServices } from '../config/services.js';
 import storage from './StorageAdapter.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
+import i18n, { t } from './I18nManager.js';
+import LanguageSelector from '../components/base/LanguageSelector.js';
 
 const { APP_MAIN, TOAST } = uiConfig;
 
@@ -29,7 +31,16 @@ class AppInitializer {
      */
     async run() {
         try {
-            // Step 0: Get selected activity from storage for optimized loading
+            // Step 0: Initialize i18n (language support)
+            await i18n.init();
+
+            // Step 0.1: Update navigation with translations
+            this.updateNavigationText();
+
+            // Step 0.2: Mount language selector
+            this.mountLanguageSelector();
+
+            // Step 0.5: Get selected activity from storage for optimized loading
             const selectedActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
             // Step 1: Initialize activities (loads selected activity first, others in background)
@@ -77,16 +88,67 @@ class AppInitializer {
 
             // Step 8: Show welcome message for first-time users
             if (!loaded) {
-                const appName = 'TeamBalance'; // Or get from config if available globally
+                const appName = 'TeamBalance';
                 toast.info(
-                    `Welcome to ${appName}! Add players to get started.`,
-                    5000 // Default welcome duration
+                    `${t('settings.welcome.title')} ${t('settings.addPlayers.title')}`,
+                    5000
                 );
             }
 
         } catch (error) {
             this.app.showFatalError(error);
         }
+    }
+
+    /**
+     * Update navigation links with translated text
+     * @private
+     */
+    updateNavigationText() {
+        const navLinks = document.querySelectorAll('.nav-link[data-route]');
+
+        const translations = {
+            '/': t('nav.settings'),
+            '/compare/': t('nav.compare'),
+            '/rankings/': t('nav.rankings'),
+            '/teams/': t('nav.teams')
+        };
+
+        navLinks.forEach(link => {
+            const route = link.getAttribute('data-route');
+            if (translations[route]) {
+                link.textContent = translations[route];
+            }
+        });
+    }
+
+    /**
+     * Mount language selector in the footer
+     * @private
+     */
+    mountLanguageSelector() {
+        // Create container for language selector in footer
+        const footer = document.querySelector('.app-footer .footer-content');
+        if (!footer) return;
+
+        // Check if already mounted
+        if (footer.querySelector('.language-selector-container')) return;
+
+        // Create container
+        const container = document.createElement('div');
+        container.className = 'language-selector-container';
+
+        // Add separator before language selector
+        const separator = document.createElement('span');
+        separator.className = 'footer-separator';
+        separator.textContent = '•';
+
+        footer.appendChild(separator);
+        footer.appendChild(container);
+
+        // Mount language selector
+        this.languageSelector = new LanguageSelector(container);
+        this.languageSelector.mount();
     }
 
     /**
