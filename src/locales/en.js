@@ -151,10 +151,19 @@ export default {
         // Position Selector
         positionSelector: {
             title: 'Select Position',
+            selectPosition: 'Select Position to Compare',
+            pickPosition: 'Pick a position below to start comparing players head-to-head and build your rankings.',
+            quickKeys: 'Quick keys:',
+            quickKeysHint: 'left • right • draw',
             resetPosition: 'Reset position comparisons',
             resetAll: 'Reset All',
             progress: '{{completed}}/{{total}} comparisons',
-            complete: 'Complete!'
+            complete: 'Complete!',
+            notEnoughPlayers: 'Not enough players',
+            statusComplete: 'Complete',
+            statusInProgress: 'In Progress',
+            statusReady: 'Ready',
+            noPlayersAtPosition: 'No players assigned to the {{position}} position yet. Add players on the Settings page.'
         },
 
         // Comparison Area
@@ -172,7 +181,9 @@ export default {
             leftKeyHint: 'A key',
             rightKeyHint: 'D key',
             positionComplete: 'Position Complete!',
-            comparedCount: '{{count}} comparisons'
+            comparedCount: '{{count}} comparisons',
+            compare: 'Compare',
+            reset: 'Reset'
         },
 
         // Messages
@@ -298,7 +309,8 @@ export default {
         noPlayersFound: 'No players found',
         importSuccess: 'Imported {{imported}} player(s)',
         importSuccessWithSkipped: 'Imported {{imported}} player(s), skipped {{skipped}}',
-        importFailed: 'Import failed'
+        importFailed: 'Import failed',
+        back: 'Back'
     },
 
     // Error Messages
@@ -347,6 +359,7 @@ export default {
     // Language names (for language selector)
     languages: {
         en: 'English',
+        ru: 'Russian',
         es: 'Spanish',
         fr: 'French',
         de: 'German',

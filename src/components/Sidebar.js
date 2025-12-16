@@ -18,6 +18,7 @@ import toast from './base/Toast.js';
 import { activities } from '../config/activities/index.js';
 import uiConfig from '../config/ui.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
+import { t } from '../core/I18nManager.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, UI_CLASSES } = uiConfig;
 
@@ -74,7 +75,7 @@ class Sidebar extends Component {
         return `
             <div class="sidebar">
                 <div class="sidebar__header">
-                    <h3 class="sidebar__title">Recent Teams</h3>
+                    <h3 class="sidebar__title">${t('sidebar.title')}</h3>
                 </div>
 
                 <div class="sidebar__list">
@@ -88,8 +89,8 @@ class Sidebar extends Component {
     renderEmptyState() {
         return `
             <div class="sidebar__empty">
-                <p>No teams yet</p>
-                <p class="text-muted">Create your first team</p>
+                <p>${t('sidebar.noTeams')}</p>
+                <p class="text-muted">${t('sidebar.createFirst')}</p>
             </div>
         `;
     }
@@ -115,14 +116,14 @@ class Sidebar extends Component {
                     </div>
                     <div class="session-item__meta">
                         <span class="session-item__date">${dateStr} ${timeStr}</span>
-                        <span class="session-item__players">${playerCount} players</span>
+                        <span class="session-item__players">${playerCount} ${t('common.players')}</span>
                     </div>
                 </div>
                 <button id="deleteSessionBtn-${session.id}"
                         class="session-item__delete"
                         ${DATA_ATTRIBUTES.SESSION_ID}="${session.id}"
                         ${DATA_ATTRIBUTES.ACTIVITY_KEY}="${activityKey}"
-                        title="Delete team">
+                        title="${t('sidebar.deleteTeam')}">
                     ${getIcon('trash')}
                 </button>
             </div>
@@ -191,7 +192,7 @@ class Sidebar extends Component {
 
                 // Full page reload required when switching activities
                 // This ensures all services get the new activity config
-                toast.info(`Switching to ${activities[activityKey]?.name}...`, uiConfig.TOAST.SHORT_DURATION);
+                toast.info(t('settings.activity.switchingTo', { activity: activities[activityKey]?.name }), uiConfig.TOAST.SHORT_DURATION);
                 setTimeout(() => {
                     window.location.reload();
                 }, ANIMATION.ACTIVITY_SWITCH_DELAY);
@@ -229,9 +230,9 @@ class Sidebar extends Component {
         const session = this.sessionService.getSession(activityKey, sessionId);
         const playerCount = session?.players?.length || 0;
 
-        let confirmMessage = 'Delete this team?';
+        let confirmMessage = t('sidebar.deleteConfirm');
         if (playerCount > 0) {
-            confirmMessage = `Delete team with ${playerCount} players?`;
+            confirmMessage = t('sidebar.deleteConfirmWithPlayers', { count: playerCount });
         }
 
         if (confirm(confirmMessage)) {
@@ -263,7 +264,7 @@ class Sidebar extends Component {
                     storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                     // Show message
-                    toast.info('All teams deleted. Please select an activity to continue.');
+                    toast.info(t('sidebar.allDeletedMessage'));
 
                     // Force immediate save before navigation/reload to ensure deletion persists
                     this.sessionService.sessionRepository.stateManager.save();
@@ -289,9 +290,9 @@ class Sidebar extends Component {
 
                     // Show appropriate message
                     if (totalSessionCount > 0) {
-                        toast.info('Team deleted. Select a team from the sidebar to continue.');
+                        toast.info(t('sidebar.deletedMessage'));
                     } else {
-                        toast.info('Team deleted. Please select an activity to continue.');
+                        toast.info(t('sidebar.allDeletedMessage'));
                     }
 
                     // Force immediate save before navigation/reload

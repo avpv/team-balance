@@ -2,6 +2,7 @@ import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
 import { trackClick } from '../../config/analytics.js';
+import { t } from '../../core/I18nManager.js';
 
 const { ELEMENT_IDS } = uiConfig;
 
@@ -19,25 +20,25 @@ class PositionSelector extends BaseComponent {
 
     render() {
         return `
-            <div class="position-selector" role="region" aria-label="Position selection">
+            <div class="position-selector" role="region" aria-label="${t('compare.positionSelector.title')}">
                 <div class="position-selector__header">
                     <div class="position-selector__header-content">
                         <div class="position-selector__header-text">
-                            <h3>Select Position to Compare</h3>
+                            <h3>${t('compare.positionSelector.selectPosition')}</h3>
                             <div class="position-selector__description">
                                 <p class="position-selector__instruction">
-                                    Pick a position below to start comparing players head-to-head and build your rankings.
+                                    ${t('compare.positionSelector.pickPosition')}
                                 </p>
                                 <div class="position-selector__shortcuts">
                                     ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
-                                    <span class="shortcuts__text">Quick keys: <kbd>A</kbd> left • <kbd>D</kbd> right • <kbd>W</kbd> draw</span>
+                                    <span class="shortcuts__text">${t('compare.positionSelector.quickKeys')} <kbd>A</kbd> ${t('compare.comparison.leftKeyHint').toLowerCase()} • <kbd>D</kbd> ${t('compare.comparison.rightKeyHint').toLowerCase()} • <kbd>W</kbd> ${t('compare.comparison.draw').toLowerCase()}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="position-grid" role="radiogroup" aria-label="Available positions">
+                <div class="position-grid" role="radiogroup" aria-label="${t('common.positions')}">
                     ${Object.entries(this.positions).map(([key, name]) => this.renderPositionCard(key, name)).join('')}
                 </div>
             </div>
@@ -54,18 +55,18 @@ class PositionSelector extends BaseComponent {
 
         // Determine card state
         let cardState = 'disabled';
-        let statusText = 'Not enough players';
+        let statusText = t('compare.positionSelector.notEnoughPlayers');
 
         if (!isDisabled) {
             if (isComplete) {
                 cardState = 'complete';
-                statusText = 'Complete';
+                statusText = t('compare.positionSelector.statusComplete');
             } else if (hasProgress) {
                 cardState = 'in-progress';
-                statusText = 'In progress';
+                statusText = t('compare.positionSelector.statusInProgress');
             } else {
                 cardState = 'ready';
-                statusText = 'Ready to start';
+                statusText = t('compare.positionSelector.statusReady');
             }
         }
 
@@ -86,7 +87,7 @@ class PositionSelector extends BaseComponent {
                     ${!isDisabled ? `
                         <div class="position-card__badges">
                             <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'in-progress' : 'ready'}">
-                                ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
+                                ${isComplete ? t('compare.positionSelector.statusComplete') : hasProgress ? t('compare.positionSelector.statusInProgress') : t('compare.positionSelector.statusReady')}
                             </span>
                         </div>
                     ` : ''}
@@ -98,7 +99,7 @@ class PositionSelector extends BaseComponent {
                             ${getIcon('users-x', { size: 32 })}
                         </div>
                         <div style="font-size: var(--font-size-sm); line-height: 1.4;">
-                            No players assigned to the ${name} position yet. Add players on the Settings page.
+                            ${t('compare.positionSelector.noPlayersAtPosition', { position: name })}
                         </div>
                     </div>
                 ` : `
@@ -106,11 +107,11 @@ class PositionSelector extends BaseComponent {
                         <div class="position-card__stats">
                             <div class="position-stat">
                                 <span class="position-stat__value">${players.length}</span>
-                                <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
+                                <span class="position-stat__label">${players.length !== 1 ? t('common.players') : t('common.player')}</span>
                             </div>
                             <div class="position-stat">
                                 <span class="position-stat__value">${prog.completed}/${prog.total}</span>
-                                <span class="position-stat__label">comparisons</span>
+                                <span class="position-stat__label">${t('common.comparisons')}</span>
                             </div>
                         </div>
 
@@ -133,24 +134,24 @@ class PositionSelector extends BaseComponent {
                             id="comparePositionBtn-${key}"
                             class="btn btn-sm btn-primary position-card__compare-btn"
                             data-position-compare="${key}"
-                            aria-label="Compare ${name} players"
-                            title="${isComplete ? 'All comparisons complete' : 'Start comparing ' + name + ' players'}"
+                            aria-label="${t('compare.comparison.compare')} ${name}"
+                            title="${isComplete ? t('compare.comparison.positionComplete') : t('compare.comparison.compare') + ' ' + name}"
                             onclick="event.stopPropagation();"
                             ${isComplete ? 'disabled' : ''}>
                             ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
-                            Compare
+                            ${t('compare.comparison.compare')}
                         </button>
                         <button
                             type="button"
                             id="resetPositionBtn-${key}"
                             class="btn btn-sm btn-secondary position-card__reset-btn"
                             data-position-reset="${key}"
-                            aria-label="Reset ${name} comparisons"
-                            title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
+                            aria-label="${t('compare.comparison.reset')} ${name}"
+                            title="${hasProgress ? t('compare.positionSelector.resetPosition') : t('info.noComparisons')}"
                             onclick="event.stopPropagation();"
                             ${!hasProgress ? 'disabled' : ''}>
                             ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
-                            Reset
+                            ${t('compare.comparison.reset')}
                         </button>
                     </div>
                 `}

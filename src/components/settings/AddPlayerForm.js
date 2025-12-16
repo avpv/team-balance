@@ -5,6 +5,7 @@ import uiConfig from '../../config/ui.js';
 import { STORAGE_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
 import { trackClick, trackEvent } from '../../config/analytics.js';
+import { t } from '../../core/I18nManager.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ICON_SIZES, MESSAGES } = uiConfig;
 
@@ -22,7 +23,7 @@ class AddPlayerForm extends BaseComponent {
         const isOpen = !!currentActivity;
 
         return `
-            <div class="accordion add-player-section" role="region" aria-label="Add players">
+            <div class="accordion add-player-section" role="region" aria-label="${t('settings.addPlayers.title')}">
                 <button
                     type="button"
                     class="accordion-header${!currentActivity ? ' disabled' : ''}"
@@ -30,7 +31,7 @@ class AddPlayerForm extends BaseComponent {
                     aria-expanded="${isOpen}"
                     aria-controls="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}"
                     ${!currentActivity ? 'aria-disabled="true"' : ''}>
-                    <span>Add Players</span>
+                    <span>${t('settings.addPlayers.title')}</span>
                     ${getIcon('chevron-down', { size: ICON_SIZES.MEDIUM, className: `accordion-icon${isOpen ? ' open' : ''}` })}
                 </button>
                 <div
@@ -40,51 +41,51 @@ class AddPlayerForm extends BaseComponent {
                     aria-hidden="${!isOpen}">
                     <!-- Import Players Section -->
                     <div class="player-section import-section">
-                        <h4 class="section-title">Import Players</h4>
+                        <h4 class="section-title">${t('settings.addPlayers.importPlayers')}</h4>
                         <div class="section-content">
                             <button
                                 type="button"
                                 class="btn btn-primary"
                                 id="${ELEMENT_IDS.IMPORT_BTN}"
                                 ${!currentActivity ? 'disabled' : ''}
-                                aria-label="Import players from CSV or JSON file">
+                                aria-label="${t('settings.addPlayers.importHelp')}">
                                 ${getIcon('arrow-down', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                Import
+                                ${t('settings.addPlayers.importBtn')}
                             </button>
                             <p class="form-help-text mt-2">
-                                Upload a CSV or JSON file with your players' names and positions
+                                ${t('settings.addPlayers.importHelp')}
                             </p>
                         </div>
                     </div>
 
                     <!-- Manual Add Players Section -->
                     <div class="player-section manual-add-section">
-                        <h4 class="section-title">Add Individual Players</h4>
-                        <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}" aria-label="Add new player form">
+                        <h4 class="section-title">${t('settings.addPlayers.addIndividual')}</h4>
+                        <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}" aria-label="${t('settings.addPlayers.addIndividual')}">
                             <div class="form-group">
-                                <label for="${ELEMENT_IDS.PLAYER_NAME_INPUT}">Player Name</label>
+                                <label for="${ELEMENT_IDS.PLAYER_NAME_INPUT}">${t('settings.addPlayers.playerName')}</label>
                                 <input
                                     type="text"
                                     id="${ELEMENT_IDS.PLAYER_NAME_INPUT}"
                                     class="form-control"
-                                    placeholder="e.g., John Smith"
+                                    placeholder="${t('settings.addPlayers.playerNamePlaceholder')}"
                                     required
                                     autocomplete="off"
                                     ${!currentActivity ? 'disabled' : ''}
                                     aria-required="true"
                                     aria-describedby="player-name-help"
                                 >
-                                <p class="form-help" id="player-name-help">Enter the full name of the player</p>
+                                <p class="form-help" id="player-name-help">${t('settings.addPlayers.playerNameHelp')}</p>
                             </div>
 
                             <div class="form-group">
-                                <label>Positions
-                                    <span class="text-tertiary">(select all that apply)</span>
+                                <label>${t('settings.addPlayers.positionsLabel')}
+                                    <span class="text-tertiary">${t('settings.addPlayers.positionsHint')}</span>
                                 </label>
-                                <div class="positions-grid" id="positionsGrid" role="group" aria-label="Player positions">
+                                <div class="positions-grid" id="positionsGrid" role="group" aria-label="${t('common.positions')}">
                                     ${this.renderPositionCheckboxes()}
                                 </div>
-                                <p class="form-help">Select one or more positions this player can fill</p>
+                                <p class="form-help">${t('settings.addPlayers.positionsHelp')}</p>
                             </div>
 
                             <div class="form-actions">
@@ -93,9 +94,9 @@ class AddPlayerForm extends BaseComponent {
                                     id="addPlayerSubmitBtn"
                                     class="btn btn-primary"
                                     ${!currentActivity ? 'disabled' : ''}
-                                    aria-label="Add player to roster">
+                                    aria-label="${t('settings.addPlayers.addPlayerBtn')}">
                                     ${getIcon('plus', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                    Add Player
+                                    ${t('settings.addPlayers.addPlayerBtn')}
                                 </button>
                             </div>
                         </form>
@@ -103,7 +104,7 @@ class AddPlayerForm extends BaseComponent {
 
                     <!-- Danger Zone Section -->
                     <div class="player-section danger-zone-section">
-                        <h4 class="section-title">Bulk Actions</h4>
+                        <h4 class="section-title">${t('settings.addPlayers.bulkActions')}</h4>
                         <div class="form-section danger-zone">
                             <div class="form-section-actions">
                                 <button
@@ -111,22 +112,22 @@ class AddPlayerForm extends BaseComponent {
                                     class="btn btn-secondary"
                                     id="${ELEMENT_IDS.RESET_ALL_BTN}"
                                     ${!currentActivity ? 'disabled' : ''}
-                                    aria-label="Reset all player ratings to default">
+                                    aria-label="${t('settings.addPlayers.resetAllRatings')}">
                                     ${getIcon('refresh', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                    Reset All Ratings
+                                    ${t('settings.addPlayers.resetAllRatings')}
                                 </button>
                                 <button
                                     type="button"
                                     class="btn btn-secondary"
                                     id="${ELEMENT_IDS.CLEAR_ALL_BTN}"
                                     ${!currentActivity ? 'disabled' : ''}
-                                    aria-label="Remove all players from current team">
+                                    aria-label="${t('settings.addPlayers.removeAllPlayers')}">
                                     ${getIcon('trash', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                    Remove All Players
+                                    ${t('settings.addPlayers.removeAllPlayers')}
                                 </button>
                             </div>
                             <p class="form-help-text mt-3 text-tertiary">
-                                ⚠️ These actions cannot be undone. Use with caution.
+                                ⚠️ ${t('settings.addPlayers.bulkActionsWarning')}
                             </p>
                         </div>
                     </div>
@@ -147,7 +148,7 @@ class AddPlayerForm extends BaseComponent {
                     class="position-input select-all"
                     ${!currentActivity ? 'disabled' : ''}
                 >
-                <span class="position-label">Select All</span>
+                <span class="position-label">${t('common.selectAll')}</span>
             </label>
         `;
 
