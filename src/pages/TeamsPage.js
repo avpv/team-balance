@@ -14,6 +14,7 @@ import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
 import { trackClick, trackEvent } from '../config/analytics.js';
+import { t } from '../core/I18nManager.js';
 
 const { ELEMENT_IDS, ICON_SIZES, MESSAGES } = uiConfig;
 
@@ -234,8 +235,8 @@ class TeamsPage extends BasePage {
     render() {
         return this.renderPageWithSidebar(`
             <header class="page-header">
-                <h2>Create Balanced Teams</h2>
-                <p class="page-subtitle">Configure team composition and weights, then generate optimally balanced teams using mathematical algorithms</p>
+                <h2>${t('teams.title')}</h2>
+                <p class="page-subtitle">${t('teams.subtitle')}</p>
             </header>
 
             <div class="page-controls">
