@@ -727,12 +727,12 @@ class TeamsPage extends BasePage {
 
         // Create and show modal
         this.exportModal = new Modal({
-            title: 'Export Teams',
+            title: t('teams.export.title'),
             content: '<div id="exportWizardContainer"></div>',
             showCancel: true,
             showConfirm: true,
-            cancelText: 'Close',
-            confirmText: 'Download',
+            cancelText: t('common.close'),
+            confirmText: t('common.download'),
             confirmIcon: 'download',
             size: 'medium',
             onConfirm: () => {

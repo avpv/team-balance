@@ -291,27 +291,27 @@ class SettingsPage extends BasePage {
     showEditPositionsModal(playerId) {
         const player = this.playerService.getById(playerId);
         if (!player) {
-            toast.error('Player not found');
+            toast.error(t('errors.playerNotFound'));
             return;
         }
 
         let modal;
         modal = new Modal({
-            title: `Edit Positions - ${player.name}`,
+            title: t('settings.modals.editPositions.title', { name: player.name }),
             content: this.renderEditPositionsContent(player),
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Save',
-            cancelText: 'Cancel',
+            confirmText: t('common.save'),
+            cancelText: t('common.cancel'),
             onConfirm: () => {
                 const selected = this.getSelectedModalPositions('editPositions', modal);
                 if (selected.length === 0) {
-                    toast.error('Please select at least one position');
+                    toast.error(t('errors.selectPosition'));
                     return false;
                 }
                 try {
                     this.playerService.updatePositions(playerId, selected);
-                    toast.success(`Positions updated for ${player.name}`);
+                    toast.success(t('success.positionsUpdated', { name: player.name }));
                     return true;
                 } catch (error) {
                     toast.error(error.message);
@@ -333,7 +333,7 @@ class SettingsPage extends BasePage {
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
-                    <label>Positions (select all applicable):</label>
+                    <label>${t('settings.modals.editPositions.label')}</label>
                     <div class="positions-grid">
                         ${Object.entries(this.playerService.positions).map(([key, name]) => `
                             <label class="position-checkbox">
@@ -357,22 +357,22 @@ class SettingsPage extends BasePage {
     showResetPlayerModal(playerId) {
         const player = this.playerService.getById(playerId);
         if (!player) {
-            toast.error('Player not found');
+            toast.error(t('errors.playerNotFound'));
             return;
         }
 
         let modal;
         modal = new Modal({
-            title: `Reset Player - ${player.name}`,
+            title: t('settings.modals.resetPlayer.title', { name: player.name }),
             content: this.renderResetPlayerContent(player),
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Reset',
-            cancelText: 'Cancel',
+            confirmText: t('common.reset'),
+            cancelText: t('common.cancel'),
             onConfirm: () => {
                 const selected = this.getSelectedModalPositions('resetPositions', modal);
                 if (selected.length === 0) {
-                    toast.error('Please select at least one position');
+                    toast.error(t('errors.selectPosition'));
                     return false;
                 }
                 try {
@@ -398,7 +398,7 @@ class SettingsPage extends BasePage {
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
-                    <label>Select positions to reset:</label>
+                    <label>${t('settings.modals.resetPlayer.label')}</label>
                     <div class="positions-grid">
                         ${player.positions.map(pos => {
             const name = this.playerService.positions[pos];
@@ -413,15 +413,15 @@ class SettingsPage extends BasePage {
                                         class="position-input"
                                         checked
                                     >
-                                    <span class="position-label">${name} (${rating} ELO, ${comparisons} comps)</span>
+                                    <span class="position-label">${name} (${rating} ELO, ${comparisons} ${t('common.comparisonsShort')})</span>
                                 </label>
                             `;
         }).join('')}
                     </div>
                     <div class="warning-box mt-3">
-                        <div class="warning-title">Warning</div>
+                        <div class="warning-title">${t('common.warning')}</div>
                         <div class="warning-text">
-                            This will reset the player's rating to 1500 and clear comparison history for the selected positions.
+                            ${t('settings.modals.resetPlayer.warning')}
                         </div>
                     </div>
                 </div>
@@ -433,16 +433,16 @@ class SettingsPage extends BasePage {
     showResetAllModal() {
         let modal;
         modal = new Modal({
-            title: 'Reset All Player Ratings',
+            title: t('settings.modals.resetAll.title'),
             content: this.renderResetAllContent(),
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Reset All',
-            cancelText: 'Cancel',
+            confirmText: t('common.reset'),
+            cancelText: t('common.cancel'),
             onConfirm: () => {
                 const selected = this.getSelectedModalPositions('resetAllPositions', modal);
                 if (selected.length === 0) {
-                    toast.error('Please select at least one position');
+                    toast.error(t('errors.selectPosition'));
                     return false;
                 }
                 try {
@@ -468,7 +468,7 @@ class SettingsPage extends BasePage {
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
-                    <label>Select positions to reset for ALL players:</label>
+                    <label>${t('settings.modals.resetAll.label')}</label>
                     <div class="positions-grid">
                         ${Object.entries(this.playerService.positions).map(([key, name]) => `
                             <label class="position-checkbox">
@@ -484,9 +484,9 @@ class SettingsPage extends BasePage {
                         `).join('')}
                     </div>
                     <div class="warning-box warning-box-danger mt-3">
-                        <div class="warning-title">Warning</div>
+                        <div class="warning-title">${t('common.warning')}</div>
                         <div class="warning-text">
-                            This will reset ALL players to 1500 ELO and clear ALL comparison history for the selected positions. This action cannot be undone!
+                            ${t('settings.modals.resetAll.warning')}
                         </div>
                     </div>
                 </div>
@@ -498,21 +498,21 @@ class SettingsPage extends BasePage {
     showClearAllModal() {
         let modal;
         modal = new Modal({
-            title: 'Remove All Players',
+            title: t('settings.modals.clearAll.title'),
             content: this.renderClearAllContent(),
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Remove All',
-            cancelText: 'Cancel',
+            confirmText: t('common.remove'),
+            cancelText: t('common.cancel'),
             onConfirm: () => {
                 const selected = this.getSelectedModalPositions('clearAllPositions', modal);
                 if (selected.length === 0) {
-                    toast.error('Please select at least one position');
+                    toast.error(t('errors.selectPosition'));
                     return false;
                 }
                 try {
                     const removedPlayers = this.playerService.clearAllByPositions(selected);
-                    toast.success(`Removed ${removedPlayers.length} player(s)`);
+                    toast.success(t('success.removedPlayers', { count: removedPlayers.length }));
                     return true;
                 } catch (error) {
                     toast.error(error.message);
@@ -533,7 +533,7 @@ class SettingsPage extends BasePage {
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
-                    <label>Select positions to remove ALL players from:</label>
+                    <label>${t('settings.modals.clearAll.label')}</label>
                     <div class="positions-grid">
                         ${Object.entries(this.playerService.positions).map(([key, name]) => `
                             <label class="position-checkbox">
@@ -549,9 +549,9 @@ class SettingsPage extends BasePage {
                         `).join('')}
                     </div>
                     <div class="warning-box warning-box-danger mt-3">
-                        <div class="warning-title">Danger Zone</div>
+                        <div class="warning-title">${t('common.dangerZone')}</div>
                         <div class="warning-text">
-                            This will remove ALL players who play the selected positions. This will delete all their data, ratings, and history. This action cannot be undone!
+                            ${t('settings.modals.clearAll.warning')}
                         </div>
                     </div>
                 </div>
@@ -584,12 +584,12 @@ class SettingsPage extends BasePage {
         });
 
         this.importModal = new Modal({
-            title: 'Import Players',
+            title: t('settings.modals.importPlayers.title'),
             content: '<div id="importWizardContainer"></div>',
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Import',
-            cancelText: 'Cancel',
+            confirmText: t('settings.modals.importPlayers.confirmBtn'),
+            cancelText: t('common.cancel'),
             size: 'large',
             onConfirm: () => this.handleImportConfirm(),
             onClose: () => {
@@ -631,7 +631,7 @@ class SettingsPage extends BasePage {
 
             const previewHTML = `
                 <div class="preview-success">
-                    <strong>Found ${players.length} player(s)</strong>
+                    <strong>${t('import.foundPlayers', { count: players.length })}</strong>
                     <div class="preview-list">
                         ${players.map(p => `
                             <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
@@ -644,7 +644,7 @@ class SettingsPage extends BasePage {
         } catch (error) {
             const errorHTML = `
                 <div class="preview-error">
-                    <strong>Error:</strong> ${this.escape(error.message)}
+                    <strong>${t('errors.unexpectedError')}:</strong> ${this.escape(error.message)}
                 </div>
             `;
             this.importWizard.updatePreview(errorHTML);
@@ -665,13 +665,13 @@ class SettingsPage extends BasePage {
                     positions: Array.isArray(item.positions) ? item.positions : [item.positions]
                 }));
             } catch (e) {
-                throw new Error('Invalid JSON format');
+                throw new Error(t('errors.invalidJson'));
             }
         }
 
         // Try CSV - using the provided delimiter
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
-        if (lines.length < 1) throw new Error('No data to import');
+        if (lines.length < 1) throw new Error(t('errors.noDataToImport'));
 
         // Check if first line is a header (contains "name" or "positions")
         const firstLine = lines[0].toLowerCase();
@@ -739,7 +739,7 @@ class SettingsPage extends BasePage {
 
     async handleImportConfirm() {
         if (!this.importWizard) {
-            toast.error('Import wizard not initialized');
+            toast.error(t('import.importFailed'));
             return false;
         }
 
@@ -749,14 +749,14 @@ class SettingsPage extends BasePage {
             const data = await this.importWizard.getData();
 
             if (!data || !data.trim()) {
-                toast.error('Please provide data to import');
+                toast.error(t('import.noData'));
                 return false;
             }
 
             // Use cached delimiter value
             const players = this.parseImportData(data, delimiter);
             if (players.length === 0) {
-                toast.error('No players found');
+                toast.error(t('import.noPlayersFound'));
                 return false;
             }
 
@@ -771,10 +771,14 @@ class SettingsPage extends BasePage {
                 }
             });
 
-            toast.success(`Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`);
+            if (skipped > 0) {
+                toast.success(t('import.importSuccessWithSkipped', { imported, skipped }));
+            } else {
+                toast.success(t('import.importSuccess', { imported }));
+            }
             return true;
         } catch (error) {
-            toast.error('Import failed: ' + error.message);
+            toast.error(t('import.importFailed') + ': ' + error.message);
             return false;
         }
     }
