@@ -1,6 +1,7 @@
 import Component from '../base/Component.js';
 import ExportFormatPicker from './ExportFormatPicker.js';
 import ExportContent from './ExportContent.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * Export Wizard - Orchestrates the multi-step export process
@@ -66,19 +67,19 @@ export default class ExportWizard extends Component {
         switch (format) {
             case 'text':
                 return {
-                    title: 'Plain Text',
+                    title: t('teams.export.formatText'),
                     filename: `teams-${date}.txt`,
                     mimeType: 'text/plain'
                 };
             case 'csv':
                 return {
-                    title: 'CSV File',
+                    title: t('teams.export.formatCsv'),
                     filename: `teams-${date}.csv`,
                     mimeType: 'text/csv'
                 };
             case 'json':
                 return {
-                    title: 'JSON File',
+                    title: t('teams.export.formatJson'),
                     filename: `teams-${date}.json`,
                     mimeType: 'application/json'
                 };
