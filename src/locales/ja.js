@@ -151,10 +151,19 @@ export default {
         // Position Selector
         positionSelector: {
             title: 'ポジションを選択',
+            selectPosition: '比較するポジションを選択',
+            pickPosition: '下のポジションを選択して、プレイヤーを直接比較し、ランキングを構築しましょう。',
+            quickKeys: 'クイックキー：',
+            quickKeysHint: '左 • 右 • 引き分け',
             resetPosition: 'ポジション比較をリセット',
             resetAll: 'すべてリセット',
             progress: '{{completed}}/{{total}} 比較',
-            complete: '完了！'
+            complete: '完了！',
+            notEnoughPlayers: 'プレイヤーが足りません',
+            statusComplete: '完了',
+            statusInProgress: '進行中',
+            statusReady: '準備完了',
+            noPlayersAtPosition: 'まだ{{position}}ポジションに割り当てられたプレイヤーがいません。設定ページでプレイヤーを追加してください。'
         },
 
         // Comparison Area
@@ -172,7 +181,9 @@ export default {
             leftKeyHint: 'Aキー',
             rightKeyHint: 'Dキー',
             positionComplete: 'ポジション完了！',
-            comparedCount: '{{count}} 比較'
+            comparedCount: '{{count}} 比較',
+            compare: '比較',
+            reset: 'リセット'
         },
 
         // Messages
@@ -298,7 +309,8 @@ export default {
         noPlayersFound: 'プレイヤーが見つかりません',
         importSuccess: '{{imported}}人のプレイヤーをインポートしました',
         importSuccessWithSkipped: '{{imported}}人のプレイヤーをインポート、{{skipped}}人をスキップ',
-        importFailed: 'インポートに失敗しました'
+        importFailed: 'インポートに失敗しました',
+        back: '戻る'
     },
 
     // Error Messages
@@ -347,6 +359,7 @@ export default {
     // Language names (for language selector)
     languages: {
         en: '英語',
+        ru: 'ロシア語',
         es: 'スペイン語',
         fr: 'フランス語',
         de: 'ドイツ語',

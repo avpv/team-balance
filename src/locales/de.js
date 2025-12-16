@@ -151,10 +151,19 @@ export default {
         // Position Selector
         positionSelector: {
             title: 'Position auswählen',
+            selectPosition: 'Position zum Vergleichen auswählen',
+            pickPosition: 'Wählen Sie unten eine Position, um Spieler direkt zu vergleichen und Ihre Rangliste aufzubauen.',
+            quickKeys: 'Schnelltasten:',
+            quickKeysHint: 'links • rechts • unentschieden',
             resetPosition: 'Positionsvergleiche zurücksetzen',
             resetAll: 'Alle zurücksetzen',
             progress: '{{completed}}/{{total}} Vergleiche',
-            complete: 'Abgeschlossen!'
+            complete: 'Abgeschlossen!',
+            notEnoughPlayers: 'Nicht genügend Spieler',
+            statusComplete: 'Abgeschlossen',
+            statusInProgress: 'In Bearbeitung',
+            statusReady: 'Bereit',
+            noPlayersAtPosition: 'Noch keine Spieler der Position {{position}} zugewiesen. Fügen Sie auf der Einstellungsseite Spieler hinzu.'
         },
 
         // Comparison Area
@@ -172,7 +181,9 @@ export default {
             leftKeyHint: 'A-Taste',
             rightKeyHint: 'D-Taste',
             positionComplete: 'Position abgeschlossen!',
-            comparedCount: '{{count}} Vergleiche'
+            comparedCount: '{{count}} Vergleiche',
+            compare: 'Vergleichen',
+            reset: 'Zurücksetzen'
         },
 
         // Messages
@@ -298,7 +309,8 @@ export default {
         noPlayersFound: 'Keine Spieler gefunden',
         importSuccess: '{{imported}} Spieler importiert',
         importSuccessWithSkipped: '{{imported}} Spieler importiert, {{skipped}} übersprungen',
-        importFailed: 'Import fehlgeschlagen'
+        importFailed: 'Import fehlgeschlagen',
+        back: 'Zurück'
     },
 
     // Error Messages
@@ -347,6 +359,7 @@ export default {
     // Language names (for language selector)
     languages: {
         en: 'Englisch',
+        ru: 'Russisch',
         es: 'Spanisch',
         fr: 'Französisch',
         de: 'Deutsch',

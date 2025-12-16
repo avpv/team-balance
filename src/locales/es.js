@@ -151,10 +151,19 @@ export default {
         // Position Selector
         positionSelector: {
             title: 'Seleccionar Posición',
+            selectPosition: 'Seleccionar Posición para Comparar',
+            pickPosition: 'Elige una posición abajo para comenzar a comparar jugadores cara a cara y construir tu ranking.',
+            quickKeys: 'Teclas rápidas:',
+            quickKeysHint: 'izquierda • derecha • empate',
             resetPosition: 'Restablecer comparaciones de posición',
             resetAll: 'Restablecer Todo',
             progress: '{{completed}}/{{total}} comparaciones',
-            complete: '¡Completo!'
+            complete: '¡Completo!',
+            notEnoughPlayers: 'No hay suficientes jugadores',
+            statusComplete: 'Completo',
+            statusInProgress: 'En Progreso',
+            statusReady: 'Listo',
+            noPlayersAtPosition: 'No hay jugadores asignados a la posición {{position}} todavía. Agrega jugadores en la página de Configuración.'
         },
 
         // Comparison Area
@@ -172,7 +181,9 @@ export default {
             leftKeyHint: 'Tecla A',
             rightKeyHint: 'Tecla D',
             positionComplete: '¡Posición Completa!',
-            comparedCount: '{{count}} comparaciones'
+            comparedCount: '{{count}} comparaciones',
+            compare: 'Comparar',
+            reset: 'Restablecer'
         },
 
         // Messages
@@ -298,7 +309,8 @@ export default {
         noPlayersFound: 'No se encontraron jugadores',
         importSuccess: 'Se importaron {{imported}} jugador(es)',
         importSuccessWithSkipped: 'Se importaron {{imported}} jugador(es), se omitieron {{skipped}}',
-        importFailed: 'La importación falló'
+        importFailed: 'La importación falló',
+        back: 'Volver'
     },
 
     // Error Messages
@@ -347,6 +359,7 @@ export default {
     // Language names (for language selector)
     languages: {
         en: 'Inglés',
+        ru: 'Ruso',
         es: 'Español',
         fr: 'Francés',
         de: 'Alemán',
