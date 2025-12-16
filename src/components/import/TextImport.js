@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
@@ -54,10 +55,10 @@ Chris Brown`;
                 <div class="import-method-header">
                     <button id="textImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
-                        Back
+                        ${t('import.back')}
                     </button>
                     <div class="header-content">
-                        <h2>Paste or Type Player Data</h2>
+                        <h2>${t('import.pasteOrType')}</h2>
                     </div>
                 </div>
 
@@ -65,36 +66,36 @@ Chris Brown`;
                     <div class="input-section">
                         <div class="delimiter-selector">
                             <label for="delimiterSelect">
-                                <strong>Field Delimiter</strong>
-                                <span class="hint">Choose how fields are separated</span>
+                                <strong>${t('import.fieldDelimiter')}</strong>
+                                <span class="hint">${t('import.delimiterHint')}</span>
                             </label>
                             <select id="delimiterSelect" class="form-select">
-                                <option value=",">Comma (,)</option>
-                                <option value="\t">Tab (\\t)</option>
-                                <option value=";">Semicolon (;)</option>
+                                <option value=",">${t('import.comma')}</option>
+                                <option value="\t">${t('import.tab')}</option>
+                                <option value=";">${t('import.semicolon')}</option>
                             </select>
                         </div>
                         <label for="textImportInput">
-                            <strong>Player Data</strong>
-                            <span class="hint">Paste your data below</span>
+                            <strong>${t('import.playerData')}</strong>
+                            <span class="hint">${t('import.delimiterHint')}</span>
                         </label>
                         <textarea
                             id="textImportInput"
                             class="import-textarea"
-                            placeholder="Paste CSV or JSON data here..."
+                            placeholder="${t('import.pasteDataPlaceholder')}"
                             rows="10"
                         ></textarea>
                     </div>
 
                     <div class="examples-section">
-                        <h3>Examples</h3>
+                        <h3>${t('import.examples')}</h3>
 
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>CSV Format</strong>
+                                <strong>${t('import.csvFormat')}</strong>
                                 <button id="copyCsvExampleBtn" class="btn btn-sm copy-button" data-copy="csv">
                                     ${getIcon('copy', { size: 14 })}
-                                    Copy
+                                    ${t('common.copy')}
                                 </button>
                             </div>
                             <pre class="code-block" id="csvExample">${this.getExampleCSV(this.delimiter)}</pre>
@@ -102,10 +103,10 @@ Chris Brown`;
 
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>JSON Format</strong>
+                                <strong>${t('import.jsonFormat')}</strong>
                                 <button id="copyJsonExampleBtn" class="btn btn-sm copy-button" data-copy="json">
                                     ${getIcon('copy', { size: 14 })}
-                                    Copy
+                                    ${t('common.copy')}
                                 </button>
                             </div>
                             <pre class="code-block">${this.getExampleJSON()}</pre>
@@ -113,11 +114,11 @@ Chris Brown`;
 
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>Names Only</strong>
-                                <span class="hint">All positions will be assigned</span>
+                                <strong>${t('import.namesOnly')}</strong>
+                                <span class="hint">${t('import.allPositionsAssigned')}</span>
                                 <button id="copyNamesExampleBtn" class="btn btn-sm copy-button" data-copy="names">
                                     ${getIcon('copy', { size: 14 })}
-                                    Copy
+                                    ${t('common.copy')}
                                 </button>
                             </div>
                             <pre class="code-block">${this.getExampleNamesOnly()}</pre>
@@ -180,7 +181,7 @@ Chris Brown`;
             // Show success feedback
             const button = this.element.querySelector(`[data-copy="${format}"]`);
             const originalHTML = button.innerHTML;
-            button.innerHTML = `${getIcon('check', { size: 14 })} Copied!`;
+            button.innerHTML = `${getIcon('check', { size: 14 })} ${t('import.copied')}`;
             button.classList.add('copied');
 
             setTimeout(() => {

@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * API import component - allows users to fetch player data from a URL
@@ -148,18 +149,18 @@ export default class ApiImport extends Component {
                 <div class="import-method-header">
                     <button id="apiImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
-                        Back
+                        ${t('import.back')}
                     </button>
                     <div class="header-content">
-                        <h2>Fetch from URL</h2>
+                        <h2>${t('import.fetchFromUrl')}</h2>
                     </div>
                 </div>
 
                 <div class="import-method-content">
                     <div class="input-section">
                         <label for="apiUrlInput">
-                            <strong>URL</strong>
-                            <span class="hint">Enter the URL of your JSON data</span>
+                            <strong>${t('import.url')}</strong>
+                            <span class="hint">${t('import.urlHint')}</span>
                         </label>
                         <div class="url-input-group">
                             <input
@@ -174,47 +175,47 @@ export default class ApiImport extends Component {
                                 data-action="fetch"
                                 ${this.isLoading ? 'disabled' : ''}
                             >
-                                ${this.isLoading ? 'Fetching...' : 'Fetch Data'}
+                                ${this.isLoading ? t('import.fetching') : t('import.fetchData')}
                             </button>
                         </div>
                     </div>
 
                     <div class="auth-section">
                         <label for="authTypeSelect">
-                            <strong>Authentication</strong>
-                            <span class="hint">Select authentication method if required</span>
+                            <strong>${t('import.authentication')}</strong>
+                            <span class="hint">${t('import.authHint')}</span>
                         </label>
                         <select id="authTypeSelect" class="auth-type-select">
-                            <option value="none" ${this.authType === 'none' ? 'selected' : ''}>None (Public URL)</option>
-                            <option value="bearer" ${this.authType === 'bearer' ? 'selected' : ''}>Bearer Token</option>
-                            <option value="apikey" ${this.authType === 'apikey' ? 'selected' : ''}>API Key</option>
-                            <option value="basic" ${this.authType === 'basic' ? 'selected' : ''}>Basic Auth</option>
-                            <option value="custom" ${this.authType === 'custom' ? 'selected' : ''}>Custom Headers</option>
+                            <option value="none" ${this.authType === 'none' ? 'selected' : ''}>${t('import.authNone')}</option>
+                            <option value="bearer" ${this.authType === 'bearer' ? 'selected' : ''}>${t('import.authBearer')}</option>
+                            <option value="apikey" ${this.authType === 'apikey' ? 'selected' : ''}>${t('import.authApiKey')}</option>
+                            <option value="basic" ${this.authType === 'basic' ? 'selected' : ''}>${t('import.authBasic')}</option>
+                            <option value="custom" ${this.authType === 'custom' ? 'selected' : ''}>${t('import.authCustomHeaders')}</option>
                         </select>
                         ${this.renderAuthFields()}
                     </div>
 
                     <div class="examples-section">
-                        <h3>Expected JSON Format</h3>
+                        <h3>${t('import.expectedJsonFormat')}</h3>
 
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>Response Example</strong>
+                                <strong>${t('import.responseExample')}</strong>
                                 <button id="copyApiExampleBtn" class="btn btn-sm copy-button" data-copy="json">
                                     ${getIcon('copy', { size: 14 })}
-                                    Copy
+                                    ${t('common.copy')}
                                 </button>
                             </div>
                             <pre class="code-block">${this.getExampleJSON()}</pre>
                         </div>
 
                         <div class="info-box">
-                            <h4>${getIcon('info', { size: 18 })} Notes</h4>
+                            <h4>${getIcon('info', { size: 18 })} ${t('import.notes')}</h4>
                             <ul>
-                                <li>The URL must return JSON data</li>
-                                <li>Response should be an array of player objects</li>
-                                <li>Each object must have "name" and "positions" fields</li>
-                                <li>CORS must be enabled on the server</li>
+                                <li>${t('import.noteJsonRequired')}</li>
+                                <li>${t('import.noteArrayRequired')}</li>
+                                <li>${t('import.noteFieldsRequired')}</li>
+                                <li>${t('import.noteCorsRequired')}</li>
                             </ul>
                         </div>
                     </div>
@@ -336,7 +337,7 @@ export default class ApiImport extends Component {
         if (!url) {
             this.updatePreview(`
                 <div class="preview-error">
-                    <strong>Please enter a URL</strong>
+                    <strong>${t('import.urlRequired')}</strong>
                 </div>
             `);
             return;
@@ -348,8 +349,8 @@ export default class ApiImport extends Component {
         } catch (error) {
             this.updatePreview(`
                 <div class="preview-error">
-                    <strong>Invalid URL</strong>
-                    <p>Please enter a valid URL (e.g., https://example.com/data.json)</p>
+                    <strong>${t('import.invalidUrl')}</strong>
+                    <p>${t('import.invalidUrlDetail')}</p>
                 </div>
             `);
             return;
@@ -367,7 +368,7 @@ export default class ApiImport extends Component {
         this.updatePreview(`
             <div class="preview-loading">
                 <div class="spinner"></div>
-                <p>Fetching data from ${url}...</p>
+                <p>${t('import.fetchingFrom', { url: url })}</p>
             </div>
         `);
 
@@ -395,8 +396,8 @@ export default class ApiImport extends Component {
 
             this.updatePreview(`
                 <div class="preview-success">
-                    <strong>✓ Data fetched successfully!</strong>
-                    <p>Fetched ${Array.isArray(data) ? data.length : 1} item(s) from the URL.</p>
+                    <strong>✓ ${t('import.fetchSuccess')}</strong>
+                    <p>${t('import.fetchedItems', { count: Array.isArray(data) ? data.length : 1 })}</p>
                 </div>
             `);
 
@@ -408,7 +409,7 @@ export default class ApiImport extends Component {
 
             this.updatePreview(`
                 <div class="preview-error">
-                    <strong>Failed to fetch data</strong>
+                    <strong>${t('import.fetchFailed')}</strong>
                     <p style="white-space: pre-line;">${errorMessage}</p>
                 </div>
             `);
@@ -425,7 +426,7 @@ export default class ApiImport extends Component {
         const fetchButton = this.element.querySelector('[data-action="fetch"]');
         if (fetchButton) {
             fetchButton.disabled = this.isLoading;
-            fetchButton.textContent = this.isLoading ? 'Fetching...' : 'Fetch Data';
+            fetchButton.textContent = this.isLoading ? t('import.fetching') : t('import.fetchData');
         }
     }
 
@@ -438,7 +439,7 @@ export default class ApiImport extends Component {
         navigator.clipboard.writeText(text).then(() => {
             const button = this.element.querySelector('.copy-button');
             const originalHTML = button.innerHTML;
-            button.innerHTML = '✓ Copied!';
+            button.innerHTML = `${getIcon('check', { size: 14 })} ${t('import.copied')}`;
             button.classList.add('copied');
 
             setTimeout(() => {

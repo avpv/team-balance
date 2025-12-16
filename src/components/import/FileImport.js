@@ -1,5 +1,6 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * File import component - handles CSV and JSON file uploads
@@ -21,7 +22,7 @@ export default class FileImport extends Component {
     getConfig() {
         if (this.fileType === 'csv') {
             return {
-                title: 'Upload CSV File',
+                title: t('import.csvUploadTitle'),
                 icon: 'table',
                 iconSize: 32,
                 accept: '.csv',
@@ -29,7 +30,7 @@ export default class FileImport extends Component {
             };
         } else {
             return {
-                title: 'Upload JSON File',
+                title: t('import.jsonUploadTitle'),
                 icon: 'code',
                 iconSize: 32,
                 accept: '.json',
@@ -73,7 +74,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
                 <div class="import-method-header">
                     <button id="fileImportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
-                        Back
+                        ${t('import.back')}
                     </button>
                     <div class="header-content">
                         <h2>${config.title}</h2>
@@ -84,13 +85,13 @@ Alice Johnson${actualDelim}${pos[0]}`;
                     ${this.fileType === 'csv' ? `
                     <div class="delimiter-selector">
                         <label for="fileDelimiterSelect">
-                            <strong>Field Delimiter</strong>
-                            <span class="hint">Choose how fields are separated</span>
+                            <strong>${t('import.fieldDelimiter')}</strong>
+                            <span class="hint">${t('import.delimiterHint')}</span>
                         </label>
                         <select id="fileDelimiterSelect" class="form-select">
-                            <option value="," ${this.delimiter === ',' ? 'selected' : ''}>Comma (,)</option>
-                            <option value="\\t" ${this.delimiter === '\t' ? 'selected' : ''}>Tab (\\t)</option>
-                            <option value=";" ${this.delimiter === ';' ? 'selected' : ''}>Semicolon (;)</option>
+                            <option value="," ${this.delimiter === ',' ? 'selected' : ''}>${t('import.comma')}</option>
+                            <option value="\\t" ${this.delimiter === '\t' ? 'selected' : ''}>${t('import.tab')}</option>
+                            <option value=";" ${this.delimiter === ';' ? 'selected' : ''}>${t('import.semicolon')}</option>
                         </select>
                     </div>
                     ` : ''}
@@ -109,32 +110,32 @@ Alice Johnson${actualDelim}${pos[0]}`;
                             <div class="upload-text">
                                 ${this.selectedFile
                                     ? `<strong>${this.selectedFile.name}</strong><br><span class="file-size">${this.formatFileSize(this.selectedFile.size)}</span>`
-                                    : `<strong>Click to select a ${this.fileType.toUpperCase()} file</strong><br><span>or drag and drop here</span>`
+                                    : `<strong>${t('import.clickToSelect')}</strong><br><span>${t('import.orDragAndDrop')}</span>`
                                 }
                             </div>
                             ${this.selectedFile
-                                ? `<button id="changeFileBtn" class="btn btn-secondary change-file-button" data-action="change-file">Change File</button>`
-                                : `<button id="browseFilesBtn" class="btn btn-primary browse-button">Browse Files</button>`
+                                ? `<button id="changeFileBtn" class="btn btn-secondary change-file-button" data-action="change-file">${t('import.changeFile')}</button>`
+                                : `<button id="browseFilesBtn" class="btn btn-primary browse-button">${t('import.browseFiles')}</button>`
                             }
                         </div>
                     </div>
 
                     <div class="examples-section">
-                        <h3>Expected Format</h3>
+                        <h3>${t('import.expectedFormat')}</h3>
                         <div class="example-block">
                             <div class="example-header">
-                                <strong>${this.fileType.toUpperCase()} Example</strong>
+                                <strong>${this.fileType === 'csv' ? t('import.csvExample') : t('import.jsonExample')}</strong>
                                 <button id="copyFileExampleBtn" class="btn btn-sm copy-button" data-copy="example">
                                     ${getIcon('copy', { size: 14 })}
-                                    Copy
+                                    ${t('common.copy')}
                                 </button>
                             </div>
                             <pre class="code-block">${config.example}</pre>
                         </div>
                         <p class="format-note">
                             ${this.fileType === 'csv'
-                                ? 'CSV files should have a header row with "name" and "positions" columns.'
-                                : 'JSON files should contain an array of objects with "name" and "positions" fields.'
+                                ? t('import.csvFormatNote')
+                                : t('import.jsonFormatNote')
                             }
                         </p>
                     </div>
@@ -206,7 +207,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
         } catch (error) {
             this.updatePreview(`
                 <div class="preview-error">
-                    <strong>Error reading file</strong>
+                    <strong>${t('import.fileReadError')}</strong>
                     <p>${error.message}</p>
                 </div>
             `);
@@ -254,7 +255,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
         navigator.clipboard.writeText(config.example).then(() => {
             const button = this.element.querySelector('.copy-button');
             const originalHTML = button.innerHTML;
-            button.innerHTML = '✓ Copied!';
+            button.innerHTML = `${getIcon('check', { size: 14 })} ${t('import.copied')}`;
             button.classList.add('copied');
 
             setTimeout(() => {

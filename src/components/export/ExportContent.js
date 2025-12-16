@@ -1,6 +1,7 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { trackClick } from '../../config/analytics.js';
+import { t } from '../../core/I18nManager.js';
 
 /**
  * Export Content component - displays export preview with Download and Copy buttons
@@ -66,7 +67,7 @@ export default class ExportContent extends Component {
         const button = this.element.querySelector(`.${buttonType}-btn`);
         if (button) {
             const originalHTML = button.innerHTML;
-            button.innerHTML = `${getIcon('check', { size: 14 })} Copied!`;
+            button.innerHTML = `${getIcon('check', { size: 14 })} ${t('teams.export.copiedSuccess')}`;
             button.classList.add('copied');
 
             setTimeout(() => {
@@ -82,20 +83,20 @@ export default class ExportContent extends Component {
                 <div class="export-method-header">
                     <button id="exportBackBtn" class="btn btn-secondary back-button" data-action="back">
                         ${getIcon('arrow-left', { size: 16 })}
-                        Back
+                        ${t('import.back')}
                     </button>
                     <div class="header-content">
-                        <h2>Export as ${this.title}</h2>
+                        <h2>${t('teams.export.exportAs', { format: this.title })}</h2>
                     </div>
                 </div>
 
                 <div class="export-method-content">
                     <div class="export-preview-section">
                         <div class="example-header">
-                            <strong>Preview</strong>
+                            <strong>${t('teams.export.preview')}</strong>
                             <button id="exportCopyBtn" class="btn btn-sm copy-button copy-btn" type="button">
                                 ${getIcon('copy', { size: 14 })}
-                                Copy
+                                ${t('common.copy')}
                             </button>
                         </div>
                         <pre class="export-preview-content">${this.escapeHtml(this.content)}</pre>
