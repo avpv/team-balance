@@ -379,22 +379,21 @@ class ComparePage extends BasePage {
 
         let modal;
         modal = new Modal({
-            title: 'Reset All Comparisons',
+            title: t('compare.resetModal.title'),
             content: this.renderResetAllContent(),
             showCancel: true,
             showConfirm: true,
-            confirmText: 'Reset All',
-            cancelText: 'Cancel',
+            confirmText: t('common.reset'),
+            cancelText: t('common.cancel'),
             onConfirm: () => {
                 const selected = this.getSelectedModalPositions('resetAllPositions');
                 if (selected.length === 0) {
-                    toast.error('Please select at least one position');
+                    toast.error(t('errors.selectPosition'));
                     return false;
                 }
                 try {
                     this.comparisonService.resetAll(selected);
-                    const posNames = selected.map(p => this.activityConfig.positions[p]).join(', ');
-                    toast.success(`Reset comparisons for ${posNames}`);
+                    toast.success(t('success.resetComplete', { count: selected.length }));
 
                     // Clear selected position and current pair if it was reset
                     if (selected.includes(this.selectedPosition)) {
@@ -425,7 +424,7 @@ class ComparePage extends BasePage {
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
-                    <label>Select positions to reset comparisons:</label>
+                    <label>${t('compare.resetModal.label')}</label>
                     <div class="positions-grid">
                         ${Object.entries(this.activityConfig.positions)
                 .filter(([pos]) => progress[pos].completed > 0)
@@ -440,15 +439,15 @@ class ComparePage extends BasePage {
                                             class="position-input"
                                             checked
                                         >
-                                        <span class="position-label">${name} (${prog.completed}/${prog.total} comparisons)</span>
+                                        <span class="position-label">${name} (${prog.completed}/${prog.total} ${t('common.comparisons')})</span>
                                     </label>
                                 `;
                 }).join('')}
                     </div>
                     <div class="warning-box warning-box-danger">
-                        <div class="warning-title">Warning</div>
+                        <div class="warning-title">${t('common.warning')}</div>
                         <div class="warning-text">
-                            This will reset all comparison history for selected positions. Player ratings will be recalculated to 1500. This action cannot be undone!
+                            ${t('compare.resetModal.warning')}
                         </div>
                     </div>
                 </div>
