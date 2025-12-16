@@ -151,10 +151,19 @@ export default {
         // Position Selector
         positionSelector: {
             title: '选择位置',
+            selectPosition: '选择要比较的位置',
+            pickPosition: '选择下方的位置开始面对面比较球员并建立您的排名。',
+            quickKeys: '快捷键：',
+            quickKeysHint: '左 • 右 • 平局',
             resetPosition: '重置位置比较',
             resetAll: '全部重置',
             progress: '{{completed}}/{{total}} 比较',
-            complete: '完成！'
+            complete: '完成！',
+            notEnoughPlayers: '球员不足',
+            statusComplete: '已完成',
+            statusInProgress: '进行中',
+            statusReady: '准备就绪',
+            noPlayersAtPosition: '尚未分配{{position}}位置的球员。请在设置页面添加球员。'
         },
 
         // Comparison Area
@@ -172,7 +181,9 @@ export default {
             leftKeyHint: 'A键',
             rightKeyHint: 'D键',
             positionComplete: '位置完成！',
-            comparedCount: '{{count}} 次比较'
+            comparedCount: '{{count}} 次比较',
+            compare: '比较',
+            reset: '重置'
         },
 
         // Messages
@@ -298,7 +309,8 @@ export default {
         noPlayersFound: '未找到球员',
         importSuccess: '已导入{{imported}}名球员',
         importSuccessWithSkipped: '已导入{{imported}}名球员，跳过{{skipped}}名',
-        importFailed: '导入失败'
+        importFailed: '导入失败',
+        back: '返回'
     },
 
     // Error Messages
@@ -347,6 +359,7 @@ export default {
     // Language names (for language selector)
     languages: {
         en: '英语',
+        ru: '俄语',
         es: '西班牙语',
         fr: '法语',
         de: '德语',
