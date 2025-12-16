@@ -11,6 +11,7 @@ import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
+import { t } from '../core/I18nManager.js';
 
 // Components
 import ActivitySelector from '../components/settings/ActivitySelector.js';
@@ -191,8 +192,8 @@ class SettingsPage extends BasePage {
 
         return this.renderPageWithSidebar(`
             <header class="page-header">
-                <h2>Player Management</h2>
-                <p class="page-subtitle">Select your activity, add players, and manage your roster</p>
+                <h2>${t('settings.title')}</h2>
+                <p class="page-subtitle">${t('settings.subtitle')}</p>
             </header>
 
             ${players.length === 0 ? `

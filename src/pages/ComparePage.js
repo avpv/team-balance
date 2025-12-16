@@ -7,6 +7,7 @@ import Modal from '../components/base/Modal.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
 import { trackClick, trackEvent } from '../config/analytics.js';
+import { t } from '../core/I18nManager.js';
 
 // Components
 import PositionSelector from '../components/compare/PositionSelector.js';
@@ -193,8 +194,8 @@ class ComparePage extends BasePage {
     render() {
         return this.renderPageWithSidebar(`
             <header class="page-header">
-                <h2>Compare Players</h2>
-                <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons</p>
+                <h2>${t('compare.title')}</h2>
+                <p class="page-subtitle">${t('compare.subtitle')}</p>
             </header>
 
             <div class="page-controls">

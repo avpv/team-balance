@@ -9,6 +9,7 @@ import storage from '../core/StorageAdapter.js';
 import { activities } from '../config/activities/index.js';
 import { getIcon } from '../components/base/Icons.js';
 import uiConfig from '../config/ui.js';
+import { t } from '../core/I18nManager.js';
 
 const { ELEMENT_IDS } = uiConfig;
 
@@ -90,8 +91,8 @@ class RankingsPage extends BasePage {
 
         return this.renderPageWithSidebar(`
             <header class="page-header">
-                <h2>Player Rankings</h2>
-                <p class="page-subtitle">View and compare player skill ratings across all positions based on ELO rankings</p>
+                <h2>${t('rankings.title')}</h2>
+                <p class="page-subtitle">${t('rankings.subtitle')}</p>
             </header>
 
             <div class="page-content">
