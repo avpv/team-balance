@@ -1,5 +1,6 @@
 import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
+import { t } from '../../core/I18nManager.js';
 import uiConfig from '../../config/ui.js';
 
 const { DATA_ATTRIBUTES } = uiConfig;
@@ -30,7 +31,7 @@ class PlayerCard extends BaseComponent {
                     </div>
                     <div class="badge-stats d-flex gap-2 text-xs">
                         <span class="badge-rating">${rating} ELO</span>
-                        <span class="badge-comparisons text-tertiary">${comparisons} comp.</span>
+                        <span class="badge-comparisons text-tertiary">${comparisons} ${t('common.comparisonsShort')}</span>
                     </div>
                 </div>
             `;
@@ -41,7 +42,7 @@ class PlayerCard extends BaseComponent {
                 <div class="player-header d-flex justify-between items-center mb-3">
                     <h4 class="player-name font-semibold m-0">${this.escape(player.name)}</h4>
                     ${player.positions.length > 1 ?
-                '<span class="multi-badge text-xs">Multi-pos</span>' : ''
+                `<span class="multi-badge text-xs">${t('common.multiPosition')}</span>` : ''
             }
                 </div>
 
@@ -52,15 +53,15 @@ class PlayerCard extends BaseComponent {
                 <div class="player-actions d-flex gap-2">
                     <button id="editPlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="edit" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
-                        Edit
+                        ${t('common.edit')}
                     </button>
                     <button id="resetPlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="reset" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
-                        Reset
+                        ${t('common.reset')}
                     </button>
                     <button id="removePlayerBtn-${player.id}" class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="remove" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
-                        Remove
+                        ${t('common.remove')}
                     </button>
                 </div>
             </div>

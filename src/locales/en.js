@@ -30,6 +30,8 @@ export default {
         rating: 'Rating',
         ratings: 'Ratings',
         comparisons: 'comparisons',
+        comparisonsShort: 'comp.',
+        multiPosition: 'Multi-pos',
         warning: 'Warning',
         dangerZone: 'Danger Zone',
         yes: 'Yes',

@@ -30,6 +30,8 @@ export default {
         rating: 'Рейтинг',
         ratings: 'Рейтинги',
         comparisons: 'сравнения',
+        comparisonsShort: 'сравн.',
+        multiPosition: 'Мульти-поз',
         warning: 'Предупреждение',
         dangerZone: 'Опасная зона',
         yes: 'Да',

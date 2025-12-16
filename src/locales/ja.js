@@ -30,6 +30,8 @@ export default {
         rating: 'レーティング',
         ratings: 'レーティング',
         comparisons: '比較',
+        comparisonsShort: '比較',
+        multiPosition: 'マルチポジ',
         warning: '警告',
         dangerZone: '危険ゾーン',
         yes: 'はい',

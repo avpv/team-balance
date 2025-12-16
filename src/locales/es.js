@@ -30,6 +30,8 @@ export default {
         rating: 'Puntuación',
         ratings: 'Puntuaciones',
         comparisons: 'comparaciones',
+        comparisonsShort: 'comp.',
+        multiPosition: 'Multi-pos',
         warning: 'Advertencia',
         dangerZone: 'Zona de peligro',
         yes: 'Sí',

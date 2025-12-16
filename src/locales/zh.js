@@ -30,6 +30,8 @@ export default {
         rating: '评分',
         ratings: '评分',
         comparisons: '比较',
+        comparisonsShort: '比较',
+        multiPosition: '多位置',
         warning: '警告',
         dangerZone: '危险区域',
         yes: '是',
