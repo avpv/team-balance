@@ -255,10 +255,10 @@ class TeamsPage extends BasePage {
         const players = this.playerService.getAll();
 
         return `
-            <div class="team-builder" role="region" aria-label="Team builder configuration">
+            <div class="team-builder" role="region" aria-label="${t('teams.builder.configLabel')}">
                 <div class="builder-settings">
                     <div class="form-group">
-                        <label for="teamCount">Number of Teams</label>
+                        <label for="teamCount">${t('teams.builder.numberOfTeams')}</label>
                         <input
                             type="number"
                             id="teamCount"
@@ -266,38 +266,38 @@ class TeamsPage extends BasePage {
                             min="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN}"
                             max="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX}"
                             class="team-count-input"
-                            aria-label="Number of teams to create"
+                            aria-label="${t('teams.builder.teamCountLabel')}"
                             aria-describedby="team-count-help"
                         >
                         <p class="form-help-text" id="team-count-help">
-                            Choose how many teams to create (${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN}-${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX})
+                            ${t('teams.builder.numberOfTeamsHelp', { min: uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN, max: uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX })}
                         </p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Team Composition & Weights</label>
+                    <label>${t('teams.builder.composition')}</label>
                     <p class="form-help-text mb-3">
-                        Set how many players per position and their importance weight (higher weight = more important for balance)
+                        ${t('teams.builder.compositionHelp')}
                     </p>
-                    <div class="composition-table" role="table" aria-label="Team composition configuration">
+                    <div class="composition-table" role="table" aria-label="${t('teams.builder.compositionConfigLabel')}">
                         <div class="composition-table-header" role="row">
-                            <div class="composition-header-cell position-cell" role="columnheader">Position</div>
+                            <div class="composition-header-cell position-cell" role="columnheader">${t('teams.builder.position')}</div>
                             <div class="composition-header-cell" role="columnheader">
                                 <span class="tooltip-wrapper">
-                                    Count
+                                    ${t('teams.builder.count')}
                                     <span class="tooltip-icon" role="tooltip">
                                         ${getIcon('info', { size: ICON_SIZES.SMALL })}
-                                        <span class="tooltip-content">Players per team at this position</span>
+                                        <span class="tooltip-content">${t('teams.builder.countTooltip')}</span>
                                     </span>
                                 </span>
                             </div>
                             <div class="composition-header-cell" role="columnheader">
                                 <span class="tooltip-wrapper">
-                                    Weight
+                                    ${t('teams.builder.weight')}
                                     <span class="tooltip-icon" role="tooltip">
                                         ${getIcon('info', { size: ICON_SIZES.SMALL })}
-                                        <span class="tooltip-content">Balance priority (1.0-3.0, higher = more important)</span>
+                                        <span class="tooltip-content">${t('teams.builder.weightTooltip')}</span>
                                     </span>
                                 </span>
                             </div>
@@ -311,14 +311,14 @@ class TeamsPage extends BasePage {
                         class="btn btn-primary btn-large"
                         id="optimizeBtn"
                         ${players.length < 2 ? 'disabled' : ''}
-                        aria-label="${this.state.isOptimizing ? 'Optimizing teams...' : 'Generate balanced teams'}"
+                        aria-label="${this.state.isOptimizing ? t('teams.builder.optimizingLabel') : t('teams.builder.generateBtn')}"
                         ${this.state.isOptimizing ? 'aria-busy="true"' : ''}>
                         ${getIcon('users', { size: ICON_SIZES.LARGE, className: 'btn-icon' })}
-                        ${this.state.isOptimizing ? 'Generating Teams...' : 'Generate Balanced Teams'}
+                        ${this.state.isOptimizing ? t('teams.builder.generating') : t('teams.builder.generateBtn')}
                     </button>
                     ${players.length < 2 ? `
                         <p class="form-help-text text-warning mt-3">
-                            ⚠️ Add at least 2 players on the Settings page to create teams
+                            ⚠️ ${t('teams.builder.needMorePlayers')}
                         </p>
                     ` : ''}
                 </div>
@@ -339,8 +339,8 @@ class TeamsPage extends BasePage {
                         min="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MIN}"
                         max="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MAX}"
                         class="composition-input"
-                        aria-label="Number of ${name}s per team"
-                        title="${name} count"
+                        aria-label="${t('teams.builder.playerCountLabel', { position: name })}"
+                        title="${t('teams.builder.playerCountLabel', { position: name })}"
                     >
                 </div>
                 <div class="composition-cell" role="cell">
@@ -352,8 +352,8 @@ class TeamsPage extends BasePage {
                         max="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.MAX}"
                         step="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.STEP}"
                         class="weight-input"
-                        aria-label="${name} position weight"
-                        title="${name} importance weight"
+                        aria-label="${t('teams.builder.positionWeightLabel', { position: name })}"
+                        title="${t('teams.builder.positionWeightLabel', { position: name })}"
                     >
                 </div>
             </div>
@@ -368,11 +368,11 @@ class TeamsPage extends BasePage {
         const quality = this.getBalanceQuality(weightedBalance);
 
         return `
-            <div class="teams-result" role="region" aria-label="Generated teams results">
+            <div class="teams-result" role="region" aria-label="${t('teams.results.regionLabel')}">
                 <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
-                        <h3 class="text-xl md:text-2xl font-semibold m-0">Your Balanced Teams</h3>
-                        <p class="text-secondary text-sm mt-1">${teams.length} teams generated</p>
+                        <h3 class="text-xl md:text-2xl font-semibold m-0">${t('teams.results.title')}</h3>
+                        <p class="text-secondary text-sm mt-1">${t('teams.results.teamsGenerated', { count: teams.length })}</p>
                     </div>
                     <div class="result-controls d-flex items-center gap-4">
                         <label class="toggle-switch">
@@ -380,28 +380,28 @@ class TeamsPage extends BasePage {
                                 type="checkbox"
                                 id="showEloToggle"
                                 ${this.state.showEloRatings ? 'checked' : ''}
-                                aria-label="Toggle ELO ratings visibility"
+                                aria-label="${t('teams.results.toggleEloLabel')}"
                             >
                             <span class="toggle-slider"></span>
-                            <span class="toggle-label">Show ELO Ratings</span>
+                            <span class="toggle-label">${t('teams.results.showEloRatings')}</span>
                         </label>
                         <label class="toggle-switch">
                             <input
                                 type="checkbox"
                                 id="showPositionsToggle"
                                 ${this.state.showPositions ? 'checked' : ''}
-                                aria-label="Toggle player positions visibility"
+                                aria-label="${t('teams.results.togglePositionsLabel')}"
                             >
                             <span class="toggle-slider"></span>
-                            <span class="toggle-label">Show Positions</span>
+                            <span class="toggle-label">${t('teams.results.showPositions')}</span>
                         </label>
                         <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);" aria-hidden="true"></div>
                         <button
                             class="btn btn-primary btn-sm"
                             id="exportTeamsBtn"
-                            aria-label="Export teams to file">
+                            aria-label="${t('teams.results.exportLabel')}">
                             ${getIcon('arrow-up', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                            Export
+                            ${t('teams.results.exportBtn')}
                         </button>
                     </div>
                 </div>
@@ -412,16 +412,16 @@ class TeamsPage extends BasePage {
                     </div>
                     <div class="balance-content">
                         <span class="balance-label d-flex items-center gap-2">
-                            Team Balance Quality:
+                            ${t('teams.results.balanceQuality')}
                             <span class="status-badge status-badge--${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'success' : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'in-progress' : 'warning'}">
                                 ${quality.label}
                             </span>
                         </span>
-                        <span class="balance-value">${weightedBalance} ELO average difference</span>
+                        <span class="balance-value">${t('teams.results.eloDifference', { value: weightedBalance })}</span>
                     </div>
                     <div class="balance-explanation">
-                        ${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'Excellent balance!' : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'Good balance' : 'Consider re-generating for better balance'}
-                        Lower difference means more even teams.
+                        ${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? t('teams.results.excellentMsg') : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? t('teams.results.goodMsg') : t('teams.results.poorMsg')}
+                        ${t('teams.results.lowerIsBetter')}
                     </div>
                 </div>
 
@@ -444,11 +444,11 @@ class TeamsPage extends BasePage {
 
     getBalanceQuality(weightedBalance) {
         const thresholds = ratingConfig.BALANCE_THRESHOLDS.QUALITY;
-        if (weightedBalance <= thresholds.EXCELLENT) return { label: 'Excellent', class: 'excellent', icon: 'target' };
-        if (weightedBalance <= thresholds.GOOD) return { label: 'Very Good', class: 'good', icon: 'award' };
-        if (weightedBalance <= thresholds.FAIR) return { label: 'Good', class: 'okay', icon: 'thumbs-up' };
-        if (weightedBalance <= thresholds.POOR) return { label: 'Fair', class: 'fair', icon: 'scale' };
-        return { label: 'Poor', class: 'poor', icon: 'alert-triangle' };
+        if (weightedBalance <= thresholds.EXCELLENT) return { label: t('teams.results.excellent'), class: 'excellent', icon: 'target' };
+        if (weightedBalance <= thresholds.GOOD) return { label: t('teams.results.veryGood'), class: 'good', icon: 'award' };
+        if (weightedBalance <= thresholds.FAIR) return { label: t('teams.results.good'), class: 'okay', icon: 'thumbs-up' };
+        if (weightedBalance <= thresholds.POOR) return { label: t('teams.results.fair'), class: 'fair', icon: 'scale' };
+        return { label: t('teams.results.poor'), class: 'poor', icon: 'alert-triangle' };
     }
 
     renderTeam(team, index) {
@@ -460,7 +460,7 @@ class TeamsPage extends BasePage {
         return `
             <div class="team-card">
                 <div class="team-header mb-4 d-flex justify-between items-center">
-                    <h4 class="font-semibold text-sm md:text-base m-0">Team ${index + 1}</h4>
+                    <h4 class="font-semibold text-sm md:text-base m-0">${t('teams.results.teamNumber', { number: index + 1 })}</h4>
                     ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
                 </div>
 
@@ -685,7 +685,7 @@ class TeamsPage extends BasePage {
                     balance_quality: weightedBalance
                 });
 
-                toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
+                toast.success(t('success.teamsCreated', { balance: weightedBalance }));
             } finally {
                 // Restore original weights
                 Object.assign(this.activityConfig.positionWeights, originalWeights);

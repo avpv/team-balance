@@ -238,13 +238,19 @@ export default {
             numberOfTeamsHelp: 'Выберите сколько команд создать ({{min}}-{{max}})',
             composition: 'Состав команды и веса',
             compositionHelp: 'Укажите количество игроков на позиции и их важность (больший вес = важнее для баланса)',
+            configLabel: 'Конфигурация построителя команд',
+            compositionConfigLabel: 'Настройка состава команды',
+            teamCountLabel: 'Количество команд для создания',
             position: 'Позиция',
             count: 'Кол-во',
             countTooltip: 'Игроков на команду на этой позиции',
+            playerCountLabel: 'Количество {{position}} на команду',
             weight: 'Вес',
             weightTooltip: 'Приоритет баланса (1.0-3.0, выше = важнее)',
+            positionWeightLabel: 'Вес позиции {{position}}',
             generateBtn: 'Сгенерировать команды',
             generating: 'Генерация команд...',
+            optimizingLabel: 'Оптимизация команд...',
             needMorePlayers: 'Добавьте минимум 2 игроков на странице настроек для создания команд'
         },
 
@@ -252,11 +258,16 @@ export default {
         results: {
             title: 'Ваши сбалансированные команды',
             teamsGenerated: '{{count}} команд создано',
+            regionLabel: 'Результаты генерации команд',
             showEloRatings: 'Показать ELO рейтинги',
             showPositions: 'Показать позиции',
+            toggleEloLabel: 'Переключить видимость ELO рейтингов',
+            togglePositionsLabel: 'Переключить видимость позиций игроков',
             exportBtn: 'Экспорт',
+            exportLabel: 'Экспортировать команды в файл',
             balanceQuality: 'Качество баланса команд:',
             eloDifference: '{{value}} ELO средняя разница',
+            teamNumber: 'Команда {{number}}',
             excellent: 'Отлично',
             veryGood: 'Очень хорошо',
             good: 'Хорошо',
@@ -396,7 +407,8 @@ export default {
         playerUpdated: 'Игрок "{{name}}" обновлён',
         positionsUpdated: 'Позиции обновлены для {{name}}',
         removedPlayers: 'Удалено {{count}} игрок(ов)',
-        dataMigrated: 'Данные перенесены в версию {{version}}'
+        dataMigrated: 'Данные перенесены в версию {{version}}',
+        teamsCreated: 'Команды созданы! Баланс: {{balance}} взвешенная разница ELO'
     },
 
     // Info Messages

@@ -238,13 +238,19 @@ export default {
             numberOfTeamsHelp: 'Choisissez combien d\'équipes créer ({{min}}-{{max}})',
             composition: 'Composition et Pondérations',
             compositionHelp: 'Définissez le nombre de joueurs par position et leur poids d\'importance (poids plus élevé = plus important pour l\'équilibre)',
+            configLabel: 'Configuration du générateur d\'équipes',
+            compositionConfigLabel: 'Configuration de la composition d\'équipe',
+            teamCountLabel: 'Nombre d\'équipes à créer',
             position: 'Position',
             count: 'Nombre',
             countTooltip: 'Joueurs par équipe à cette position',
+            playerCountLabel: 'Nombre de {{position}} par équipe',
             weight: 'Poids',
             weightTooltip: 'Priorité d\'équilibrage (1.0-3.0, plus élevé = plus important)',
+            positionWeightLabel: 'Poids de la position {{position}}',
             generateBtn: 'Générer des Équipes Équilibrées',
             generating: 'Génération des Équipes...',
+            optimizingLabel: 'Optimisation des équipes...',
             needMorePlayers: 'Ajoutez au moins 2 joueurs sur la page Paramètres pour créer des équipes'
         },
 
@@ -252,11 +258,16 @@ export default {
         results: {
             title: 'Vos Équipes Équilibrées',
             teamsGenerated: '{{count}} équipes générées',
+            regionLabel: 'Résultats des équipes générées',
             showEloRatings: 'Afficher les Notes ELO',
             showPositions: 'Afficher les Positions',
+            toggleEloLabel: 'Basculer la visibilité des notes ELO',
+            togglePositionsLabel: 'Basculer la visibilité des positions',
             exportBtn: 'Exporter',
+            exportLabel: 'Exporter les équipes vers un fichier',
             balanceQuality: 'Qualité de l\'Équilibre :',
             eloDifference: '{{value}} différence ELO moyenne',
+            teamNumber: 'Équipe {{number}}',
             excellent: 'Excellent',
             veryGood: 'Très Bien',
             good: 'Bien',
@@ -396,7 +407,8 @@ export default {
         playerUpdated: 'Joueur "{{name}}" mis à jour',
         positionsUpdated: 'Positions mises à jour pour {{name}}',
         removedPlayers: '{{count}} joueur(s) supprimé(s)',
-        dataMigrated: 'Données migrées vers v{{version}}'
+        dataMigrated: 'Données migrées vers v{{version}}',
+        teamsCreated: 'Équipes créées ! Balance : {{balance}} différence ELO pondérée'
     },
 
     // Info Messages

@@ -238,13 +238,19 @@ export default {
             numberOfTeamsHelp: '选择要创建的队伍数量（{{min}}-{{max}}）',
             composition: '队伍组成和权重',
             compositionHelp: '设置每个位置的球员数量及其重要性权重（权重越高 = 对平衡越重要）',
+            configLabel: '队伍构建器配置',
+            compositionConfigLabel: '队伍组成配置',
+            teamCountLabel: '要创建的队伍数量',
             position: '位置',
             count: '数量',
             countTooltip: '该位置每队的球员数',
+            playerCountLabel: '每队{{position}}的数量',
             weight: '权重',
             weightTooltip: '平衡优先级（1.0-3.0，越高越重要）',
+            positionWeightLabel: '{{position}}位置权重',
             generateBtn: '生成平衡队伍',
             generating: '正在生成队伍...',
+            optimizingLabel: '正在优化队伍...',
             needMorePlayers: '请在设置页面添加至少2名球员以创建队伍'
         },
 
@@ -252,11 +258,16 @@ export default {
         results: {
             title: '您的平衡队伍',
             teamsGenerated: '已生成{{count}}支队伍',
+            regionLabel: '生成的队伍结果',
             showEloRatings: '显示ELO评分',
             showPositions: '显示位置',
+            toggleEloLabel: '切换ELO评分显示',
+            togglePositionsLabel: '切换球员位置显示',
             exportBtn: '导出',
+            exportLabel: '导出队伍到文件',
             balanceQuality: '队伍平衡质量：',
             eloDifference: '{{value}} ELO平均差值',
+            teamNumber: '队伍 {{number}}',
             excellent: '优秀',
             veryGood: '非常好',
             good: '良好',
@@ -396,7 +407,8 @@ export default {
         playerUpdated: '球员"{{name}}"已更新',
         positionsUpdated: '已更新{{name}}的位置',
         removedPlayers: '已移除{{count}}名球员',
-        dataMigrated: '数据已迁移到v{{version}}'
+        dataMigrated: '数据已迁移到v{{version}}',
+        teamsCreated: '队伍已创建！平衡度：{{balance}}加权ELO差值'
     },
 
     // Info Messages
