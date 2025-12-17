@@ -238,13 +238,19 @@ export default {
             numberOfTeamsHelp: '作成するチーム数を選択（{{min}}-{{max}}）',
             composition: 'チーム構成とウェイト',
             compositionHelp: 'ポジションごとのプレイヤー数と重要度ウェイトを設定（ウェイトが高い＝バランスにより重要）',
+            configLabel: 'チームビルダー設定',
+            compositionConfigLabel: 'チーム構成設定',
+            teamCountLabel: '作成するチーム数',
             position: 'ポジション',
             count: '人数',
             countTooltip: 'このポジションのチームあたりのプレイヤー数',
+            playerCountLabel: 'チームあたりの{{position}}の人数',
             weight: 'ウェイト',
             weightTooltip: 'バランス優先度（1.0-3.0、高い＝より重要）',
+            positionWeightLabel: '{{position}}ポジションのウェイト',
             generateBtn: 'バランスの取れたチームを生成',
             generating: 'チーム生成中...',
+            optimizingLabel: 'チームを最適化中...',
             needMorePlayers: 'チームを作成するには設定ページで少なくとも2人のプレイヤーを追加してください'
         },
 
@@ -252,11 +258,16 @@ export default {
         results: {
             title: 'バランスの取れたチーム',
             teamsGenerated: '{{count}}チーム生成',
+            regionLabel: '生成されたチームの結果',
             showEloRatings: 'ELOレーティングを表示',
             showPositions: 'ポジションを表示',
+            toggleEloLabel: 'ELOレーティングの表示を切り替え',
+            togglePositionsLabel: 'プレイヤーポジションの表示を切り替え',
             exportBtn: 'エクスポート',
+            exportLabel: 'チームをファイルにエクスポート',
             balanceQuality: 'チームバランス品質：',
             eloDifference: '{{value}} ELO平均差',
+            teamNumber: 'チーム {{number}}',
             excellent: '優秀',
             veryGood: '非常に良い',
             good: '良い',
@@ -396,7 +407,8 @@ export default {
         playerUpdated: 'プレイヤー「{{name}}」を更新しました',
         positionsUpdated: '{{name}}のポジションを更新しました',
         removedPlayers: '{{count}}人のプレイヤーを削除しました',
-        dataMigrated: 'データをv{{version}}に移行しました'
+        dataMigrated: 'データをv{{version}}に移行しました',
+        teamsCreated: 'チームが作成されました！バランス：{{balance}}加重ELO差'
     },
 
     // Info Messages

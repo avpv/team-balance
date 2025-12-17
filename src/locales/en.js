@@ -238,13 +238,19 @@ export default {
             numberOfTeamsHelp: 'Choose how many teams to create ({{min}}-{{max}})',
             composition: 'Team Composition & Weights',
             compositionHelp: 'Set how many players per position and their importance weight (higher weight = more important for balance)',
+            configLabel: 'Team builder configuration',
+            compositionConfigLabel: 'Team composition configuration',
+            teamCountLabel: 'Number of teams to create',
             position: 'Position',
             count: 'Count',
             countTooltip: 'Players per team at this position',
+            playerCountLabel: 'Number of {{position}}s per team',
             weight: 'Weight',
             weightTooltip: 'Balance priority (1.0-3.0, higher = more important)',
+            positionWeightLabel: '{{position}} position weight',
             generateBtn: 'Generate Balanced Teams',
             generating: 'Generating Teams...',
+            optimizingLabel: 'Optimizing teams...',
             needMorePlayers: 'Add at least 2 players on the Settings page to create teams'
         },
 
@@ -252,11 +258,16 @@ export default {
         results: {
             title: 'Your Balanced Teams',
             teamsGenerated: '{{count}} teams generated',
+            regionLabel: 'Generated teams results',
             showEloRatings: 'Show ELO Ratings',
             showPositions: 'Show Positions',
+            toggleEloLabel: 'Toggle ELO ratings visibility',
+            togglePositionsLabel: 'Toggle player positions visibility',
             exportBtn: 'Export',
+            exportLabel: 'Export teams to file',
             balanceQuality: 'Team Balance Quality:',
             eloDifference: '{{value}} ELO average difference',
+            teamNumber: 'Team {{number}}',
             excellent: 'Excellent',
             veryGood: 'Very Good',
             good: 'Good',
@@ -396,7 +407,8 @@ export default {
         playerUpdated: 'Player "{{name}}" updated',
         positionsUpdated: 'Positions updated for {{name}}',
         removedPlayers: 'Removed {{count}} player(s)',
-        dataMigrated: 'Data migrated to v{{version}}'
+        dataMigrated: 'Data migrated to v{{version}}',
+        teamsCreated: 'Teams created! Balance: {{balance}} weighted ELO difference'
     },
 
     // Info Messages
