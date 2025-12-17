@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'Player Rankings',
         subtitle: 'View and compare player skill ratings across all positions',
+        playersRanked: '{{count}} player(s) ranked',
 
         // Position Filter
         positionFilter: {

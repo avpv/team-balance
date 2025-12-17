@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'プレイヤーランキング',
         subtitle: 'すべてのポジションでプレイヤーのスキルレーティングを確認・比較',
+        playersRanked: '{{count}}人がランク付け済み',
 
         // Position Filter
         positionFilter: {
