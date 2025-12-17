@@ -292,11 +292,11 @@ class ComparePage extends BasePage {
 
     handlePositionReset(positionKey) {
         const positionName = this.activityConfig.positions[positionKey];
-        const confirmed = confirm(`Are you sure you want to reset all comparisons for ${positionName}? This cannot be undone.`);
+        const confirmed = confirm(t('compare.messages.resetConfirm', { position: positionName }));
 
         if (confirmed) {
             this.comparisonService.resetPosition(positionKey);
-            toast.success(`${positionName} comparisons have been reset`);
+            toast.success(t('compare.messages.resetSuccess', { position: positionName }));
 
             // Track position reset
             trackEvent('position_reset', {
