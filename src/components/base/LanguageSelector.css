@@ -71,6 +71,7 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    background: var(--color-bg-canvas-opaque, #0d1117);
 }
 
 .language-selector__option {
