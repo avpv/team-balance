@@ -141,6 +141,9 @@ export default {
             importPlayers: {
                 title: 'プレイヤーをインポート',
                 confirmBtn: 'インポート'
+            },
+            removePlayer: {
+                confirmMessage: '{{name}}を削除しますか？'
             }
         }
     },
