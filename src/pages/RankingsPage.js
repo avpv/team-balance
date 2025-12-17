@@ -155,7 +155,7 @@ class RankingsPage extends BasePage {
                     <div class="ranking-stats text-sm text-secondary d-flex items-center gap-2" aria-label="Player statistics">
                         <span aria-label="ELO rating">${rating} ELO</span>
                         <span aria-hidden="true"> • </span>
-                        <span aria-label="Number of comparisons">${comparisons} comp.</span>
+                        <span aria-label="Number of comparisons">${comparisons} ${t('common.comparisonsShort')}</span>
                     </div>
                 </div>
             </li>
