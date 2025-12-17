@@ -277,7 +277,7 @@ class SettingsPage extends BasePage {
 
                 case 'remove':
                     const player = this.playerService.getById(playerId);
-                    if (confirm(`Remove ${player.name}?`)) {
+                    if (confirm(t('settings.modals.removePlayer.confirmMessage', { name: player.name }))) {
                         this.playerService.remove(playerId);
                     }
                     break;

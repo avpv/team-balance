@@ -141,6 +141,9 @@ export default {
             importPlayers: {
                 title: 'Importer des Joueurs',
                 confirmBtn: 'Importer'
+            },
+            removePlayer: {
+                confirmMessage: 'Supprimer {{name}} ?'
             }
         }
     },

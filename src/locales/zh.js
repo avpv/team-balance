@@ -141,6 +141,9 @@ export default {
             importPlayers: {
                 title: '导入球员',
                 confirmBtn: '导入'
+            },
+            removePlayer: {
+                confirmMessage: '移除{{name}}？'
             }
         }
     },
