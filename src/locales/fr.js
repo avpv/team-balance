@@ -209,6 +209,7 @@ export default {
         title: 'Classement des Joueurs',
         subtitle: 'Consultez et comparez les notes de compétence des joueurs pour toutes les positions',
         playersRanked: '{{count}} joueur(s) classé(s)',
+        noPlayersAtPosition: 'Aucun joueur assigné à la position {{position}} pour l\'instant. Ajoutez des joueurs sur la page Paramètres.',
 
         // Position Filter
         positionFilter: {

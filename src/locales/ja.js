@@ -209,6 +209,7 @@ export default {
         title: 'プレイヤーランキング',
         subtitle: 'すべてのポジションでプレイヤーのスキルレーティングを確認・比較',
         playersRanked: '{{count}}人がランク付け済み',
+        noPlayersAtPosition: 'まだ{{position}}ポジションに割り当てられたプレイヤーがいません。設定ページでプレイヤーを追加してください。',
 
         // Position Filter
         positionFilter: {

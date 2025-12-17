@@ -209,6 +209,7 @@ export default {
         title: 'Рейтинги игроков',
         subtitle: 'Просмотр и сравнение рейтингов игроков по всем позициям',
         playersRanked: '{{count}} игрок(ов) в рейтинге',
+        noPlayersAtPosition: 'На позиции {{position}} ещё нет игроков. Добавьте игроков на странице настроек.',
 
         // Position Filter
         positionFilter: {
