@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: '球员排名',
         subtitle: '查看和比较所有位置的球员技能评分',
+        playersRanked: '{{count}}名球员已排名',
 
         // Position Filter
         positionFilter: {

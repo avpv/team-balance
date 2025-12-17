@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'Spielerrangliste',
         subtitle: 'Sehen und vergleichen Sie die Fähigkeitsbewertungen aller Spieler für alle Positionen',
+        playersRanked: '{{count}} Spieler gerankt',
 
         // Position Filter
         positionFilter: {

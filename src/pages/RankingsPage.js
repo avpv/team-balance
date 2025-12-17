@@ -120,7 +120,7 @@ class RankingsPage extends BasePage {
             <article class="ranking-card" role="region" aria-label="${positionName} rankings">
                 <header class="ranking-header mb-4">
                     <h3 class="ranking-title font-semibold text-lg">${positionName}s</h3>
-                    <p class="text-xs text-tertiary">${players.length} player${players.length !== 1 ? 's' : ''} ranked</p>
+                    <p class="text-xs text-tertiary">${t('rankings.playersRanked', { count: players.length })}</p>
                 </header>
                 <ol class="ranking-list" aria-label="${positionName} player rankings">
                     ${players.map((player, index) =>

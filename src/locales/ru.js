@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'Рейтинги игроков',
         subtitle: 'Просмотр и сравнение рейтингов игроков по всем позициям',
+        playersRanked: '{{count}} игрок(ов) в рейтинге',
 
         // Position Filter
         positionFilter: {

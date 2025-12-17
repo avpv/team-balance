@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'Rankings de Jugadores',
         subtitle: 'Ve y compara las puntuaciones de habilidad de los jugadores en todas las posiciones',
+        playersRanked: '{{count}} jugador(es) clasificado(s)',
 
         // Position Filter
         positionFilter: {

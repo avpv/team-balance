@@ -208,6 +208,7 @@ export default {
     rankings: {
         title: 'Classement des Joueurs',
         subtitle: 'Consultez et comparez les notes de compétence des joueurs pour toutes les positions',
+        playersRanked: '{{count}} joueur(s) classé(s)',
 
         // Position Filter
         positionFilter: {
