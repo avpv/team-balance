@@ -209,6 +209,7 @@ export default {
         title: 'Player Rankings',
         subtitle: 'View and compare player skill ratings across all positions',
         playersRanked: '{{count}} player(s) ranked',
+        noPlayersAtPosition: 'No players assigned to the {{position}} position yet. Add players on the Settings page.',
 
         // Position Filter
         positionFilter: {

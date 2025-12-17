@@ -209,6 +209,7 @@ export default {
         title: 'Rankings de Jugadores',
         subtitle: 'Ve y compara las puntuaciones de habilidad de los jugadores en todas las posiciones',
         playersRanked: '{{count}} jugador(es) clasificado(s)',
+        noPlayersAtPosition: 'No hay jugadores asignados a la posición {{position}} todavía. Agrega jugadores en la página de Configuración.',
 
         // Position Filter
         positionFilter: {

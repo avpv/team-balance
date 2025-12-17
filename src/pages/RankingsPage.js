@@ -111,7 +111,7 @@ class RankingsPage extends BasePage {
             return `
                 <article class="ranking-card" role="region" aria-label="${positionName} rankings">
                     <h3 class="ranking-title">${positionName}s</h3>
-                    ${this.renderEmpty(`No players assigned to the ${positionName} position yet. Add players on the Settings page.`, icon)}
+                    ${this.renderEmpty(t('rankings.noPlayersAtPosition', { position: positionName }), icon)}
                 </article>
             `;
         }

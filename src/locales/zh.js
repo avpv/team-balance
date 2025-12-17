@@ -209,6 +209,7 @@ export default {
         title: '球员排名',
         subtitle: '查看和比较所有位置的球员技能评分',
         playersRanked: '{{count}}名球员已排名',
+        noPlayersAtPosition: '尚未分配{{position}}位置的球员。请在设置页面添加球员。',
 
         // Position Filter
         positionFilter: {

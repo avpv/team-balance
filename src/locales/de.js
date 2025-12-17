@@ -209,6 +209,7 @@ export default {
         title: 'Spielerrangliste',
         subtitle: 'Sehen und vergleichen Sie die Fähigkeitsbewertungen aller Spieler für alle Positionen',
         playersRanked: '{{count}} Spieler gerankt',
+        noPlayersAtPosition: 'Noch keine Spieler der Position {{position}} zugewiesen. Fügen Sie auf der Einstellungsseite Spieler hinzu.',
 
         // Position Filter
         positionFilter: {
