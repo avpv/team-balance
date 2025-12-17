@@ -1,6 +1,7 @@
 import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
 import { generateAvatar } from '../../utils/avatarGenerator.js';
+import { t } from '../../core/I18nManager.js';
 
 class ComparisonCard extends BaseComponent {
     constructor(container, props = {}) {
@@ -49,7 +50,7 @@ class ComparisonCard extends BaseComponent {
                         <span class="rating-value">${rating}</span>
                         <span class="rating-label">ELO</span>
                     </div>
-                    <p class="player-comparisons">${comparisons} comparison${comparisons !== 1 ? 's' : ''}</p>
+                    <p class="player-comparisons">${t('compare.comparison.comparedCount', { count: comparisons })}</p>
                 </div>
             </button>
         `;
