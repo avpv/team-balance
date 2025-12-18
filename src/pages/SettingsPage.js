@@ -219,19 +219,19 @@ class SettingsPage extends BasePage {
     renderWelcomeGuide() {
         return `
             <div class="welcome-guide" role="complementary" aria-label="Getting started guide">
-                <h3 class="mb-3 font-semibold">👋 Welcome to TeamBalance!</h3>
+                <h3 class="mb-3 font-semibold">👋 ${t('settings.welcome.title')}</h3>
                 <p class="mb-4 text-secondary">
-                    Create perfectly balanced teams. Get started in 4 simple steps:
+                    ${t('settings.welcome.subtitle')}
                 </p>
                 <ol class="space-y-2">
                     <li>
                         <a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity">
-                            <strong>Select your sport or activity</strong>
-                        </a> from the dropdown below to begin
+                            <strong>${t('settings.welcome.step1')}</strong>
+                        </a> ${t('settings.welcome.step1Detail')}
                     </li>
-                    <li><strong>Add your players</strong> and assign their positions</li>
-                    <li><strong>Compare players head-to-head</strong> to build accurate skill ratings</li>
-                    <li><strong>Generate balanced teams automatically</strong> with one click</li>
+                    <li><strong>${t('settings.welcome.step2')}</strong> ${t('settings.welcome.step2Detail')}</li>
+                    <li><strong>${t('settings.welcome.step3')}</strong> ${t('settings.welcome.step3Detail')}</li>
+                    <li><strong>${t('settings.welcome.step4')}</strong> ${t('settings.welcome.step4Detail')}</li>
                 </ol>
             </div>
         `;
