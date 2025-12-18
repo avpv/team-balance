@@ -1,8 +1,8 @@
 <div align="center">
 
-[<img src="assets/images/logo.svg" alt="TeamBalance Логотип" width="120" height="120">](https://avpv.github.io/team-balance/)
+[<img src="assets/images/logo.svg" alt="TeamBalance Логотип" width="120" height="120">](https://avpv.github.io/team-balance/?lang=ru)
 
-# [TeamBalance](https://avpv.github.io/team-balance/)
+# [TeamBalance](https://avpv.github.io/team-balance/?lang=ru)
 
 Идеально сбалансированные команды.
 За минуты, а не часы.
@@ -11,7 +11,7 @@
 
 <div align="center">
 
-**[Попробовать TeamBalance](https://avpv.github.io/team-balance/)**
+**[Попробовать TeamBalance](https://avpv.github.io/team-balance/?lang=ru)**
 
 </div>
 
@@ -89,7 +89,7 @@ ELO-рейтинг. Золотой стандарт измерения маст�
 
 ## Начните сейчас.
 
-**[Открыть TeamBalance](https://avpv.github.io/team-balance/)**
+**[Открыть TeamBalance](https://avpv.github.io/team-balance/?lang=ru)**
 
 Без установки. Без регистрации. Без сложностей.
 

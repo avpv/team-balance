@@ -1,8 +1,8 @@
 <div align="center">
 
-[<img src="assets/images/logo.svg" alt="TeamBalance 标志" width="120" height="120">](https://avpv.github.io/team-balance/)
+[<img src="assets/images/logo.svg" alt="TeamBalance 标志" width="120" height="120">](https://avpv.github.io/team-balance/?lang=zh)
 
-# [TeamBalance](https://avpv.github.io/team-balance/)
+# [TeamBalance](https://avpv.github.io/team-balance/?lang=zh)
 
 完美平衡的队伍。
 几分钟，而非几小时。
@@ -11,7 +11,7 @@
 
 <div align="center">
 
-**[试用 TeamBalance](https://avpv.github.io/team-balance/)**
+**[试用 TeamBalance](https://avpv.github.io/team-balance/?lang=zh)**
 
 </div>
 
@@ -89,7 +89,7 @@ ELO 评分。衡量技能的黄金标准。
 
 ## 立即开始。
 
-**[打开 TeamBalance](https://avpv.github.io/team-balance/)**
+**[打开 TeamBalance](https://avpv.github.io/team-balance/?lang=zh)**
 
 无需安装。无需注册。没有复杂性。
 
