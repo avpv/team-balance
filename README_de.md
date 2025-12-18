@@ -7,6 +7,10 @@
 Perfekt ausgewogene Teams.
 In Minuten, nicht Stunden.
 
+[![GitHub stars](https://img.shields.io/github/stars/avpv/team-balance?style=flat-square)](https://github.com/avpv/team-balance/stargazers)
+[![License](https://img.shields.io/github/license/avpv/team-balance?style=flat-square)](https://github.com/avpv/team-balance/blob/main/LICENSE)
+[![Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)](https://avpv.github.io/team-balance/?lang=de)
+
 </div>
 
 <div align="center">

@@ -7,6 +7,10 @@
 完璧にバランスの取れたチーム。
 数時間ではなく、数分で。
 
+[![GitHub stars](https://img.shields.io/github/stars/avpv/team-balance?style=flat-square)](https://github.com/avpv/team-balance/stargazers)
+[![License](https://img.shields.io/github/license/avpv/team-balance?style=flat-square)](https://github.com/avpv/team-balance/blob/main/LICENSE)
+[![Demo](https://img.shields.io/badge/demo-live-brightgreen?style=flat-square)](https://avpv.github.io/team-balance/?lang=ja)
+
 </div>
 
 <div align="center">
