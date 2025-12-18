@@ -45,17 +45,27 @@ class I18nManager {
     /**
      * Initialize the i18n manager
      * Loads saved language preference and translations
+     * Priority: URL param > localStorage > browser language > default
      * @returns {Promise<void>}
      */
     async init() {
-        // Load saved language preference
-        const savedLanguage = storage.get(STORAGE_KEY, null);
+        // Check URL parameter first (?lang=xx)
+        const urlLanguage = this.getUrlLanguage();
 
-        if (savedLanguage && SUPPORTED_LANGUAGES[savedLanguage]) {
-            this.currentLanguage = savedLanguage;
+        if (urlLanguage) {
+            this.currentLanguage = urlLanguage;
+            // Save URL language to storage for persistence
+            storage.set(STORAGE_KEY, urlLanguage);
         } else {
-            // Try to detect browser language
-            this.currentLanguage = this.detectBrowserLanguage();
+            // Load saved language preference
+            const savedLanguage = storage.get(STORAGE_KEY, null);
+
+            if (savedLanguage && SUPPORTED_LANGUAGES[savedLanguage]) {
+                this.currentLanguage = savedLanguage;
+            } else {
+                // Try to detect browser language
+                this.currentLanguage = this.detectBrowserLanguage();
+            }
         }
 
         // Load translations for current language
@@ -72,6 +82,25 @@ class I18nManager {
         document.documentElement.lang = this.currentLanguage;
 
         eventBus.emit('i18n:initialized', { language: this.currentLanguage });
+    }
+
+    /**
+     * Get language from URL parameter (?lang=xx)
+     * @private
+     * @returns {string|null} Language code or null if not specified
+     */
+    getUrlLanguage() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+
+        if (langParam) {
+            const langCode = langParam.toLowerCase();
+            if (SUPPORTED_LANGUAGES[langCode]) {
+                return langCode;
+            }
+        }
+
+        return null;
     }
 
     /**
