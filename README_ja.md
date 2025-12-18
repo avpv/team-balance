@@ -1,8 +1,8 @@
 <div align="center">
 
-[<img src="assets/images/logo.svg" alt="TeamBalance ロゴ" width="120" height="120">](https://avpv.github.io/team-balance/)
+[<img src="assets/images/logo.svg" alt="TeamBalance ロゴ" width="120" height="120">](https://avpv.github.io/team-balance/?lang=ja)
 
-# [TeamBalance](https://avpv.github.io/team-balance/)
+# [TeamBalance](https://avpv.github.io/team-balance/?lang=ja)
 
 完璧にバランスの取れたチーム。
 数時間ではなく、数分で。
@@ -11,7 +11,7 @@
 
 <div align="center">
 
-**[TeamBalanceを試す](https://avpv.github.io/team-balance/)**
+**[TeamBalanceを試す](https://avpv.github.io/team-balance/?lang=ja)**
 
 </div>
 
@@ -89,7 +89,7 @@ ELOレーティング。スキル測定のゴールドスタンダード。
 
 ## 今すぐ始めましょう。
 
-**[TeamBalanceを開く](https://avpv.github.io/team-balance/)**
+**[TeamBalanceを開く](https://avpv.github.io/team-balance/?lang=ja)**
 
 インストール不要。登録不要。複雑さなし。
 

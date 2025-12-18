@@ -1,8 +1,8 @@
 <div align="center">
 
-[<img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">](https://avpv.github.io/team-balance/)
+[<img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">](https://avpv.github.io/team-balance/?lang=fr)
 
-# [TeamBalance](https://avpv.github.io/team-balance/)
+# [TeamBalance](https://avpv.github.io/team-balance/?lang=fr)
 
 Des équipes parfaitement équilibrées.
 En minutes, pas en heures.
@@ -11,7 +11,7 @@ En minutes, pas en heures.
 
 <div align="center">
 
-**[Essayer TeamBalance](https://avpv.github.io/team-balance/)**
+**[Essayer TeamBalance](https://avpv.github.io/team-balance/?lang=fr)**
 
 </div>
 
@@ -89,7 +89,7 @@ Confidentialité totale par conception.
 
 ## Commencez maintenant.
 
-**[Ouvrir TeamBalance](https://avpv.github.io/team-balance/)**
+**[Ouvrir TeamBalance](https://avpv.github.io/team-balance/?lang=fr)**
 
 Pas d'installation. Pas d'inscription. Pas de complexité.
 
