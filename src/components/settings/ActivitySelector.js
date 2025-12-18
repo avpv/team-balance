@@ -235,6 +235,12 @@ class ActivitySelector extends BaseComponent {
             });
 
             toast.success(t('settings.activity.newTeamCreated'));
+
+            // Scroll to add player form
+            const addPlayerForm = document.querySelector('.add-player-form-container');
+            if (addPlayerForm) {
+                addPlayerForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
             // Page will auto-update via event bus
         } catch (error) {
             toast.error(error.message);
