@@ -414,7 +414,7 @@ class Application {
                     e.preventDefault();
                     toast.error('Please select an activity first');
                     // Navigate to settings page and scroll to activity selector
-                    router.navigate('/settings/');
+                    router.navigate('/');
                     // Use a small delay to ensure the page has loaded before scrolling
                     setTimeout(() => {
                         eventBus.emit('scroll-to-activity-selector');
