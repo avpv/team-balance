@@ -15,6 +15,12 @@ In minutes, not hours.
 
 </div>
 
+<div align="center">
+
+*Read in other languages: [Русский](README_ru.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [日本語](README_ja.md)*
+
+</div>
+
 ---
 
 ## The fairest way to create teams.
