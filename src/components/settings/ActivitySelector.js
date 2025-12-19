@@ -236,15 +236,39 @@ class ActivitySelector extends BaseComponent {
 
             toast.success(t('settings.activity.newTeamCreated'));
 
-            // Scroll to add player form
-            const addPlayerForm = document.querySelector('.add-player-form-container');
-            if (addPlayerForm) {
-                addPlayerForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            // Scroll to add player form after content loads
+            this.scrollToPlayerFormWhenReady();
             // Page will auto-update via event bus
         } catch (error) {
             toast.error(error.message);
         }
+    }
+
+    /**
+     * Waits for the add player form content to load, then scrolls to it.
+     * Uses MutationObserver to detect when content is rendered.
+     */
+    scrollToPlayerFormWhenReady() {
+        const maxWaitTime = 3000; // Maximum wait time in ms
+        const startTime = Date.now();
+
+        const tryScroll = () => {
+            const container = document.querySelector('.add-player-form-container');
+
+            // Check if container exists and has content (accordion is rendered)
+            if (container && container.querySelector('.accordion')) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            // If still waiting and not timed out, try again
+            if (Date.now() - startTime < maxWaitTime) {
+                requestAnimationFrame(tryScroll);
+            }
+        };
+
+        // Start checking after a small delay to allow event bus updates
+        setTimeout(tryScroll, ANIMATION.SHORT);
     }
 }
 
