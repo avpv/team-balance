@@ -66,8 +66,8 @@ Form teams instantly. Focus on what matters.
 
 ## Built on proven science.
 
-ELO rating. The gold standard for measuring skill.
-Genetic algorithms. The smartest way to optimize teams.
+[ELO rating](docs/elo.md). The gold standard for measuring skill.
+[Team optimizer](docs/optimizer.md). The smartest way to optimize teams.
 
 The result? Teams balanced to mathematical perfection.
 

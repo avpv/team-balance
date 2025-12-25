@@ -155,6 +155,12 @@ TeamBuilding is **activity-agnostic** by design:
 - You can create configs for anything that needs balanced team distribution
 - Clean separation of concerns = maximum flexibility
 
+## Documentation
+
+For more details on the algorithms used:
+- [ELO Rating System](../../docs/elo.md) - How player skill ratings are calculated
+- [Team Optimizer](../../docs/optimizer.md) - How teams are balanced optimally
+
 ## Need Help?
 
 The system is flexible - if you need a feature that doesn't fit this structure, consider:
