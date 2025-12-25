@@ -17,7 +17,7 @@ The optimizer aims to **minimize the difference** between team strengths while e
 
 ## Algorithms
 
-The optimizer runs **four algorithms in parallel**, selecting the best result:
+The optimizer provides **seven algorithms** for team balancing:
 
 ### 1. Genetic Algorithm
 
@@ -105,6 +105,97 @@ Final refinement phase applied to the best solution from parallel algorithms.
 
 **Purpose:**
 Polishes the solution with small, targeted improvements after the main algorithms complete.
+
+---
+
+### 5. Ant Colony Optimizer
+
+Inspired by foraging behavior of ants using pheromone trails.
+
+| Parameter | Description |
+|-----------|-------------|
+| Ant Count | Number of ants constructing solutions per iteration |
+| Iterations | Number of colony cycles |
+| Evaporation Rate | Pheromone decay rate (prevents stagnation) |
+| Alpha | Pheromone influence weight |
+| Beta | Heuristic (rating) influence weight |
+| Elitist Weight | Extra pheromone deposit for best solution |
+
+**Core Mechanism:**
+
+Ants construct solutions probabilistically:
+```
+P(select player) ∝ pheromone^α × heuristic^β
+```
+
+Where:
+- **Pheromone**: Learned from previous good solutions
+- **Heuristic**: Player rating normalized around 1.0
+
+**Key Features:**
+- Constructs solutions from scratch (no mutation)
+- Pheromone evaporation prevents premature convergence
+- Elitist strategy reinforces best solutions
+- Naturally diverse (each ant explores differently)
+
+---
+
+### 6. Constraint Programming Optimizer
+
+Uses backtracking with constraint propagation to construct valid solutions.
+
+| Parameter | Description |
+|-----------|-------------|
+| Max Backtracks | Maximum backtracking steps before giving up |
+| Attempts | Number of tries with different variable orderings |
+
+**Constraints Enforced:**
+1. **AllDifferent**: Each player assigned exactly once
+2. **Composition**: Each team has correct position counts
+3. **Eligibility**: Players only assigned to positions they can play
+
+**Search Process:**
+1. Build variables: one for each position slot in each team
+2. Assign domains: eligible player IDs for each variable
+3. Backtrack search: try assignments, propagate constraints
+4. On conflict: backtrack and try alternative
+
+**Variable Ordering:**
+Multiple attempts with shuffled variable order to find different solutions.
+
+---
+
+### 7. Hybrid Optimizer
+
+Combines three complementary optimization strategies in sequential phases.
+
+**Phase 1: Genetic Algorithm (Global Exploration)**
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Population Size | 15 | Smaller for speed |
+| Generations | 100 | Quick exploration |
+| Mutation Rate | 0.3 | Higher for diversity |
+
+**Phase 2: Tabu Search (Focused Exploitation)**
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Iterations | 3,000 | Intensive local search |
+| Tabu Tenure | 50 | Shorter memory |
+| Neighborhood Size | 15 | Solutions per step |
+
+**Phase 3: Local Search (Final Polishing)**
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Iterations | 1,000 | Quick refinement |
+| Neighborhood Size | 10 | Focused improvements |
+
+**Synergy:**
+- GA finds promising regions globally
+- Tabu Search intensifies in those regions
+- Local Search ensures local optimum
 
 ---
 
@@ -325,6 +416,9 @@ Composition: 1 player at A, 1 player at B per team.
 | Tabu Search | Avoiding cycles | Memory-guided exploration |
 | Simulated Annealing | Escaping local minima | Probabilistic acceptance |
 | Local Search | Final polish | Greedy improvement |
+| Ant Colony | Learning from history | Pheromone-guided construction |
+| Constraint Programming | Guaranteed validity | Backtracking with propagation |
+| Hybrid | Balanced approach | Multi-phase optimization |
 
 ### Parallel Advantage
 
