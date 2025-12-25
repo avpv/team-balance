@@ -66,8 +66,8 @@ Forma equipos al instante. Concéntrate en lo que importa.
 
 ## Basado en ciencia probada.
 
-Puntuación ELO. El estándar de oro para medir habilidades.
-Algoritmos genéticos. La forma más inteligente de optimizar equipos.
+[Puntuación ELO](docs/elo.md). Cómo se miden las habilidades de los jugadores.
+[Optimizador de equipos](docs/optimizer.md). Cómo se crean equipos equilibrados.
 
 ¿El resultado? Equipos equilibrados a la perfección matemática.
 
