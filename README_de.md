@@ -66,8 +66,8 @@ Bilden Sie Teams sofort. Konzentrieren Sie sich auf das Wesentliche.
 
 ## Basiert auf bewährter Wissenschaft.
 
-[ELO-Bewertung](docs/elo.md). Der Goldstandard zur Messung von Fähigkeiten.
-[Team-Optimierer](docs/optimizer.md). Der intelligenteste Weg zur Team-Optimierung.
+[ELO-Bewertung](docs/elo.md). Wie Spielerfähigkeiten gemessen werden.
+[Team-Optimierer](docs/optimizer.md). Wie ausgewogene Teams erstellt werden.
 
 Das Ergebnis? Teams, die mathematisch perfekt ausgewogen sind.
 

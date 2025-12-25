@@ -66,8 +66,8 @@ Formez des équipes instantanément. Concentrez-vous sur l'essentiel.
 
 ## Basé sur une science éprouvée.
 
-[Notation ELO](docs/elo.md). La référence pour mesurer les compétences.
-[Optimiseur d'équipes](docs/optimizer.md). La façon la plus intelligente d'optimiser les équipes.
+[Notation ELO](docs/elo.md). Comment les compétences des joueurs sont mesurées.
+[Optimiseur d'équipes](docs/optimizer.md). Comment les équipes équilibrées sont créées.
 
 Le résultat ? Des équipes équilibrées à la perfection mathématique.
 
