@@ -10,7 +10,7 @@ import { getIcon } from '../components/base/Icons.js';
 import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
-import { STORAGE_KEYS } from '../utils/constants.js';
+import { STORAGE_KEYS, SESSION_KEYS } from '../utils/constants.js';
 import { t } from '../core/I18nManager.js';
 
 // Components
@@ -60,6 +60,42 @@ class SettingsPage extends BasePage {
         this.mountSidebar();
         this.mountComponents();
         this.attachEventListeners();
+        this.checkScrollToPlayerForm();
+    }
+
+    /**
+     * Check if we should scroll to the add player form after page reload.
+     * Uses sessionStorage for single-use flag that clears on tab close.
+     */
+    checkScrollToPlayerForm() {
+        const shouldScroll = sessionStorage.getItem(SESSION_KEYS.SCROLL_TO_PLAYER_FORM);
+        if (shouldScroll) {
+            sessionStorage.removeItem(SESSION_KEYS.SCROLL_TO_PLAYER_FORM);
+            this.scrollToPlayerFormWhenReady();
+        }
+    }
+
+    /**
+     * Waits for the add player form content to load, then scrolls to it.
+     */
+    scrollToPlayerFormWhenReady() {
+        const maxWaitTime = 3000;
+        const startTime = Date.now();
+
+        const tryScroll = () => {
+            const container = this.$('.add-player-form-container');
+            // Check if container exists and has content (accordion is rendered)
+            if (container && container.querySelector('.accordion')) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+            // If still waiting and not timed out, try again
+            if (Date.now() - startTime < maxWaitTime) {
+                requestAnimationFrame(tryScroll);
+            }
+        };
+
+        setTimeout(tryScroll, ANIMATION.SHORT);
     }
 
     onUpdate() {
@@ -122,7 +158,7 @@ class SettingsPage extends BasePage {
         if (activitySelectorContainer) {
             this.activitySelector = new ActivitySelector(activitySelectorContainer, {
                 sessionService: this.sessionService,
-                onActivityChange: (action) => this.handleGuideAction(action)
+                onAction: (action) => this.handleGuideAction(action)
             });
             this.activitySelector.mount();
             this.addComponent(this.activitySelector);
@@ -260,6 +296,9 @@ class SettingsPage extends BasePage {
                     // Focus the select to draw attention
                     setTimeout(() => activitySelect.focus(), ANIMATION.STANDARD);
                 }
+                break;
+            case 'scroll-to-player-form':
+                this.scrollToPlayerFormWhenReady();
                 break;
         }
     }
