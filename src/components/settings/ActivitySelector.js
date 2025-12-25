@@ -4,7 +4,7 @@ import stateManager from '../../core/StateManager.js';
 import toast from '../base/Toast.js';
 import { activities } from '../../config/activities/index.js';
 import uiConfig from '../../config/ui.js';
-import { STORAGE_KEYS } from '../../utils/constants.js';
+import { STORAGE_KEYS, SESSION_KEYS } from '../../utils/constants.js';
 import { getIcon } from '../base/Icons.js';
 import { trackEvent } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
@@ -15,7 +15,7 @@ class ActivitySelector extends BaseComponent {
     constructor(container, props = {}) {
         super(container);
         this.sessionService = props.sessionService;
-        this.onActivityChange = props.onActivityChange; // Callback for when activity changes
+        this.onAction = props.onAction; // Callback for component actions
     }
 
     render() {
@@ -195,7 +195,7 @@ class ActivitySelector extends BaseComponent {
         if (!targetActivity) {
             toast.error(t('settings.activity.selectFirst'));
             // Notify parent to scroll to activity selector (though we are already here)
-            if (this.onActivityChange) this.onActivityChange('select-activity');
+            if (this.onAction) this.onAction('select-activity');
 
             // Focus the select
             const select = this.container.querySelector(`#${ELEMENT_IDS.ACTIVITY_SELECT}`);
@@ -214,6 +214,8 @@ class ActivitySelector extends BaseComponent {
             if (pendingActivity && targetActivity !== currentActivity) {
                 storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, targetActivity);
                 storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+                // Set flag to scroll to player form after reload (use sessionStorage for single-use)
+                sessionStorage.setItem(SESSION_KEYS.SCROLL_TO_PLAYER_FORM, 'true');
 
                 const selectedActivity = activities[targetActivity];
                 toast.success(t('settings.activity.switchingTo', { activity: selectedActivity.name }), TOAST.QUICK_DURATION);
@@ -236,39 +238,13 @@ class ActivitySelector extends BaseComponent {
 
             toast.success(t('settings.activity.newTeamCreated'));
 
-            // Scroll to add player form after content loads
-            this.scrollToPlayerFormWhenReady();
-            // Page will auto-update via event bus
+            // Notify parent to scroll to add player form
+            if (this.onAction) {
+                this.onAction('scroll-to-player-form');
+            }
         } catch (error) {
             toast.error(error.message);
         }
-    }
-
-    /**
-     * Waits for the add player form content to load, then scrolls to it.
-     * Uses MutationObserver to detect when content is rendered.
-     */
-    scrollToPlayerFormWhenReady() {
-        const maxWaitTime = 3000; // Maximum wait time in ms
-        const startTime = Date.now();
-
-        const tryScroll = () => {
-            const container = document.querySelector('.add-player-form-container');
-
-            // Check if container exists and has content (accordion is rendered)
-            if (container && container.querySelector('.accordion')) {
-                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                return;
-            }
-
-            // If still waiting and not timed out, try again
-            if (Date.now() - startTime < maxWaitTime) {
-                requestAnimationFrame(tryScroll);
-            }
-        };
-
-        // Start checking after a small delay to allow event bus updates
-        setTimeout(tryScroll, ANIMATION.SHORT);
     }
 }
 

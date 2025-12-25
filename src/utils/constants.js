@@ -36,6 +36,11 @@ export const STORAGE_KEYS = {
     PENDING_ACTIVITY: 'pendingActivity'
 };
 
+// Session-only storage keys (cleared on tab close)
+export const SESSION_KEYS = {
+    SCROLL_TO_PLAYER_FORM: 'scrollToPlayerForm'
+};
+
 export const EVENTS = {
     // State events
     STATE_LOADED: 'state:loaded',
@@ -77,6 +82,7 @@ export default {
     DEFAULT_RATING,
     ROUTES,
     STORAGE_KEYS,
+    SESSION_KEYS,
     EVENTS,
     VALIDATION
 };
