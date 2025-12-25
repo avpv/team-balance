@@ -297,7 +297,7 @@ class TeamsPage extends BasePage {
                                     ${t('teams.builder.weight')}
                                     <span class="tooltip-icon" role="tooltip">
                                         ${getIcon('info', { size: ICON_SIZES.SMALL })}
-                                        <span class="tooltip-content">${t('teams.builder.weightTooltip')}</span>
+                                        <span class="tooltip-content tooltip-right">${t('teams.builder.weightTooltip')}</span>
                                     </span>
                                 </span>
                             </div>
