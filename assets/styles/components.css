@@ -1840,6 +1840,19 @@ textarea:focus-visible {
     border-top-color: var(--color-bg-tertiary);
 }
 
+/* Right-aligned tooltip variant for elements near right edge */
+.tooltip-content.tooltip-right {
+    left: auto;
+    right: 0;
+    transform: translateY(-8px);
+}
+
+.tooltip-content.tooltip-right::after {
+    left: auto;
+    right: 8px;
+    transform: none;
+}
+
 /* =============================================================================
    Sidebar - Session Management
    ============================================================================= */
