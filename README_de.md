@@ -21,7 +21,7 @@ In Minuten, nicht Stunden.
 
 <div align="center">
 
-*In anderen Sprachen lesen: [English](README.md), [Русский](README_ru.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [日本語](README_ja.md)*
+*In anderen Sprachen lesen: [English](README.md), [Русский](README_ru.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [日本語](README_ja.md), [한국어](README_ko.md)*
 
 </div>
 

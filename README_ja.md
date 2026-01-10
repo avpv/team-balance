@@ -21,7 +21,7 @@
 
 <div align="center">
 
-*他の言語で読む：[English](README.md), [Русский](README_ru.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md)*
+*他の言語で読む：[English](README.md), [Русский](README_ru.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [한국어](README_ko.md)*
 
 </div>
 

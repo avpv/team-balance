@@ -21,7 +21,7 @@
 
 <div align="center">
 
-*其他语言版本：[English](README.md), [Русский](README_ru.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [日本語](README_ja.md)*
+*其他语言版本：[English](README.md), [Русский](README_ru.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [日本語](README_ja.md), [한국어](README_ko.md)*
 
 </div>
 

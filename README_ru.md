@@ -21,7 +21,7 @@
 
 <div align="center">
 
-*Читать на других языках: [English](README.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [日本語](README_ja.md)*
+*Читать на других языках: [English](README.md), [Deutsch](README_de.md), [Español](README_es.md), [Français](README_fr.md), [中文](README_zh.md), [日本語](README_ja.md), [한국어](README_ko.md)*
 
 </div>
 
