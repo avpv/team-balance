@@ -170,6 +170,14 @@
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .danger-zone-section .form-section.danger-zone {
+        padding: var(--spacing-2);
+    }
+
+    .danger-zone-section .form-section-actions {
+        gap: var(--spacing-2);
+    }
 }
 
 .player-form {
