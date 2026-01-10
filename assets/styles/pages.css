@@ -2087,7 +2087,6 @@
 
     .result-controls {
         width: 100%;
-        flex-direction: column;
     }
 
     .progress-section {
