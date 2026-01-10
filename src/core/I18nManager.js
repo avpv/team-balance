@@ -17,7 +17,8 @@ export const SUPPORTED_LANGUAGES = {
     fr: { name: 'French', nativeName: 'Français', flag: '🇫🇷' },
     de: { name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
     ja: { name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
-    zh: { name: 'Chinese', nativeName: '中文', flag: '🇨🇳' }
+    zh: { name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
+    ko: { name: 'Korean', nativeName: '한국어', flag: '🇰🇷' }
 };
 
 /**
