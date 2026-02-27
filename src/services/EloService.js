@@ -34,6 +34,20 @@ class EloService {
     }
 
     /**
+     * Clamp and round rating to valid bounds [MIN, MAX]
+     * Ensures ratings stay within configured boundaries and are integers
+     *
+     * @param {number} rating - Raw rating value
+     * @returns {number} Clamped and rounded integer rating
+     */
+    clampRating(rating) {
+        return Math.max(
+            ratingConfig.RATING_CONSTANTS.MIN,
+            Math.min(ratingConfig.RATING_CONSTANTS.MAX, Math.round(rating))
+        );
+    }
+
+    /**
      * Calculate expected match outcome
      * Uses standard ELO probability formula
      *
@@ -151,23 +165,34 @@ class EloService {
             loserK = this.calculatePoolAdjustedKFactor(loserBaseK, poolSize);
         }
 
-        const winnerChange = winnerK * (1 - winnerExpected);
-        const loserChange = loserK * (0 - loserExpected);
+        // Use effective (average) K-factor for zero-sum guarantee:
+        // Since E(winner) + E(loser) = 1, using the same K for both
+        // ensures winnerChange + loserChange = K_eff * (1 - E_w) + K_eff * (0 - E_l) = 0
+        const effectiveK = Math.round((winnerK + loserK) / 2);
+
+        // Round the change first, then apply symmetrically for strict zero-sum
+        const rawChange = effectiveK * (1 - winnerExpected);
+        const roundedChange = Math.round(rawChange);
+
+        const winnerNewRating = this.clampRating(winnerRating + roundedChange);
+        const loserNewRating = this.clampRating(loserRating - roundedChange);
 
         return {
             winner: {
                 oldRating: winnerRating,
-                newRating: winnerRating + winnerChange,
-                change: winnerChange,
-                kFactor: winnerK,
+                newRating: winnerNewRating,
+                change: winnerNewRating - winnerRating,
+                kFactor: effectiveK,
+                individualKFactor: winnerK,
                 baseKFactor: winnerBaseK,
                 expected: winnerExpected
             },
             loser: {
                 oldRating: loserRating,
-                newRating: loserRating + loserChange,
-                change: loserChange,
-                kFactor: loserK,
+                newRating: loserNewRating,
+                change: loserNewRating - loserRating,
+                kFactor: effectiveK,
+                individualKFactor: loserK,
                 baseKFactor: loserBaseK,
                 expected: loserExpected
             },
@@ -221,24 +246,34 @@ class EloService {
             player2K = this.calculatePoolAdjustedKFactor(player2BaseK, poolSize);
         }
 
-        // In a Win-Win, both players score 0.5
-        const player1Change = player1K * (0.5 - player1Expected);
-        const player2Change = player2K * (0.5 - player2Expected);
+        // Use effective (average) K-factor for zero-sum guarantee:
+        // Since E(p1) + E(p2) = 1, using the same K for both ensures
+        // p1Change + p2Change = K_eff * (0.5 - E_1) + K_eff * (0.5 - E_2) = 0
+        const effectiveK = Math.round((player1K + player2K) / 2);
+
+        // Round the change first, then apply symmetrically for strict zero-sum
+        const rawChange = effectiveK * (0.5 - player1Expected);
+        const roundedChange = Math.round(rawChange);
+
+        const player1NewRating = this.clampRating(player1Rating + roundedChange);
+        const player2NewRating = this.clampRating(player2Rating - roundedChange);
 
         return {
             player1: {
                 oldRating: player1Rating,
-                newRating: player1Rating + player1Change,
-                change: player1Change,
-                kFactor: player1K,
+                newRating: player1NewRating,
+                change: player1NewRating - player1Rating,
+                kFactor: effectiveK,
+                individualKFactor: player1K,
                 baseKFactor: player1BaseK,
                 expected: player1Expected
             },
             player2: {
                 oldRating: player2Rating,
-                newRating: player2Rating + player2Change,
-                change: player2Change,
-                kFactor: player2K,
+                newRating: player2NewRating,
+                change: player2NewRating - player2Rating,
+                kFactor: effectiveK,
+                individualKFactor: player2K,
                 baseKFactor: player2BaseK,
                 expected: player2Expected
             },

@@ -76,6 +76,24 @@ Adjustment Factor = √(15 / number of players at position)
 
 The coefficient is bounded between 0.5 and 2.0.
 
+### Effective K-Factor (Zero-Sum Guarantee)
+
+When two players have different K-factors (e.g., a novice vs. an expert), the system uses the **effective K-factor** — the average of both players' individual K-factors:
+
+```
+Effective K = round((K_player1 + K_player2) / 2)
+```
+
+This ensures the system is **zero-sum**: the winner gains exactly as many points as the loser loses. Without this, asymmetric K-factors would cause rating inflation (more points created than destroyed).
+
+**Example:**
+- Novice (K=40) vs Master (K=15): Effective K = round((40 + 15) / 2) = **28**
+- Both novices (K=40): Effective K = round((40 + 40) / 2) = **40**
+
+### Rating Bounds and Rounding
+
+All ratings are clamped to **[0, 3000]** and rounded to integers after each update. Rating changes are computed, rounded, and applied symmetrically to both players to preserve strict zero-sum even after rounding.
+
 ---
 
 ## Example: Comparison Iterations
