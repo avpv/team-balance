@@ -71,7 +71,7 @@ class TeamsPage extends BasePage {
                 showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
                 composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
-                positionWeights: this.getInitialWeights()
+                positionWeights: savedSettings.positionWeights ?? this.getInitialWeights()
             });
         });
         this.on('state:changed', () => {
@@ -84,7 +84,7 @@ class TeamsPage extends BasePage {
                 showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
                 composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
-                positionWeights: this.getInitialWeights()
+                positionWeights: savedSettings.positionWeights ?? this.getInitialWeights()
             });
         });
     }
