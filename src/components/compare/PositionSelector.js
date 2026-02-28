@@ -3,8 +3,6 @@ import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
 import { trackClick } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
-import { CONFIDENCE_LEVELS } from '../../config/rating.js';
-
 const { ELEMENT_IDS } = uiConfig;
 
 class PositionSelector extends BaseComponent {
@@ -87,7 +85,6 @@ class PositionSelector extends BaseComponent {
                     </div>
                     ${!isDisabled ? `
                         <div class="position-card__badges">
-                            ${this.renderConfidenceBadge(prog)}
                             <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'in-progress' : 'ready'}">
                                 ${isComplete ? t('compare.positionSelector.statusComplete') : hasProgress ? t('compare.positionSelector.statusInProgress') : t('compare.positionSelector.statusReady')}
                             </span>
@@ -159,19 +156,6 @@ class PositionSelector extends BaseComponent {
                 `}
             </div>
         `;
-    }
-
-    getCompletionConfidenceLevel(percentage) {
-        if (percentage >= CONFIDENCE_LEVELS.VERY_HIGH) return 'high';
-        if (percentage >= CONFIDENCE_LEVELS.MEDIUM) return 'medium';
-        if (percentage >= CONFIDENCE_LEVELS.LOW) return 'low';
-        return 'very-low';
-    }
-
-    renderConfidenceBadge(prog) {
-        const confidence = this.getCompletionConfidenceLevel(prog.percentage);
-        const label = t(`compare.confidence.${confidence}`);
-        return `<span class="rd-badge rd-badge--${confidence}" title="${prog.completed}/${prog.total}">${label}</span>`;
     }
 
     onMount() {
