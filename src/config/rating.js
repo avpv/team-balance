@@ -70,25 +70,21 @@ export const K_FACTORS = {
  *
  * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
  *
- * With defaults (INITIAL=2.5, DECAY_RATE=0.3):
- *   0 comparisons → K × 2.5  (first comparison has maximum impact)
- *   2 comparisons → K × 1.82
- *   5 comparisons → K × 1.33
- *   10 comparisons → K × 1.07 (approaching standard ELO)
- *   15+ comparisons → K × ~1.0 (standard ELO behavior)
+ * With defaults (INITIAL=2.5, DECAY_RATE=0.4):
+ *   0 comparisons → K × 2.5
+ *   1 comparison  → K × 2.01
+ *   2 comparisons → K × 1.67
+ *   3 comparisons → K × 1.45
+ *   5 comparisons → K × 1.20
+ *   8 comparisons → K × 1.06
+ *   10+ comparisons → K × ~1.0 (standard ELO)
  */
 export const UNCERTAINTY_BOOST = {
-    /** Enable/disable uncertainty-based K-factor boost */
-    ENABLED: true,
-
     /** Initial multiplier for players with zero comparisons */
     INITIAL_MULTIPLIER: 2.5,
 
     /** Decay rate: higher = faster convergence to standard K */
-    DECAY_RATE: 0.3,
-
-    /** Minimum multiplier (floor, always at least standard K) */
-    MIN_MULTIPLIER: 1.0,
+    DECAY_RATE: 0.4,
 
     /** Maximum multiplier cap (safety bound) */
     MAX_MULTIPLIER: 3.0

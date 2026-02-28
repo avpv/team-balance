@@ -123,17 +123,10 @@ class EloService {
     calculateUncertaintyMultiplier(comparisons) {
         const boost = this.UNCERTAINTY_BOOST;
 
-        if (!boost || !boost.ENABLED) {
-            return 1.0;
-        }
-
         const multiplier = 1 + (boost.INITIAL_MULTIPLIER - 1) *
             Math.exp(-boost.DECAY_RATE * comparisons);
 
-        return Math.max(
-            boost.MIN_MULTIPLIER,
-            Math.min(boost.MAX_MULTIPLIER, multiplier)
-        );
+        return Math.min(boost.MAX_MULTIPLIER, multiplier);
     }
 
     /**
