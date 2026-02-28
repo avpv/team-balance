@@ -2,7 +2,6 @@ import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
 import { generateAvatar } from '../../utils/avatarGenerator.js';
 import { t } from '../../core/I18nManager.js';
-import { GLICKO2 } from '../../config/rating.js';
 
 class ComparisonCard extends BaseComponent {
     constructor(container, props = {}) {
@@ -23,9 +22,6 @@ class ComparisonCard extends BaseComponent {
 
         const rating = Math.round(player.ratings[positionKey]);
         const comparisons = player.comparisons[positionKey];
-        const rd = player.rd?.[positionKey] ?? GLICKO2.INITIAL_RD;
-        const rdConfidence = this.getRdConfidenceLevel(rd);
-        const rdLabel = t(`compare.confidence.${rdConfidence}`);
 
         // Generate SVG avatar with ELO-based smile
         const avatarSvg = generateAvatar(player.name, 96, rating);
@@ -54,11 +50,6 @@ class ComparisonCard extends BaseComponent {
                         <span class="rating-value">${rating}</span>
                         <span class="rating-label">ELO</span>
                     </div>
-                    ${rdConfidence !== 'very-low' ? `
-                    <div class="player-rd-confidence">
-                        <span class="rd-badge rd-badge--${rdConfidence}" title="${t('compare.confidence.tooltip', { rd: Math.round(rd) })}">${rdLabel}</span>
-                    </div>
-                    ` : ''}
                     <p class="player-comparisons">${t('compare.comparison.comparedCount', { count: comparisons })}</p>
                 </div>
             </button>
@@ -74,14 +65,6 @@ class ComparisonCard extends BaseComponent {
                 }
             });
         }
-    }
-
-    getRdConfidenceLevel(rd) {
-        const thresholds = GLICKO2.CONFIDENCE;
-        if (rd <= thresholds.HIGH) return 'high';
-        if (rd <= thresholds.MEDIUM) return 'medium';
-        if (rd <= thresholds.LOW) return 'low';
-        return 'very-low';
     }
 
     animate() {
