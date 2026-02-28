@@ -54,9 +54,11 @@ class ComparisonCard extends BaseComponent {
                         <span class="rating-value">${rating}</span>
                         <span class="rating-label">ELO</span>
                     </div>
+                    ${rdConfidence !== 'very-low' ? `
                     <div class="player-rd-confidence">
                         <span class="rd-badge rd-badge--${rdConfidence}" title="${t('compare.confidence.tooltip', { rd: Math.round(rd) })}">${rdLabel}</span>
                     </div>
+                    ` : ''}
                     <p class="player-comparisons">${t('compare.comparison.comparedCount', { count: comparisons })}</p>
                 </div>
             </button>
