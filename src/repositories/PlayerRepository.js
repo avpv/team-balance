@@ -311,6 +311,7 @@ class PlayerRepository {
         const updatedComparedWith = { ...player.comparedWith };
         const updatedRd = { ...(player.rd || {}) };
         const updatedVolatility = { ...(player.volatility || {}) };
+        const updatedWinsAgainst = { ...(player.winsAgainst || {}) };
 
         positions.forEach(pos => {
             if (updatedRatings[pos] !== undefined) {
@@ -319,6 +320,7 @@ class PlayerRepository {
                 updatedComparedWith[pos] = [];
                 updatedRd[pos] = GLICKO2.INITIAL_RD;
                 updatedVolatility[pos] = GLICKO2.INITIAL_VOLATILITY;
+                updatedWinsAgainst[pos] = [];
             }
         });
 
@@ -327,7 +329,8 @@ class PlayerRepository {
             comparisons: updatedComparisons,
             comparedWith: updatedComparedWith,
             rd: updatedRd,
-            volatility: updatedVolatility
+            volatility: updatedVolatility,
+            winsAgainst: updatedWinsAgainst
         });
     }
 
@@ -346,6 +349,7 @@ class PlayerRepository {
             const updatedComparedWith = { ...player.comparedWith };
             const updatedRd = { ...(player.rd || {}) };
             const updatedVolatility = { ...(player.volatility || {}) };
+            const updatedWinsAgainst = { ...(player.winsAgainst || {}) };
 
             positions.forEach(pos => {
                 if (updatedRatings[pos] !== undefined) {
@@ -354,6 +358,7 @@ class PlayerRepository {
                     updatedComparedWith[pos] = [];
                     updatedRd[pos] = GLICKO2.INITIAL_RD;
                     updatedVolatility[pos] = GLICKO2.INITIAL_VOLATILITY;
+                    updatedWinsAgainst[pos] = [];
                 }
             });
 
@@ -364,7 +369,8 @@ class PlayerRepository {
                     comparisons: updatedComparisons,
                     comparedWith: updatedComparedWith,
                     rd: updatedRd,
-                    volatility: updatedVolatility
+                    volatility: updatedVolatility,
+                    winsAgainst: updatedWinsAgainst
                 }
             };
         });

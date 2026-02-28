@@ -323,7 +323,7 @@ class StateManager {
             });
         }
 
-        // Version 5.0 -> 5.1 migration (add Glicko-2 rd and volatility fields)
+        // Version 5.0 -> 5.1 migration (add Glicko-2 rd, volatility, and winsAgainst fields)
         if (version < '5.1' || data.version === '5.0') {
             let playersUpdated = 0;
 
@@ -334,20 +334,43 @@ class StateManager {
                         const session = activitySessions[sessionId];
                         if (session?.players) {
                             session.players = session.players.map(player => {
-                                if (!player.rd || !player.volatility) {
-                                    const rd = {};
-                                    const volatility = {};
+                                let needsUpdate = false;
+                                const updates = {};
+
+                                // Add rd if missing
+                                if (!player.rd) {
+                                    updates.rd = {};
                                     (player.positions || []).forEach(pos => {
                                         const comparisons = player.comparisons?.[pos] || 0;
-                                        // Estimate RD from comparisons: more comparisons = lower RD
-                                        // New players: 350, experienced: down to ~50
-                                        rd[pos] = comparisons === 0
+                                        updates.rd[pos] = comparisons === 0
                                             ? 350
                                             : Math.max(30, Math.round(350 * Math.exp(-0.15 * comparisons)));
-                                        volatility[pos] = 0.06;
                                     });
+                                    needsUpdate = true;
+                                }
+
+                                // Add volatility if missing
+                                if (!player.volatility) {
+                                    updates.volatility = {};
+                                    (player.positions || []).forEach(pos => {
+                                        updates.volatility[pos] = 0.06;
+                                    });
+                                    needsUpdate = true;
+                                }
+
+                                // Add winsAgainst if missing (empty — we can't reconstruct
+                                // actual results from old data, only new comparisons will populate it)
+                                if (!player.winsAgainst) {
+                                    updates.winsAgainst = {};
+                                    (player.positions || []).forEach(pos => {
+                                        updates.winsAgainst[pos] = [];
+                                    });
+                                    needsUpdate = true;
+                                }
+
+                                if (needsUpdate) {
                                     playersUpdated++;
-                                    return { ...player, rd, volatility };
+                                    return { ...player, ...updates };
                                 }
                                 return player;
                             });

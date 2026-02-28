@@ -90,6 +90,7 @@ class PlayerService {
         const comparedWith = {};
         const rd = {};
         const volatility = {};
+        const winsAgainst = {};
 
         positions.forEach(pos => {
             ratings[pos] = this.DEFAULT_RATING;
@@ -97,6 +98,7 @@ class PlayerService {
             comparedWith[pos] = [];
             rd[pos] = GLICKO2.INITIAL_RD;
             volatility[pos] = GLICKO2.INITIAL_VOLATILITY;
+            winsAgainst[pos] = [];
         });
 
         return {
@@ -108,6 +110,7 @@ class PlayerService {
             comparedWith,
             rd,
             volatility,
+            winsAgainst,
             createdAt: new Date().toISOString()
         };
     }
@@ -148,6 +151,7 @@ class PlayerService {
         const newComparedWith = {};
         const newRd = {};
         const newVolatility = {};
+        const newWinsAgainst = {};
 
         newPositions.forEach(pos => {
             newRatings[pos] = player.ratings[pos] || this.DEFAULT_RATING;
@@ -155,6 +159,7 @@ class PlayerService {
             newComparedWith[pos] = player.comparedWith[pos] || validationConfig.DEFAULT_VALUES.COMPARED_WITH;
             newRd[pos] = player.rd?.[pos] ?? GLICKO2.INITIAL_RD;
             newVolatility[pos] = player.volatility?.[pos] ?? GLICKO2.INITIAL_VOLATILITY;
+            newWinsAgainst[pos] = player.winsAgainst?.[pos] || [];
         });
 
         // Update through repository
@@ -164,7 +169,8 @@ class PlayerService {
             comparisons: newComparisons,
             comparedWith: newComparedWith,
             rd: newRd,
-            volatility: newVolatility
+            volatility: newVolatility,
+            winsAgainst: newWinsAgainst
         });
     }
 

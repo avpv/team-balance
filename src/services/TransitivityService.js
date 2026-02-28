@@ -9,6 +9,9 @@
  * This creates a cycle that makes accurate ranking impossible.
  * Detecting these cycles helps users identify inconsistent evaluations
  * and re-compare the problematic players for more accurate ratings.
+ *
+ * Uses the `winsAgainst` field on player objects, which records the actual
+ * outcome of each comparison (not inferred from ratings).
  */
 class TransitivityService {
     /**
@@ -21,7 +24,7 @@ class TransitivityService {
     /**
      * Detect all transitivity violations (cycles of length 3) at a given position.
      *
-     * Algorithm: Build a directed graph of comparison results (winner → loser),
+     * Algorithm: Build a directed graph from actual win records (winsAgainst),
      * then find all 3-node cycles (A→B→C→A).
      *
      * @param {string} position - Position to check
@@ -31,9 +34,10 @@ class TransitivityService {
         const players = this.playerRepository.getByPosition(position);
         if (players.length < 3) return [];
 
-        // Build directed graph: wins[winnerId] = Set of loserIds
+        // Build directed graph from actual win records
         const wins = this._buildWinGraph(players, position);
         const playerMap = new Map(players.map(p => [p.id, p]));
+        const nameToId = new Map(players.map(p => [p.name, p.id]));
 
         const violations = [];
         const seen = new Set();
@@ -89,9 +93,8 @@ class TransitivityService {
         if (!wins.has(winnerId)) wins.set(winnerId, new Set());
         wins.get(winnerId).add(loserId);
 
-        // Check if this creates a cycle through the two involved players
-        // Look for: winnerId → loserId → ... → winnerId (cycle through the new edge)
-        const cycle = this._findCycleThroughEdge(winnerId, loserId, wins, players);
+        // Check if this creates a cycle through the new edge
+        const cycle = this._findCycleThroughEdge(winnerId, loserId, wins);
 
         if (cycle) {
             return {
@@ -122,14 +125,8 @@ class TransitivityService {
     }
 
     /**
-     * Build a directed graph of wins from comparison history.
-     * Uses comparedWith to know which pairs were compared,
-     * and rating changes to infer who won (higher rating = more wins).
-     *
-     * Since we don't store win/loss per pair explicitly, we reconstruct
-     * the graph from the comparedWith lists. For each pair (A, B) that
-     * has been compared at this position, the one with higher rating
-     * is considered the winner. For draws, no edge is added.
+     * Build a directed graph of wins from actual comparison outcomes.
+     * Uses the `winsAgainst` field which stores names of players each player has beaten.
      *
      * @private
      * @param {Array} players - All players at this position
@@ -138,29 +135,23 @@ class TransitivityService {
      */
     _buildWinGraph(players, position) {
         const wins = new Map();
-        const playerByName = new Map(players.map(p => [p.name, p]));
+        const nameToId = new Map(players.map(p => [p.name, p.id]));
 
         for (const player of players) {
-            const compared = player.comparedWith?.[position] || [];
-            for (const opponentName of compared) {
-                const opponent = playerByName.get(opponentName);
-                if (!opponent) continue;
+            const beaten = player.winsAgainst?.[position] || [];
+            if (beaten.length === 0) continue;
 
-                // Avoid processing the same pair twice
-                if (player.id > opponent.id) continue;
+            const winnerWins = wins.get(player.id) || new Set();
 
-                const playerRating = player.ratings?.[position] || 1500;
-                const opponentRating = opponent.ratings?.[position] || 1500;
-
-                // The player with higher rating after comparison is considered the winner.
-                // For equal ratings (draw result), no directional edge.
-                if (playerRating > opponentRating) {
-                    if (!wins.has(player.id)) wins.set(player.id, new Set());
-                    wins.get(player.id).add(opponent.id);
-                } else if (opponentRating > playerRating) {
-                    if (!wins.has(opponent.id)) wins.set(opponent.id, new Set());
-                    wins.get(opponent.id).add(player.id);
+            for (const loserName of beaten) {
+                const loserId = nameToId.get(loserName);
+                if (loserId) {
+                    winnerWins.add(loserId);
                 }
+            }
+
+            if (winnerWins.size > 0) {
+                wins.set(player.id, winnerWins);
             }
         }
 
@@ -190,10 +181,9 @@ class TransitivityService {
 
     /**
      * Find a cycle that goes through a specific new edge (winner → loser).
-     * We only need to check for 3-cycles since those are the most meaningful.
      * @private
      */
-    _findCycleThroughEdge(winnerId, loserId, wins, players) {
+    _findCycleThroughEdge(winnerId, loserId, wins) {
         const loserWins = wins.get(loserId) || new Set();
 
         // Check: winnerId → loserId → X → winnerId

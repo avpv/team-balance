@@ -324,6 +324,7 @@ class ComparisonService {
                     ratings: this.buildUpdatedRatings(winnerId, position, changes.winner.newRating),
                     comparisons: this.buildUpdatedComparisons(winnerId, position),
                     comparedWith: this.buildUpdatedComparedWith(winnerId, position, loserName),
+                    winsAgainst: this.buildUpdatedWinsAgainst(winnerId, position, loserName),
                     rd: this.buildUpdatedRd(winnerId, position, changes.winner.newRd),
                     volatility: this.buildUpdatedVolatility(winnerId, position, changes.winner.newVolatility)
                 }
@@ -422,6 +423,20 @@ class ComparisonService {
         return {
             ...(player.volatility || {}),
             [position]: newVolatility
+        };
+    }
+
+    /**
+     * Build updated winsAgainst object (tracks who this player has beaten)
+     * @private
+     */
+    buildUpdatedWinsAgainst(playerId, position, loserName) {
+        const player = this.playerRepository.getById(playerId);
+        const currentWins = player.winsAgainst?.[position] || [];
+
+        return {
+            ...(player.winsAgainst || {}),
+            [position]: [...new Set([...currentWins, loserName])]
         };
     }
 
@@ -542,6 +557,10 @@ class ComparisonService {
                 volatility: {
                     ...(player.volatility || {}),
                     [position]: 0.06
+                },
+                winsAgainst: {
+                    ...(player.winsAgainst || {}),
+                    [position]: []
                 }
             }
         }));
