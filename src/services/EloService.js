@@ -34,6 +34,9 @@ class EloService {
 
         // Confidence levels
         this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
+
+        // Reliability threshold for expected score damping
+        this.RELIABILITY_THRESHOLD = ratingConfig.RATING_CONSTANTS.RELIABILITY_THRESHOLD;
     }
 
     /**
@@ -47,6 +50,22 @@ class EloService {
     calculateExpectedScore(playerRating, opponentRating) {
         const ratingDifference = opponentRating - playerRating;
         return 1 / (1 + Math.pow(this.PROBABILITY_BASE, ratingDifference / this.RATING_DIVISOR));
+    }
+
+    /**
+     * Get reliability-damped rating for expected score calculation.
+     * Blends the current rating toward DEFAULT based on comparison count.
+     * This reduces order-dependence in sequential ELO processing:
+     * players with few comparisons have unreliable ratings that shouldn't
+     * heavily influence expected scores.
+     *
+     * @param {number} rating - Player's current rating
+     * @param {number} comparisons - Number of comparisons completed
+     * @returns {number} Damped rating for expected score calculation
+     */
+    getDampedRating(rating, comparisons) {
+        const confidence = Math.min(1, comparisons / this.RELIABILITY_THRESHOLD);
+        return this.DEFAULT_RATING + (rating - this.DEFAULT_RATING) * confidence;
     }
 
     /**
@@ -181,8 +200,15 @@ class EloService {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
-        const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
-        const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
+        // Use damped ratings for expected score calculation to reduce order-dependence.
+        // Players with few comparisons have unreliable ratings; damping blends them
+        // toward the default, ensuring that sequential comparison order doesn't
+        // unfairly penalize players who happen to be compared earlier.
+        const dampedWinnerRating = this.getDampedRating(winnerRating, winnerComparisons);
+        const dampedLoserRating = this.getDampedRating(loserRating, loserComparisons);
+
+        const winnerExpected = this.calculateExpectedScore(dampedWinnerRating, dampedLoserRating);
+        const loserExpected = this.calculateExpectedScore(dampedLoserRating, dampedWinnerRating);
 
         // Calculate base K-factors (experience level only)
         const winnerBaseK = this.calculateKFactor(winnerComparisons, winnerRating);
@@ -247,8 +273,12 @@ class EloService {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
-        const player1Expected = this.calculateExpectedScore(player1Rating, player2Rating);
-        const player2Expected = this.calculateExpectedScore(player2Rating, player1Rating);
+        // Use damped ratings for expected score calculation to reduce order-dependence
+        const dampedPlayer1Rating = this.getDampedRating(player1Rating, player1Comparisons);
+        const dampedPlayer2Rating = this.getDampedRating(player2Rating, player2Comparisons);
+
+        const player1Expected = this.calculateExpectedScore(dampedPlayer1Rating, dampedPlayer2Rating);
+        const player2Expected = this.calculateExpectedScore(dampedPlayer2Rating, dampedPlayer1Rating);
 
         // Calculate base K-factors (experience level only)
         const player1BaseK = this.calculateKFactor(player1Comparisons, player1Rating);

@@ -24,7 +24,20 @@ export const RATING_CONSTANTS = {
     RATING_DIVISOR: 400,
 
     /** Base for probability calculation (standard ELO) */
-    PROBABILITY_BASE: 10
+    PROBABILITY_BASE: 10,
+
+    /**
+     * Reliability threshold for expected score damping.
+     * When a player has fewer comparisons than this threshold,
+     * their rating is blended toward DEFAULT for expected score calculation.
+     * This reduces order-dependence in sequential ELO processing.
+     *
+     * With threshold 10:
+     *   0 comparisons → uses DEFAULT rating (fully damped)
+     *   5 comparisons → uses 50% of rating deviation from DEFAULT
+     *   10+ comparisons → uses full current rating (no damping)
+     */
+    RELIABILITY_THRESHOLD: 10
 };
 
 /**
