@@ -3,7 +3,7 @@ import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
 import { trackClick } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
-import { GLICKO2 } from '../../config/rating.js';
+import { CONFIDENCE_LEVELS } from '../../config/rating.js';
 
 const { ELEMENT_IDS } = uiConfig;
 
@@ -87,7 +87,7 @@ class PositionSelector extends BaseComponent {
                     </div>
                     ${!isDisabled ? `
                         <div class="position-card__badges">
-                            ${this.renderConfidenceBadge(key, players)}
+                            ${this.renderConfidenceBadge(prog)}
                             <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'in-progress' : 'ready'}">
                                 ${isComplete ? t('compare.positionSelector.statusComplete') : hasProgress ? t('compare.positionSelector.statusInProgress') : t('compare.positionSelector.statusReady')}
                             </span>
@@ -161,26 +161,17 @@ class PositionSelector extends BaseComponent {
         `;
     }
 
-    getPositionAverageRd(positionKey, players) {
-        if (!players || players.length === 0) return GLICKO2.INITIAL_RD;
-        const totalRd = players.reduce((sum, p) => sum + (p.rd?.[positionKey] ?? GLICKO2.INITIAL_RD), 0);
-        return totalRd / players.length;
-    }
-
-    getRdConfidenceLevel(rd) {
-        const thresholds = GLICKO2.CONFIDENCE;
-        if (rd <= thresholds.HIGH) return 'high';
-        if (rd <= thresholds.MEDIUM) return 'medium';
-        if (rd <= thresholds.LOW) return 'low';
+    getCompletionConfidenceLevel(percentage) {
+        if (percentage >= CONFIDENCE_LEVELS.VERY_HIGH) return 'high';
+        if (percentage >= CONFIDENCE_LEVELS.MEDIUM) return 'medium';
+        if (percentage >= CONFIDENCE_LEVELS.LOW) return 'low';
         return 'very-low';
     }
 
-    renderConfidenceBadge(positionKey, players) {
-        const avgRd = this.getPositionAverageRd(positionKey, players);
-        const confidence = this.getRdConfidenceLevel(avgRd);
+    renderConfidenceBadge(prog) {
+        const confidence = this.getCompletionConfidenceLevel(prog.percentage);
         const label = t(`compare.confidence.${confidence}`);
-        const tooltip = t('compare.confidence.tooltip', { rd: Math.round(avgRd) });
-        return `<span class="rd-badge rd-badge--${confidence}" title="${tooltip}">${label}</span>`;
+        return `<span class="rd-badge rd-badge--${confidence}" title="${prog.completed}/${prog.total}">${label}</span>`;
     }
 
     onMount() {
