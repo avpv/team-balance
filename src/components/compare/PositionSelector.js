@@ -3,7 +3,6 @@ import { getIcon } from '../base/Icons.js';
 import uiConfig from '../../config/ui.js';
 import { trackClick } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
-
 const { ELEMENT_IDS } = uiConfig;
 
 class PositionSelector extends BaseComponent {
