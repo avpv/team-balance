@@ -33,16 +33,16 @@ export const RATING_CONSTANTS = {
  */
 export const K_FACTORS = {
     /** Base K-factor for experienced players */
-    BASE: 30,
+    BASE: 40,
 
     /** High K-factor for new players (< 20 comparisons) */
-    NOVICE: 40,
+    NOVICE: 50,
 
     /** Low K-factor for masters (> 2000 rating, > 50 comparisons) */
-    MASTER: 15,
+    MASTER: 20,
 
     /** Low K-factor for experts (> 1800 rating, > 30 comparisons) */
-    EXPERT: 20,
+    EXPERT: 25,
 
     /** Experience thresholds */
     THRESHOLDS: {
@@ -70,24 +70,25 @@ export const K_FACTORS = {
  *
  * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
  *
- * With defaults (INITIAL=2.5, DECAY_RATE=0.4):
- *   0 comparisons → K × 2.5
- *   1 comparison  → K × 2.01
- *   2 comparisons → K × 1.67
- *   3 comparisons → K × 1.45
- *   5 comparisons → K × 1.20
- *   8 comparisons → K × 1.06
- *   10+ comparisons → K × ~1.0 (standard ELO)
+ * With defaults (INITIAL=3.0, DECAY_RATE=0.35):
+ *   0 comparisons → K × 3.0
+ *   1 comparison  → K × 2.41
+ *   2 comparisons → K × 1.99
+ *   3 comparisons → K × 1.70
+ *   5 comparisons → K × 1.34
+ *   8 comparisons → K × 1.12
+ *   10 comparisons → K × 1.06
+ *   12+ comparisons → K × ~1.0 (standard ELO)
  */
 export const UNCERTAINTY_BOOST = {
     /** Initial multiplier for players with zero comparisons */
-    INITIAL_MULTIPLIER: 2.5,
+    INITIAL_MULTIPLIER: 3.0,
 
     /** Decay rate: higher = faster convergence to standard K */
-    DECAY_RATE: 0.4,
+    DECAY_RATE: 0.35,
 
     /** Maximum multiplier cap (safety bound) */
-    MAX_MULTIPLIER: 3.0
+    MAX_MULTIPLIER: 3.5
 };
 
 /**
