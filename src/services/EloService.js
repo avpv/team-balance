@@ -193,15 +193,20 @@ class EloService {
         const winnerK = this.calculateEffectiveKFactor(winnerComparisons, winnerRating, poolSize);
         const loserK = this.calculateEffectiveKFactor(loserComparisons, loserRating, poolSize);
 
-        const winnerChange = winnerK * (1 - winnerExpected);
-        const loserChange = loserK * (0 - loserExpected);
+        // Use symmetric K-factor (average) for both players to ensure:
+        // 1. ELO conservation (total rating pool stays constant)
+        // 2. Fair, order-independent results (players with identical records get identical ratings)
+        const symmetricK = Math.round((winnerK + loserK) / 2);
+
+        const winnerChange = symmetricK * (1 - winnerExpected);
+        const loserChange = symmetricK * (0 - loserExpected);
 
         return {
             winner: {
                 oldRating: winnerRating,
                 newRating: winnerRating + winnerChange,
                 change: winnerChange,
-                kFactor: winnerK,
+                kFactor: symmetricK,
                 baseKFactor: winnerBaseK,
                 expected: winnerExpected
             },
@@ -209,7 +214,7 @@ class EloService {
                 oldRating: loserRating,
                 newRating: loserRating + loserChange,
                 change: loserChange,
-                kFactor: loserK,
+                kFactor: symmetricK,
                 baseKFactor: loserBaseK,
                 expected: loserExpected
             },
@@ -259,16 +264,21 @@ class EloService {
         const player1K = this.calculateEffectiveKFactor(player1Comparisons, player1Rating, poolSize);
         const player2K = this.calculateEffectiveKFactor(player2Comparisons, player2Rating, poolSize);
 
+        // Use symmetric K-factor (average) for both players to ensure:
+        // 1. ELO conservation (total rating pool stays constant)
+        // 2. Fair, order-independent results (players with identical records get identical ratings)
+        const symmetricK = Math.round((player1K + player2K) / 2);
+
         // In a Win-Win, both players score 0.5
-        const player1Change = player1K * (0.5 - player1Expected);
-        const player2Change = player2K * (0.5 - player2Expected);
+        const player1Change = symmetricK * (0.5 - player1Expected);
+        const player2Change = symmetricK * (0.5 - player2Expected);
 
         return {
             player1: {
                 oldRating: player1Rating,
                 newRating: player1Rating + player1Change,
                 change: player1Change,
-                kFactor: player1K,
+                kFactor: symmetricK,
                 baseKFactor: player1BaseK,
                 expected: player1Expected
             },
@@ -276,7 +286,7 @@ class EloService {
                 oldRating: player2Rating,
                 newRating: player2Rating + player2Change,
                 change: player2Change,
-                kFactor: player2K,
+                kFactor: symmetricK,
                 baseKFactor: player2BaseK,
                 expected: player2Expected
             },
