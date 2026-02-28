@@ -204,7 +204,8 @@ export default {
         violations: {
             title: '{{count}} contradictions détectées',
             andMore: '...et {{count}} de plus',
-            hint: 'Ces comparaisons circulaires réduisent la précision du classement. Envisagez de recomparer ces joueurs.'
+            hint: 'Ces comparaisons circulaires réduisent la précision du classement. Envisagez de recomparer ces joueurs.',
+            confirmRecord: 'Cela créera une contradiction :\n{{cycle}}\n\nEnregistrer quand même ?'
         },
 
         // Messages

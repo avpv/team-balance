@@ -204,7 +204,8 @@ export default {
         violations: {
             title: '检测到{{count}}个矛盾',
             andMore: '...还有{{count}}个',
-            hint: '这些循环比较降低了评分准确性。建议重新比较这些玩家。'
+            hint: '这些循环比较降低了评分准确性。建议重新比较这些玩家。',
+            confirmRecord: '这将产生矛盾：\n{{cycle}}\n\n仍然记录？'
         },
 
         // Messages

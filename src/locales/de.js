@@ -204,7 +204,8 @@ export default {
         violations: {
             title: '{{count}} Widersprüche erkannt',
             andMore: '...und {{count}} weitere',
-            hint: 'Diese zirkulären Vergleiche reduzieren die Rating-Genauigkeit. Erwägen Sie, diese Spieler erneut zu vergleichen.'
+            hint: 'Diese zirkulären Vergleiche reduzieren die Rating-Genauigkeit. Erwägen Sie, diese Spieler erneut zu vergleichen.',
+            confirmRecord: 'Dies erzeugt einen Widerspruch:\n{{cycle}}\n\nTrotzdem speichern?'
         },
 
         // Messages
