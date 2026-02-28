@@ -346,6 +346,19 @@ class ComparePage extends BasePage {
 
     handleComparison(winnerId, loserId) {
         try {
+            // Check if this comparison would create a transitivity violation
+            if (this.transitivityService) {
+                const violation = this.transitivityService.wouldCreateViolation(
+                    winnerId, loserId, this.selectedPosition
+                );
+                if (violation) {
+                    const confirmed = confirm(
+                        t('compare.violations.confirmRecord', { cycle: violation.cycle })
+                    );
+                    if (!confirmed) return;
+                }
+            }
+
             this.comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
 
             // Track comparison event

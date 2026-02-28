@@ -204,7 +204,8 @@ export default {
         violations: {
             title: '{{count}}개 모순 감지',
             andMore: '...외 {{count}}개',
-            hint: '이러한 순환 비교는 레이팅 정확도를 낮춥니다. 해당 선수들을 다시 비교하는 것을 고려하세요.'
+            hint: '이러한 순환 비교는 레이팅 정확도를 낮춥니다. 해당 선수들을 다시 비교하는 것을 고려하세요.',
+            confirmRecord: '이것은 모순을 만듭니다:\n{{cycle}}\n\n그래도 기록하시겠습니까?'
         },
 
         // Messages

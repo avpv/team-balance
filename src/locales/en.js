@@ -204,7 +204,8 @@ export default {
         violations: {
             title: '{{count}} contradictions detected',
             andMore: '...and {{count}} more',
-            hint: 'These circular comparisons reduce rating accuracy. Consider re-comparing these players.'
+            hint: 'These circular comparisons reduce rating accuracy. Consider re-comparing these players.',
+            confirmRecord: 'This will create a contradiction:\n{{cycle}}\n\nRecord anyway?'
         },
 
         // Messages
