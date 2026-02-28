@@ -77,30 +77,58 @@ export const K_FACTORS = {
 };
 
 /**
- * Uncertainty Multiplier Configuration (Glicko-inspired)
- * Boosts K-factor when few comparisons have been made,
- * allowing ratings to spread faster with limited data.
+ * Glicko-2 Rating Deviation (RD) Configuration
+ * Tracks individual uncertainty for each player's rating.
  *
- * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
+ * RD represents how confident we are in a player's rating:
+ *   - Low RD (~50) = very confident, rating is accurate
+ *   - High RD (~350) = uncertain, rating may be inaccurate
  *
- * With defaults (INITIAL=3.0, DECAY_RATE=0.3):
- *   0 comparisons → K × 3.0
- *   1 comparison  → K × 2.48
- *   2 comparisons → K × 2.10
- *   3 comparisons → K × 1.81
- *   5 comparisons → K × 1.45
- *   8 comparisons → K × 1.18
- *   12+ comparisons → K × ~1.0 (standard ELO)
+ * RD increases over time without comparisons (rating becomes stale).
+ * RD decreases as more comparisons are made.
  */
-export const UNCERTAINTY_BOOST = {
-    /** Initial multiplier for players with zero comparisons */
-    INITIAL_MULTIPLIER: 3.0,
+export const GLICKO2 = {
+    /** Initial RD for new players (maximum uncertainty) */
+    INITIAL_RD: 350,
 
-    /** Decay rate: higher = faster convergence to standard K */
-    DECAY_RATE: 0.3,
+    /** Minimum RD (maximum confidence, never drops below this) */
+    MIN_RD: 30,
 
-    /** Maximum multiplier cap (safety bound) */
-    MAX_MULTIPLIER: 3.5
+    /** Maximum RD (full uncertainty) */
+    MAX_RD: 350,
+
+    /** Initial volatility (σ) for new players */
+    INITIAL_VOLATILITY: 0.06,
+
+    /** Minimum volatility */
+    MIN_VOLATILITY: 0.01,
+
+    /** Maximum volatility */
+    MAX_VOLATILITY: 0.12,
+
+    /** System constant (τ) - constrains volatility change rate.
+     *  Lower value = more conservative volatility changes.
+     *  Glicko-2 recommends 0.3-1.2 depending on domain. */
+    TAU: 0.5,
+
+    /** Convergence tolerance for volatility iteration */
+    CONVERGENCE_TOLERANCE: 0.000001,
+
+    /** Maximum iterations for volatility calculation */
+    MAX_ITERATIONS: 100,
+
+    /** Glicko-2 scaling factor: 173.7178 = 400/ln(10) */
+    SCALE: 173.7178,
+
+    /** RD confidence thresholds for UI display */
+    CONFIDENCE: {
+        /** Very confident in rating */
+        HIGH: 75,
+        /** Moderately confident */
+        MEDIUM: 150,
+        /** Low confidence */
+        LOW: 250
+    }
 };
 
 /**
@@ -183,15 +211,9 @@ export const PERCENTILE_CONFIG = {
 export default {
     RATING_CONSTANTS,
     K_FACTORS,
-    UNCERTAINTY_BOOST,
+    GLICKO2,
     POOL_ADJUSTMENT,
     BALANCE_THRESHOLDS,
     CONFIDENCE_LEVELS,
-    PERCENTILE_CONFIG,
-
-    // Legacy compatibility exports
-    DEFAULT_RATING: RATING_CONSTANTS.DEFAULT,
-    MIN_RATING: RATING_CONSTANTS.MIN,
-    MAX_RATING: RATING_CONSTANTS.MAX,
-    BASE_K_FACTOR: K_FACTORS.BASE
+    PERCENTILE_CONFIG
 };

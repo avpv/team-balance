@@ -16,7 +16,7 @@ class StateManager {
         this.state = {
             sessions: {},
             activeSessions: {},
-            version: '5.0',
+            version: '5.1',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'
@@ -323,6 +323,71 @@ class StateManager {
             });
         }
 
+        // Version 5.0 -> 5.1 migration (add Glicko-2 rd, volatility, and winsAgainst fields)
+        if (version < '5.1' || data.version === '5.0') {
+            let playersUpdated = 0;
+
+            if (data.sessions) {
+                Object.keys(data.sessions).forEach(activityKey => {
+                    const activitySessions = data.sessions[activityKey] || {};
+                    Object.keys(activitySessions).forEach(sessionId => {
+                        const session = activitySessions[sessionId];
+                        if (session?.players) {
+                            session.players = session.players.map(player => {
+                                let needsUpdate = false;
+                                const updates = {};
+
+                                // Add rd if missing
+                                if (!player.rd) {
+                                    updates.rd = {};
+                                    (player.positions || []).forEach(pos => {
+                                        const comparisons = player.comparisons?.[pos] || 0;
+                                        updates.rd[pos] = comparisons === 0
+                                            ? 350
+                                            : Math.max(30, Math.round(350 * Math.exp(-0.15 * comparisons)));
+                                    });
+                                    needsUpdate = true;
+                                }
+
+                                // Add volatility if missing
+                                if (!player.volatility) {
+                                    updates.volatility = {};
+                                    (player.positions || []).forEach(pos => {
+                                        updates.volatility[pos] = 0.06;
+                                    });
+                                    needsUpdate = true;
+                                }
+
+                                // Add winsAgainst if missing (empty — we can't reconstruct
+                                // actual results from old data, only new comparisons will populate it)
+                                if (!player.winsAgainst) {
+                                    updates.winsAgainst = {};
+                                    (player.positions || []).forEach(pos => {
+                                        updates.winsAgainst[pos] = [];
+                                    });
+                                    needsUpdate = true;
+                                }
+
+                                if (needsUpdate) {
+                                    playersUpdated++;
+                                    return { ...player, ...updates };
+                                }
+                                return player;
+                            });
+                        }
+                    });
+                });
+            }
+
+            data.version = '5.1';
+
+            eventBus.emit('state:migrated', {
+                from: version,
+                to: '5.1',
+                playersUpdated
+            });
+        }
+
         return data;
     }
 
@@ -335,7 +400,7 @@ class StateManager {
         this.state = {
             sessions: {},
             activeSessions: {},
-            version: '5.0',
+            version: '5.1',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'

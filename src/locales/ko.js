@@ -191,6 +191,22 @@ export default {
             reset: '초기화'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: '확실',
+            medium: '보통',
+            low: '불확실',
+            'very-low': '신규',
+            tooltip: '레이팅 편차: {{rd}} — 낮을수록 더 신뢰할 수 있는 레이팅'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '{{count}}개 모순 감지',
+            andMore: '...외 {{count}}개',
+            hint: '이러한 순환 비교는 레이팅 정확도를 낮춥니다. 해당 선수들을 다시 비교하는 것을 고려하세요.'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}: 비교하려면 최소 2명의 선수가 필요합니다. 현재 이 포지션에 {{count}}명의 선수가 있습니다.',

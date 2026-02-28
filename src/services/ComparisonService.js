@@ -323,7 +323,10 @@ class ComparisonService {
                 updates: {
                     ratings: this.buildUpdatedRatings(winnerId, position, changes.winner.newRating),
                     comparisons: this.buildUpdatedComparisons(winnerId, position),
-                    comparedWith: this.buildUpdatedComparedWith(winnerId, position, loserName)
+                    comparedWith: this.buildUpdatedComparedWith(winnerId, position, loserName),
+                    winsAgainst: this.buildUpdatedWinsAgainst(winnerId, position, loserName),
+                    rd: this.buildUpdatedRd(winnerId, position, changes.winner.newRd),
+                    volatility: this.buildUpdatedVolatility(winnerId, position, changes.winner.newVolatility)
                 }
             },
             {
@@ -331,7 +334,9 @@ class ComparisonService {
                 updates: {
                     ratings: this.buildUpdatedRatings(loserId, position, changes.loser.newRating),
                     comparisons: this.buildUpdatedComparisons(loserId, position),
-                    comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName)
+                    comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName),
+                    rd: this.buildUpdatedRd(loserId, position, changes.loser.newRd),
+                    volatility: this.buildUpdatedVolatility(loserId, position, changes.loser.newVolatility)
                 }
             }
         ]);
@@ -352,7 +357,9 @@ class ComparisonService {
                 updates: {
                     ratings: this.buildUpdatedRatings(player1Id, position, changes.player1.newRating),
                     comparisons: this.buildUpdatedComparisons(player1Id, position),
-                    comparedWith: this.buildUpdatedComparedWith(player1Id, position, player2Name)
+                    comparedWith: this.buildUpdatedComparedWith(player1Id, position, player2Name),
+                    rd: this.buildUpdatedRd(player1Id, position, changes.player1.newRd),
+                    volatility: this.buildUpdatedVolatility(player1Id, position, changes.player1.newVolatility)
                 }
             },
             {
@@ -360,7 +367,9 @@ class ComparisonService {
                 updates: {
                     ratings: this.buildUpdatedRatings(player2Id, position, changes.player2.newRating),
                     comparisons: this.buildUpdatedComparisons(player2Id, position),
-                    comparedWith: this.buildUpdatedComparedWith(player2Id, position, player1Name)
+                    comparedWith: this.buildUpdatedComparedWith(player2Id, position, player1Name),
+                    rd: this.buildUpdatedRd(player2Id, position, changes.player2.newRd),
+                    volatility: this.buildUpdatedVolatility(player2Id, position, changes.player2.newVolatility)
                 }
             }
         ]);
@@ -390,6 +399,44 @@ class ComparisonService {
         return {
             ...player.comparisons,
             [position]: (player.comparisons[position] || 0) + 1
+        };
+    }
+
+    /**
+     * Build updated rd (Rating Deviation) object
+     * @private
+     */
+    buildUpdatedRd(playerId, position, newRd) {
+        const player = this.playerRepository.getById(playerId);
+        return {
+            ...(player.rd || {}),
+            [position]: newRd
+        };
+    }
+
+    /**
+     * Build updated volatility object
+     * @private
+     */
+    buildUpdatedVolatility(playerId, position, newVolatility) {
+        const player = this.playerRepository.getById(playerId);
+        return {
+            ...(player.volatility || {}),
+            [position]: newVolatility
+        };
+    }
+
+    /**
+     * Build updated winsAgainst object (tracks who this player has beaten)
+     * @private
+     */
+    buildUpdatedWinsAgainst(playerId, position, loserName) {
+        const player = this.playerRepository.getById(playerId);
+        const currentWins = player.winsAgainst?.[position] || [];
+
+        return {
+            ...(player.winsAgainst || {}),
+            [position]: [...new Set([...currentWins, loserName])]
         };
     }
 
@@ -487,7 +534,7 @@ class ComparisonService {
             return;
         }
 
-        // Reset each player's data for this position
+        // Reset each player's data for this position (including Glicko-2 fields)
         const updates = players.map(player => ({
             id: player.id,
             updates: {
@@ -501,6 +548,18 @@ class ComparisonService {
                 },
                 comparedWith: {
                     ...player.comparedWith,
+                    [position]: []
+                },
+                rd: {
+                    ...(player.rd || {}),
+                    [position]: 350
+                },
+                volatility: {
+                    ...(player.volatility || {}),
+                    [position]: 0.06
+                },
+                winsAgainst: {
+                    ...(player.winsAgainst || {}),
                     [position]: []
                 }
             }

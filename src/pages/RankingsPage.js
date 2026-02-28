@@ -10,6 +10,7 @@ import { activities } from '../config/activities/index.js';
 import { getIcon } from '../components/base/Icons.js';
 import uiConfig from '../config/ui.js';
 import { t } from '../core/I18nManager.js';
+import { GLICKO2 } from '../config/rating.js';
 
 const { ELEMENT_IDS } = uiConfig;
 
@@ -137,10 +138,9 @@ class RankingsPage extends BasePage {
         const rating = Math.round(player.positionRating);
         const comparisons = player.positionComparisons;
         const rankLabel = rank === 1 ? '🥇 1st' : rank === 2 ? '🥈 2nd' : rank === 3 ? '🥉 3rd' : `#${rank}`;
-
-        // Determine comparison status
-        const hasComparisons = comparisons > 0;
-        const statusClass = hasComparisons ? 'success' : 'neutral';
+        const rd = player.rd?.[position] ?? GLICKO2.INITIAL_RD;
+        const rdConfidence = this.getRdConfidenceLevel(rd);
+        const rdLabel = t(`compare.confidence.${rdConfidence}`);
 
         return `
             <li class="ranking-item d-flex items-center gap-3 py-3" role="listitem">
@@ -155,11 +155,21 @@ class RankingsPage extends BasePage {
                     <div class="ranking-stats text-sm text-secondary d-flex items-center gap-2" aria-label="Player statistics">
                         <span aria-label="ELO rating">${rating} ELO</span>
                         <span aria-hidden="true"> • </span>
+                        <span class="rd-badge rd-badge--${rdConfidence}" title="RD: ${Math.round(rd)}">${rdLabel}</span>
+                        <span aria-hidden="true"> • </span>
                         <span aria-label="Number of comparisons">${comparisons} ${t('common.comparisonsShort')}</span>
                     </div>
                 </div>
             </li>
         `;
+    }
+
+    getRdConfidenceLevel(rd) {
+        const thresholds = GLICKO2.CONFIDENCE;
+        if (rd <= thresholds.HIGH) return 'high';
+        if (rd <= thresholds.MEDIUM) return 'medium';
+        if (rd <= thresholds.LOW) return 'low';
+        return 'very-low';
     }
 }
 

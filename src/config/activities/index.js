@@ -45,7 +45,7 @@ import team7 from './team-7.js';
 import team8 from './team-8.js';
 
 /**
- * Activity file mappings (kept for reference and backwards compatibility)
+ * Activity file mappings - used by StateManager for migration
  *
  * To add a new activity:
  * 1. Create a config file in src/config/activities/ (e.g., tennis.js)
@@ -171,29 +171,6 @@ const ACTIVITY_CONFIGS = {
 };
 
 /**
- * Load an activity configuration
- * @param {string} activityName - Name of the activity (e.g., 'volleyball')
- * @returns {Promise<Object>} Activity configuration
- */
-async function loadActivity(activityName) {
-    const config = ACTIVITY_CONFIGS[activityName];
-    if (!config) {
-        throw new Error(
-            `Activity '${activityName}' not found. Available: ${Object.keys(ACTIVITY_CONFIGS).join(', ')}`
-        );
-    }
-    return config;
-}
-
-/**
- * Load all activities at once
- * @returns {Promise<Object>} Object with all activity configurations
- */
-async function loadAllActivities() {
-    return { ...ACTIVITY_CONFIGS };
-}
-
-/**
  * Get activity config by name (synchronous version)
  * @param {string} activityName - Name of the activity
  * @returns {Object} Activity configuration
@@ -225,13 +202,10 @@ export async function initializeActivities(selectedActivity = null) {
     return activities;
 }
 
-// Named exports for async loading (maintained for backwards compatibility)
-export { loadActivity, loadAllActivities, ACTIVITY_FILES };
+export { ACTIVITY_FILES };
 
 export default {
     activities,
     getActivityConfig,
-    loadActivity,
-    loadAllActivities,
     initializeActivities
 };

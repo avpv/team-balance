@@ -15,6 +15,7 @@ class ComparisonArea extends BaseComponent {
         this.progress = props.progress;
         this.currentPair = props.currentPair;
         this.nextPair = props.nextPair;
+        this.violations = props.violations || [];
         this.onComparison = props.onComparison; // Callback for win
         this.onDraw = props.onDraw; // Callback for draw
         this.onSuggestionClick = props.onSuggestionClick; // Callback for suggestion click
@@ -92,6 +93,8 @@ class ComparisonArea extends BaseComponent {
                     </div>
                 </div>
 
+                ${this.renderViolationsWarning()}
+
                 <div class="comparison-cards" role="group" aria-label="${t('compare.title')}">
                     <div id="leftCardContainer"></div>
 
@@ -111,6 +114,30 @@ class ComparisonArea extends BaseComponent {
 
                     <div id="rightCardContainer"></div>
                 </div>
+            </div>
+        `;
+    }
+
+    renderViolationsWarning() {
+        if (!this.violations || this.violations.length === 0) return '';
+
+        const icon = getIcon('alert-triangle', { size: 16, color: COLORS.WARNING });
+        const cycleList = this.violations
+            .slice(0, 3) // Show max 3 violations
+            .map(v => `<li class="violation-cycle">${v.cycle}</li>`)
+            .join('');
+
+        const moreCount = this.violations.length > 3 ? this.violations.length - 3 : 0;
+
+        return `
+            <div class="violations-warning" role="alert">
+                <div class="violations-warning__header">
+                    ${icon}
+                    <span class="violations-warning__title">${t('compare.violations.title', { count: this.violations.length })}</span>
+                </div>
+                <ul class="violations-warning__list">${cycleList}</ul>
+                ${moreCount > 0 ? `<p class="violations-warning__more">${t('compare.violations.andMore', { count: moreCount })}</p>` : ''}
+                <p class="violations-warning__hint">${t('compare.violations.hint')}</p>
             </div>
         `;
     }

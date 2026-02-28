@@ -191,6 +191,22 @@ export default {
             reset: 'Zurücksetzen'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: 'Sicher',
+            medium: 'Mittel',
+            low: 'Unsicher',
+            'very-low': 'Neu',
+            tooltip: 'Ratingabweichung: {{rd}} — niedriger bedeutet zuverlässigeres Rating'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '{{count}} Widersprüche erkannt',
+            andMore: '...und {{count}} weitere',
+            hint: 'Diese zirkulären Vergleiche reduzieren die Rating-Genauigkeit. Erwägen Sie, diese Spieler erneut zu vergleichen.'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}: Mindestens 2 Spieler zum Vergleichen benötigt. Derzeit {{count}} Spieler auf dieser Position.',

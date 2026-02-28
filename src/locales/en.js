@@ -191,6 +191,22 @@ export default {
             reset: 'Reset'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: 'Confident',
+            medium: 'Moderate',
+            low: 'Uncertain',
+            'very-low': 'New',
+            tooltip: 'Rating Deviation: {{rd}} — lower means more confident rating'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '{{count}} contradictions detected',
+            andMore: '...and {{count}} more',
+            hint: 'These circular comparisons reduce rating accuracy. Consider re-comparing these players.'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}: Need at least 2 players for comparison. Currently {{count}} player(s) at this position.',

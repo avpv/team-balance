@@ -9,17 +9,8 @@
  * IMPORTANT: Activity-specific constants (positions, etc.) are in config/activities/
  */
 
-import ratingConfig from '../config/rating.js';
-import validationConfig from '../config/validation.js';
-
 export const APP_VERSION = '4.0.0';
 export const APP_NAME = 'TeamBalance';
-
-// Rating constants - imported from centralized config
-// DEPRECATED: Import directly from config/rating.js instead
-export const DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
-export const MIN_RATING = ratingConfig.RATING_CONSTANTS.MIN;
-export const MAX_RATING = ratingConfig.RATING_CONSTANTS.MAX;
 
 export const ROUTES = {
     HOME: '/',
@@ -66,23 +57,11 @@ export const EVENTS = {
     ROUTE_ERROR: 'route:error'
 };
 
-// DEPRECATED: Import directly from config/validation.js instead
-// Kept for backward compatibility only
-export const VALIDATION = {
-    MAX_NAME_LENGTH: validationConfig.NAME_VALIDATION.MAX_LENGTH,
-    MAX_POSITIONS_PER_PLAYER: validationConfig.POSITION_VALIDATION.MAX_POSITIONS,
-    MIN_PLAYERS_FOR_COMPARISON: validationConfig.COMPARISON_VALIDATION.MIN_PLAYERS,
-    MIN_TEAMS: validationConfig.TEAM_VALIDATION.MIN_TEAMS,
-    MAX_TEAMS: validationConfig.TEAM_VALIDATION.MAX_TEAMS
-};
-
 export default {
     APP_VERSION,
     APP_NAME,
-    DEFAULT_RATING,
     ROUTES,
     STORAGE_KEYS,
     SESSION_KEYS,
-    EVENTS,
-    VALIDATION
+    EVENTS
 };

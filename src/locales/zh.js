@@ -191,6 +191,22 @@ export default {
             reset: '重置'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: '可靠',
+            medium: '一般',
+            low: '不确定',
+            'very-low': '新手',
+            tooltip: '评分偏差: {{rd}} — 越低表示评分越可靠'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '检测到{{count}}个矛盾',
+            andMore: '...还有{{count}}个',
+            hint: '这些循环比较降低了评分准确性。建议重新比较这些玩家。'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}：比较至少需要2名球员。当前该位置有{{count}}名球员。',

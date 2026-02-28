@@ -25,6 +25,7 @@ class ComparePage extends BasePage {
         this.activityKey = props.activityKey; // Key like 'volleyball', 'basketball', etc.
         this.playerService = props.services?.resolve('playerService');
         this.comparisonService = props.services?.resolve('comparisonService');
+        this.transitivityService = props.services?.resolve('transitivityService');
         this.sessionService = props.services?.resolve('sessionService');
         this.eventBus = props.services?.resolve('eventBus');
 
@@ -140,6 +141,11 @@ class ComparePage extends BasePage {
             const positionName = this.activityConfig.positions[this.selectedPosition];
             const suggestion = this.getNextPositionSuggestion();
 
+            // Detect transitivity violations for this position
+            const violations = this.transitivityService
+                ? this.transitivityService.detectViolations(this.selectedPosition)
+                : [];
+
             this.comparisonArea = new ComparisonArea(comparisonAreaContainer, {
                 selectedPosition: this.selectedPosition,
                 positionName,
@@ -148,6 +154,7 @@ class ComparePage extends BasePage {
                 currentPair: this.currentPair,
                 nextPair: status.nextPair,
                 suggestion,
+                violations,
                 onComparison: (winnerId, loserId) => this.handleComparison(winnerId, loserId),
                 onDraw: (p1, p2) => this.handleDraw(p1, p2),
                 onSuggestionClick: (key) => this.handlePositionSelect(key)

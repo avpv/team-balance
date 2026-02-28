@@ -33,6 +33,7 @@ import PlayerService from '../services/PlayerService.js';
 import EloService from '../services/EloService.js';
 import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
+import TransitivityService from '../services/TransitivityService.js';
 import SessionService from '../services/SessionService.js';
 
 /**
@@ -241,6 +242,20 @@ export function createCoreServiceConfig(activityConfig = null) {
         },
 
         /**
+         * Transitivity Service - Contradiction detection
+         * Singleton: Stateless service
+         * Dependencies: playerRepository
+         *
+         * Purpose: Detect circular comparison contradictions (A>B>C>A)
+         */
+        transitivityService: {
+            implementation: TransitivityService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['playerRepository'],
+            factory: (deps) => new TransitivityService(deps.playerRepository)
+        },
+
+        /**
          * Team Optimizer Service - Team generation
          * Singleton: Stateless service
          * Dependencies: activityConfig (optional), eloService
@@ -258,23 +273,6 @@ export function createCoreServiceConfig(activityConfig = null) {
         }
     };
 }
-
-/**
- * Full service configuration factory
- * Note: Now delegates to createCoreServiceConfig which handles all services
- *
- * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
- * @returns {Object} Service configuration
- * @deprecated Use createCoreServiceConfig directly
- */
-export function createServiceConfig(activityConfig) {
-    // Delegate to core config which now handles all services
-    return createCoreServiceConfig(activityConfig);
-}
-
-// Backwards compatibility: export serviceConfig as empty object
-// Applications should now call createServiceConfig(activityConfig)
-export const serviceConfig = {};
 
 /**
  * Initialize service registry
@@ -314,9 +312,7 @@ export function getServiceGraph(registry) {
 }
 
 export default {
-    serviceConfig,
     createCoreServiceConfig,
-    createServiceConfig,
     initializeServices,
     getServiceGraph
 };
