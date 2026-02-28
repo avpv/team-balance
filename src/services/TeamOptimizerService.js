@@ -19,10 +19,6 @@ class TeamOptimizerServiceWrapper {
         // No custom evaluation needed - EvaluationService uses the same player.ratings[position] data
         this.optimizer = activityConfig ? new LibraryTeamOptimizer(activityConfig) : null;
 
-        // Expose positions for backward compatibility
-        this.positions = activityConfig?.positions || {};
-        this.positionOrder = activityConfig?.positionOrder || [];
-
         // Expose config for external access
         this.config = this.optimizer?.config || null;
         this.algorithmConfigs = this.optimizer?.algorithmConfigs || null;

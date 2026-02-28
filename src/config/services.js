@@ -275,23 +275,6 @@ export function createCoreServiceConfig(activityConfig = null) {
 }
 
 /**
- * Full service configuration factory
- * Note: Now delegates to createCoreServiceConfig which handles all services
- *
- * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
- * @returns {Object} Service configuration
- * @deprecated Use createCoreServiceConfig directly
- */
-export function createServiceConfig(activityConfig) {
-    // Delegate to core config which now handles all services
-    return createCoreServiceConfig(activityConfig);
-}
-
-// Backwards compatibility: export serviceConfig as empty object
-// Applications should now call createServiceConfig(activityConfig)
-export const serviceConfig = {};
-
-/**
  * Initialize service registry
  * Creates and configures the global service registry
  *
@@ -329,9 +312,7 @@ export function getServiceGraph(registry) {
 }
 
 export default {
-    serviceConfig,
     createCoreServiceConfig,
-    createServiceConfig,
     initializeServices,
     getServiceGraph
 };

@@ -26,9 +26,6 @@ class EloService {
         // Pool adjustment settings
         this.POOL_ADJUSTMENT = ratingConfig.POOL_ADJUSTMENT;
 
-        // Uncertainty boost settings (Glicko-inspired)
-        this.UNCERTAINTY_BOOST = ratingConfig.UNCERTAINTY_BOOST;
-
         // Glicko-2 settings
         this.GLICKO2 = ratingConfig.GLICKO2;
 
@@ -176,53 +173,27 @@ class EloService {
     }
 
     /**
-     * Calculate uncertainty-based K-factor multiplier (Glicko-inspired)
-     * Players with fewer comparisons get a higher K-factor, allowing
-     * ratings to spread faster when data is scarce.
-     *
-     * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
-     *
-     * @param {number} comparisons - Number of comparisons completed
-     * @returns {number} Multiplier (>= 1.0)
-     */
-    calculateUncertaintyMultiplier(comparisons) {
-        const boost = this.UNCERTAINTY_BOOST;
-
-        const multiplier = 1 + (boost.INITIAL_MULTIPLIER - 1) *
-            Math.exp(-boost.DECAY_RATE * comparisons);
-
-        return Math.min(boost.MAX_MULTIPLIER, multiplier);
-    }
-
-    /**
      * Calculate the effective K-factor combining all adjustments:
      * base K-factor (experience) × RD-based multiplier × pool adjustment
      *
-     * When RD is provided, uses it directly for uncertainty scaling
-     * (replaces the old comparison-count-based uncertainty boost).
-     * RD is the authoritative measure of rating uncertainty from Glicko-2.
+     * Uses Glicko-2 RD for uncertainty scaling:
+     * high RD → higher K-factor (rating should change more when uncertain)
      *
      * @param {number} comparisons - Number of comparisons completed
      * @param {number} rating - Current rating
      * @param {number|null} poolSize - Number of players in position pool
-     * @param {number|null} rd - Player's Rating Deviation (if available)
+     * @param {number} rd - Player's Rating Deviation
      * @returns {number} Fully adjusted K-factor
      */
-    calculateEffectiveKFactor(comparisons, rating, poolSize = null, rd = null) {
+    calculateEffectiveKFactor(comparisons, rating, poolSize = null, rd = this.GLICKO2.INITIAL_RD) {
         let k = this.calculateKFactor(comparisons, rating);
 
-        if (rd !== null) {
-            // RD-based uncertainty scaling (preferred, replaces old boost):
-            // RD 350 (new) → multiplier ~2.5x, RD 30 (certain) → multiplier ~1.0x
-            const g2 = this.GLICKO2;
-            const normalizedRd = (rd - g2.MIN_RD) / (g2.MAX_RD - g2.MIN_RD); // 0..1
-            const rdMultiplier = 1 + normalizedRd * 1.5; // 1.0..2.5
-            k = k * rdMultiplier;
-        } else {
-            // Fallback: old comparison-count-based uncertainty boost
-            const uncertaintyMultiplier = this.calculateUncertaintyMultiplier(comparisons);
-            k = k * uncertaintyMultiplier;
-        }
+        // RD-based uncertainty scaling:
+        // RD 350 (new) → multiplier ~2.5x, RD 30 (certain) → multiplier ~1.0x
+        const g2 = this.GLICKO2;
+        const normalizedRd = (rd - g2.MIN_RD) / (g2.MAX_RD - g2.MIN_RD);
+        const rdMultiplier = 1 + normalizedRd * 1.5;
+        k = k * rdMultiplier;
 
         // Apply pool-size adjustment
         if (poolSize && poolSize > 1) {
@@ -506,8 +477,6 @@ class EloService {
         const loserChange = symmetricK * (0 - loserExpected);
 
         // Calculate Glicko-2 RD and volatility updates
-        const winnerRd = winner.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
-        const loserRd = loser.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
         const winnerVol = winner.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
         const loserVol = loser.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
 
@@ -897,11 +866,8 @@ class EloService {
         // Calculate base K-factor
         const baseK = this.calculateKFactor(comparisons, rating);
 
-        // Calculate effective K-factor (with uncertainty boost + pool adjustment)
-        const adjustedK = this.calculateEffectiveKFactor(comparisons, rating, poolSize);
-
-        // Calculate uncertainty multiplier for display
-        const uncertaintyMultiplier = this.calculateUncertaintyMultiplier(comparisons);
+        // Calculate effective K-factor with RD-based scaling + pool adjustment
+        const adjustedK = this.calculateEffectiveKFactor(comparisons, rating, poolSize, rd);
 
         // Calculate percentile
         const percentileInfo = this.calculatePercentile(player, position, allPlayersInPosition);
@@ -924,7 +890,6 @@ class EloService {
             ratingInterval,
             baseKFactor: baseK,
             adjustedKFactor: adjustedK,
-            uncertaintyMultiplier: Math.round(uncertaintyMultiplier * 100) / 100,
             percentile: percentileInfo.percentile,
             rank: percentileInfo.rank,
             confidence: confidenceInfo.confidence,
