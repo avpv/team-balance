@@ -26,6 +26,9 @@ class EloService {
         // Pool adjustment settings
         this.POOL_ADJUSTMENT = ratingConfig.POOL_ADJUSTMENT;
 
+        // Uncertainty boost settings (Glicko-inspired)
+        this.UNCERTAINTY_BOOST = ratingConfig.UNCERTAINTY_BOOST;
+
         // Balance thresholds
         this.BALANCE_THRESHOLDS = ratingConfig.BALANCE_THRESHOLDS;
 
@@ -108,6 +111,49 @@ class EloService {
     }
 
     /**
+     * Calculate uncertainty-based K-factor multiplier (Glicko-inspired)
+     * Players with fewer comparisons get a higher K-factor, allowing
+     * ratings to spread faster when data is scarce.
+     *
+     * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
+     *
+     * @param {number} comparisons - Number of comparisons completed
+     * @returns {number} Multiplier (>= 1.0)
+     */
+    calculateUncertaintyMultiplier(comparisons) {
+        const boost = this.UNCERTAINTY_BOOST;
+
+        const multiplier = 1 + (boost.INITIAL_MULTIPLIER - 1) *
+            Math.exp(-boost.DECAY_RATE * comparisons);
+
+        return Math.min(boost.MAX_MULTIPLIER, multiplier);
+    }
+
+    /**
+     * Calculate the effective K-factor combining all adjustments:
+     * base K-factor (experience) × uncertainty multiplier × pool adjustment
+     *
+     * @param {number} comparisons - Number of comparisons completed
+     * @param {number} rating - Current rating
+     * @param {number|null} poolSize - Number of players in position pool
+     * @returns {number} Fully adjusted K-factor
+     */
+    calculateEffectiveKFactor(comparisons, rating, poolSize = null) {
+        let k = this.calculateKFactor(comparisons, rating);
+
+        // Apply uncertainty boost for few comparisons
+        const uncertaintyMultiplier = this.calculateUncertaintyMultiplier(comparisons);
+        k = k * uncertaintyMultiplier;
+
+        // Apply pool-size adjustment
+        if (poolSize && poolSize > 1) {
+            k = this.calculatePoolAdjustedKFactor(k, poolSize);
+        }
+
+        return Math.round(k);
+    }
+
+    /**
      * Calculate rating changes for a position
      *
      * @param {Object} winner - Winner player object
@@ -138,18 +184,14 @@ class EloService {
         const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
         const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
 
-        // Calculate base K-factors
+        // Calculate base K-factors (experience level only)
         const winnerBaseK = this.calculateKFactor(winnerComparisons, winnerRating);
         const loserBaseK = this.calculateKFactor(loserComparisons, loserRating);
 
-        // Apply pool-size adjustment if poolSize is provided
-        let winnerK = winnerBaseK;
-        let loserK = loserBaseK;
-
-        if (poolSize && poolSize > 1) {
-            winnerK = this.calculatePoolAdjustedKFactor(winnerBaseK, poolSize);
-            loserK = this.calculatePoolAdjustedKFactor(loserBaseK, poolSize);
-        }
+        // Calculate effective K-factors with all adjustments
+        // (uncertainty boost + pool-size adjustment)
+        const winnerK = this.calculateEffectiveKFactor(winnerComparisons, winnerRating, poolSize);
+        const loserK = this.calculateEffectiveKFactor(loserComparisons, loserRating, poolSize);
 
         const winnerChange = winnerK * (1 - winnerExpected);
         const loserChange = loserK * (0 - loserExpected);
@@ -208,18 +250,14 @@ class EloService {
         const player1Expected = this.calculateExpectedScore(player1Rating, player2Rating);
         const player2Expected = this.calculateExpectedScore(player2Rating, player1Rating);
 
-        // Calculate base K-factors
+        // Calculate base K-factors (experience level only)
         const player1BaseK = this.calculateKFactor(player1Comparisons, player1Rating);
         const player2BaseK = this.calculateKFactor(player2Comparisons, player2Rating);
 
-        // Apply pool-size adjustment if poolSize is provided
-        let player1K = player1BaseK;
-        let player2K = player2BaseK;
-
-        if (poolSize && poolSize > 1) {
-            player1K = this.calculatePoolAdjustedKFactor(player1BaseK, poolSize);
-            player2K = this.calculatePoolAdjustedKFactor(player2BaseK, poolSize);
-        }
+        // Calculate effective K-factors with all adjustments
+        // (uncertainty boost + pool-size adjustment)
+        const player1K = this.calculateEffectiveKFactor(player1Comparisons, player1Rating, poolSize);
+        const player2K = this.calculateEffectiveKFactor(player2Comparisons, player2Rating, poolSize);
 
         // In a Win-Win, both players score 0.5
         const player1Change = player1K * (0.5 - player1Expected);
@@ -494,8 +532,11 @@ class EloService {
         // Calculate base K-factor
         const baseK = this.calculateKFactor(comparisons, rating);
 
-        // Calculate pool-adjusted K-factor
-        const adjustedK = this.calculatePoolAdjustedKFactor(baseK, poolSize);
+        // Calculate effective K-factor (with uncertainty boost + pool adjustment)
+        const adjustedK = this.calculateEffectiveKFactor(comparisons, rating, poolSize);
+
+        // Calculate uncertainty multiplier for display
+        const uncertaintyMultiplier = this.calculateUncertaintyMultiplier(comparisons);
 
         // Calculate percentile
         const percentileInfo = this.calculatePercentile(player, position, allPlayersInPosition);
@@ -510,6 +551,7 @@ class EloService {
             poolSize,
             baseKFactor: baseK,
             adjustedKFactor: adjustedK,
+            uncertaintyMultiplier: Math.round(uncertaintyMultiplier * 100) / 100,
             percentile: percentileInfo.percentile,
             rank: percentileInfo.rank,
             confidence: confidenceInfo.confidence,

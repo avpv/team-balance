@@ -64,6 +64,33 @@ export const K_FACTORS = {
 };
 
 /**
+ * Uncertainty Multiplier Configuration (Glicko-inspired)
+ * Boosts K-factor when few comparisons have been made,
+ * allowing ratings to spread faster with limited data.
+ *
+ * Formula: multiplier = 1 + (INITIAL - 1) * exp(-DECAY_RATE * comparisons)
+ *
+ * With defaults (INITIAL=2.5, DECAY_RATE=0.4):
+ *   0 comparisons → K × 2.5
+ *   1 comparison  → K × 2.01
+ *   2 comparisons → K × 1.67
+ *   3 comparisons → K × 1.45
+ *   5 comparisons → K × 1.20
+ *   8 comparisons → K × 1.06
+ *   10+ comparisons → K × ~1.0 (standard ELO)
+ */
+export const UNCERTAINTY_BOOST = {
+    /** Initial multiplier for players with zero comparisons */
+    INITIAL_MULTIPLIER: 2.5,
+
+    /** Decay rate: higher = faster convergence to standard K */
+    DECAY_RATE: 0.4,
+
+    /** Maximum multiplier cap (safety bound) */
+    MAX_MULTIPLIER: 3.0
+};
+
+/**
  * Pool Adjustment Configuration
  * Adjusts K-factors based on position pool size for fairness
  */
@@ -143,6 +170,7 @@ export const PERCENTILE_CONFIG = {
 export default {
     RATING_CONSTANTS,
     K_FACTORS,
+    UNCERTAINTY_BOOST,
     POOL_ADJUSTMENT,
     BALANCE_THRESHOLDS,
     CONFIDENCE_LEVELS,
