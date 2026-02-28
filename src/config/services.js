@@ -33,6 +33,7 @@ import PlayerService from '../services/PlayerService.js';
 import EloService from '../services/EloService.js';
 import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
+import TransitivityService from '../services/TransitivityService.js';
 import SessionService from '../services/SessionService.js';
 
 /**
@@ -238,6 +239,20 @@ export function createCoreServiceConfig(activityConfig = null) {
                 deps.eloService,
                 deps.eventBus
             )
+        },
+
+        /**
+         * Transitivity Service - Contradiction detection
+         * Singleton: Stateless service
+         * Dependencies: playerRepository
+         *
+         * Purpose: Detect circular comparison contradictions (A>B>C>A)
+         */
+        transitivityService: {
+            implementation: TransitivityService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['playerRepository'],
+            factory: (deps) => new TransitivityService(deps.playerRepository)
         },
 
         /**

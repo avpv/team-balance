@@ -191,6 +191,22 @@ export default {
             reset: 'リセット'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: '確実',
+            medium: '普通',
+            low: '不確実',
+            'very-low': '新規',
+            tooltip: 'レーティング偏差: {{rd}} — 低いほど信頼性の高いレーティング'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '{{count}}件の矛盾を検出',
+            andMore: '...他{{count}}件',
+            hint: 'これらの循環比較はレーティングの精度を下げます。これらのプレイヤーを再比較することを検討してください。'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}：比較には少なくとも2人のプレイヤーが必要です。現在このポジションには{{count}}人のプレイヤーがいます。',

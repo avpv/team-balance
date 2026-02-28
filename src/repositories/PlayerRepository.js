@@ -1,6 +1,6 @@
 // src/repositories/PlayerRepository.js
 
-import ratingConfig from '../config/rating.js';
+import ratingConfig, { GLICKO2 } from '../config/rating.js';
 
 /**
  * PlayerRepository - Data Access Layer for Player entities
@@ -309,19 +309,25 @@ class PlayerRepository {
         const updatedRatings = { ...player.ratings };
         const updatedComparisons = { ...player.comparisons };
         const updatedComparedWith = { ...player.comparedWith };
+        const updatedRd = { ...(player.rd || {}) };
+        const updatedVolatility = { ...(player.volatility || {}) };
 
         positions.forEach(pos => {
             if (updatedRatings[pos] !== undefined) {
                 updatedRatings[pos] = defaultRating;
                 updatedComparisons[pos] = 0;
                 updatedComparedWith[pos] = [];
+                updatedRd[pos] = GLICKO2.INITIAL_RD;
+                updatedVolatility[pos] = GLICKO2.INITIAL_VOLATILITY;
             }
         });
 
         return this.update(playerId, {
             ratings: updatedRatings,
             comparisons: updatedComparisons,
-            comparedWith: updatedComparedWith
+            comparedWith: updatedComparedWith,
+            rd: updatedRd,
+            volatility: updatedVolatility
         });
     }
 
@@ -338,12 +344,16 @@ class PlayerRepository {
             const updatedRatings = { ...player.ratings };
             const updatedComparisons = { ...player.comparisons };
             const updatedComparedWith = { ...player.comparedWith };
+            const updatedRd = { ...(player.rd || {}) };
+            const updatedVolatility = { ...(player.volatility || {}) };
 
             positions.forEach(pos => {
                 if (updatedRatings[pos] !== undefined) {
                     updatedRatings[pos] = defaultRating;
                     updatedComparisons[pos] = 0;
                     updatedComparedWith[pos] = [];
+                    updatedRd[pos] = GLICKO2.INITIAL_RD;
+                    updatedVolatility[pos] = GLICKO2.INITIAL_VOLATILITY;
                 }
             });
 
@@ -352,7 +362,9 @@ class PlayerRepository {
                 updates: {
                     ratings: updatedRatings,
                     comparisons: updatedComparisons,
-                    comparedWith: updatedComparedWith
+                    comparedWith: updatedComparedWith,
+                    rd: updatedRd,
+                    volatility: updatedVolatility
                 }
             };
         });

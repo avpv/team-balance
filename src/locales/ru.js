@@ -191,6 +191,22 @@ export default {
             reset: 'Сбросить'
         },
 
+        // RD Confidence levels
+        confidence: {
+            high: 'Точный',
+            medium: 'Средний',
+            low: 'Неточный',
+            'very-low': 'Новый',
+            tooltip: 'Отклонение рейтинга: {{rd}} — чем ниже, тем точнее рейтинг'
+        },
+
+        // Transitivity violations
+        violations: {
+            title: '{{count}} противоречий обнаружено',
+            andMore: '...и ещё {{count}}',
+            hint: 'Эти кольцевые сравнения снижают точность рейтинга. Рекомендуется пересравнить этих игроков.'
+        },
+
         // Messages
         messages: {
             insufficientPlayers: '{{position}}: Нужно минимум 2 игрока для сравнения. Сейчас {{count}} игрок(ов) на этой позиции.',

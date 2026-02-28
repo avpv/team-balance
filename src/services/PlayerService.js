@@ -1,6 +1,6 @@
 // src/services/PlayerService.js (Refactored)
 
-import ratingConfig from '../config/rating.js';
+import ratingConfig, { GLICKO2 } from '../config/rating.js';
 import validationConfig from '../config/validation.js';
 
 /**
@@ -88,11 +88,15 @@ class PlayerService {
         const ratings = {};
         const comparisons = {};
         const comparedWith = {};
+        const rd = {};
+        const volatility = {};
 
         positions.forEach(pos => {
             ratings[pos] = this.DEFAULT_RATING;
             comparisons[pos] = 0;
             comparedWith[pos] = [];
+            rd[pos] = GLICKO2.INITIAL_RD;
+            volatility[pos] = GLICKO2.INITIAL_VOLATILITY;
         });
 
         return {
@@ -102,6 +106,8 @@ class PlayerService {
             ratings,
             comparisons,
             comparedWith,
+            rd,
+            volatility,
             createdAt: new Date().toISOString()
         };
     }
@@ -140,11 +146,15 @@ class PlayerService {
         const newRatings = {};
         const newComparisons = {};
         const newComparedWith = {};
+        const newRd = {};
+        const newVolatility = {};
 
         newPositions.forEach(pos => {
             newRatings[pos] = player.ratings[pos] || this.DEFAULT_RATING;
             newComparisons[pos] = player.comparisons[pos] || validationConfig.DEFAULT_VALUES.COMPARISONS;
             newComparedWith[pos] = player.comparedWith[pos] || validationConfig.DEFAULT_VALUES.COMPARED_WITH;
+            newRd[pos] = player.rd?.[pos] ?? GLICKO2.INITIAL_RD;
+            newVolatility[pos] = player.volatility?.[pos] ?? GLICKO2.INITIAL_VOLATILITY;
         });
 
         // Update through repository
@@ -152,7 +162,9 @@ class PlayerService {
             positions: newPositions,
             ratings: newRatings,
             comparisons: newComparisons,
-            comparedWith: newComparedWith
+            comparedWith: newComparedWith,
+            rd: newRd,
+            volatility: newVolatility
         });
     }
 
