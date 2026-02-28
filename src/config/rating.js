@@ -32,12 +32,12 @@ export const RATING_CONSTANTS = {
      * their rating is blended toward DEFAULT for expected score calculation.
      * This reduces order-dependence in sequential ELO processing.
      *
-     * With threshold 10:
+     * With threshold 5:
      *   0 comparisons → uses DEFAULT rating (fully damped)
-     *   5 comparisons → uses 50% of rating deviation from DEFAULT
-     *   10+ comparisons → uses full current rating (no damping)
+     *   2 comparisons → uses 40% of rating deviation from DEFAULT
+     *   5+ comparisons → uses full current rating (no damping)
      */
-    RELIABILITY_THRESHOLD: 10
+    RELIABILITY_THRESHOLD: 5
 };
 
 /**
