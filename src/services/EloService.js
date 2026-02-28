@@ -53,6 +53,26 @@ class EloService {
     }
 
     /**
+     * Get the comparison count at the start of the current round.
+     * A "round" is one complete cycle where each player compares with every
+     * other player at their position exactly once (poolSize - 1 comparisons).
+     *
+     * Within a round, this returns the same base count for all comparisons,
+     * ensuring that a player's K-factor and damped rating stay consistent
+     * regardless of comparison order. This eliminates order-dependent unfairness
+     * where two players with identical results could end up with different ratings.
+     *
+     * @param {number} comparisons - Actual number of comparisons completed
+     * @param {number|null} poolSize - Number of players in the position pool
+     * @returns {number} Round-base comparison count
+     */
+    getRoundBaseComparisons(comparisons, poolSize) {
+        if (!poolSize || poolSize <= 1) return comparisons;
+        const roundSize = poolSize - 1;
+        return Math.floor(comparisons / roundSize) * roundSize;
+    }
+
+    /**
      * Get reliability-damped rating for expected score calculation.
      * Blends the current rating toward DEFAULT based on comparison count.
      * This reduces order-dependence in sequential ELO processing:
@@ -200,24 +220,31 @@ class EloService {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
+        // Use round-based comparison counts for expected score and K-factor calculations.
+        // Within a single round (where each player compares with every other player once),
+        // a player's effective state stays constant regardless of comparison order.
+        // This ensures players with identical results get identical ratings.
+        const winnerRoundComparisons = this.getRoundBaseComparisons(winnerComparisons, poolSize);
+        const loserRoundComparisons = this.getRoundBaseComparisons(loserComparisons, poolSize);
+
         // Use damped ratings for expected score calculation to reduce order-dependence.
         // Players with few comparisons have unreliable ratings; damping blends them
         // toward the default, ensuring that sequential comparison order doesn't
         // unfairly penalize players who happen to be compared earlier.
-        const dampedWinnerRating = this.getDampedRating(winnerRating, winnerComparisons);
-        const dampedLoserRating = this.getDampedRating(loserRating, loserComparisons);
+        const dampedWinnerRating = this.getDampedRating(winnerRating, winnerRoundComparisons);
+        const dampedLoserRating = this.getDampedRating(loserRating, loserRoundComparisons);
 
         const winnerExpected = this.calculateExpectedScore(dampedWinnerRating, dampedLoserRating);
         const loserExpected = this.calculateExpectedScore(dampedLoserRating, dampedWinnerRating);
 
         // Calculate base K-factors (experience level only)
-        const winnerBaseK = this.calculateKFactor(winnerComparisons, winnerRating);
-        const loserBaseK = this.calculateKFactor(loserComparisons, loserRating);
+        const winnerBaseK = this.calculateKFactor(winnerRoundComparisons, winnerRating);
+        const loserBaseK = this.calculateKFactor(loserRoundComparisons, loserRating);
 
         // Calculate effective K-factors with all adjustments
         // (uncertainty boost + pool-size adjustment)
-        const winnerK = this.calculateEffectiveKFactor(winnerComparisons, winnerRating, poolSize);
-        const loserK = this.calculateEffectiveKFactor(loserComparisons, loserRating, poolSize);
+        const winnerK = this.calculateEffectiveKFactor(winnerRoundComparisons, winnerRating, poolSize);
+        const loserK = this.calculateEffectiveKFactor(loserRoundComparisons, loserRating, poolSize);
 
         // Use symmetric K-factor (average) for both players to ensure:
         // 1. ELO conservation (total rating pool stays constant)
@@ -278,21 +305,27 @@ class EloService {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
+        // Use round-based comparison counts for expected score and K-factor calculations.
+        // Within a single round, a player's effective state stays constant regardless
+        // of comparison order, ensuring players with identical results get identical ratings.
+        const player1RoundComparisons = this.getRoundBaseComparisons(player1Comparisons, poolSize);
+        const player2RoundComparisons = this.getRoundBaseComparisons(player2Comparisons, poolSize);
+
         // Use damped ratings for expected score calculation to reduce order-dependence
-        const dampedPlayer1Rating = this.getDampedRating(player1Rating, player1Comparisons);
-        const dampedPlayer2Rating = this.getDampedRating(player2Rating, player2Comparisons);
+        const dampedPlayer1Rating = this.getDampedRating(player1Rating, player1RoundComparisons);
+        const dampedPlayer2Rating = this.getDampedRating(player2Rating, player2RoundComparisons);
 
         const player1Expected = this.calculateExpectedScore(dampedPlayer1Rating, dampedPlayer2Rating);
         const player2Expected = this.calculateExpectedScore(dampedPlayer2Rating, dampedPlayer1Rating);
 
         // Calculate base K-factors (experience level only)
-        const player1BaseK = this.calculateKFactor(player1Comparisons, player1Rating);
-        const player2BaseK = this.calculateKFactor(player2Comparisons, player2Rating);
+        const player1BaseK = this.calculateKFactor(player1RoundComparisons, player1Rating);
+        const player2BaseK = this.calculateKFactor(player2RoundComparisons, player2Rating);
 
         // Calculate effective K-factors with all adjustments
         // (uncertainty boost + pool-size adjustment)
-        const player1K = this.calculateEffectiveKFactor(player1Comparisons, player1Rating, poolSize);
-        const player2K = this.calculateEffectiveKFactor(player2Comparisons, player2Rating, poolSize);
+        const player1K = this.calculateEffectiveKFactor(player1RoundComparisons, player1Rating, poolSize);
+        const player2K = this.calculateEffectiveKFactor(player2RoundComparisons, player2Rating, poolSize);
 
         // Use symmetric K-factor (average) for both players to ensure:
         // 1. ELO conservation (total rating pool stays constant)
