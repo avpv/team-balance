@@ -12,7 +12,7 @@ class PositionSelector extends BaseComponent {
         this.progress = props.progress || {};
         this.selectedPosition = props.selectedPosition || '';
         this.playerService = props.playerService;
-        this.compareMode = props.compareMode || 'pairwise';
+        this.compareMode = props.compareMode || 'ranking';
         this.onSelect = props.onSelect;
         this.onReset = props.onReset;
         this.onResetAll = props.onResetAll;
