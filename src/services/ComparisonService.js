@@ -640,9 +640,9 @@ class ComparisonService {
         // This makes the result completely order-independent.
 
         const poolSize = this.playerRepository.countByPosition(position);
-        const snapshotRating = 1500;
-        const snapshotRd = 350;
-        const snapshotVol = 0.06;
+        const snapshotRating = this.eloService.DEFAULT_RATING;
+        const snapshotRd = this.eloService.GLICKO2.INITIAL_RD;
+        const snapshotVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
 
         // K-factor is identical for all players (same state after reset)
         const effectiveK = this.eloService.calculateEffectiveKFactor(0, snapshotRating, poolSize, snapshotRd);
@@ -752,11 +752,9 @@ class ComparisonService {
         // Apply all rating changes in a single batch
         this.playerRepository.updateMany(updates);
 
-        // Increment session comparison counter
+        // Increment session comparison counter in a single write
         const totalComparisons = winsProcessed + drawsProcessed;
-        for (let i = 0; i < totalComparisons; i++) {
-            this.playerRepository.incrementSessionComparison();
-        }
+        this.playerRepository.incrementSessionComparisonBy(totalComparisons);
 
         const result = {
             position,
