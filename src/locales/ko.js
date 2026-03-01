@@ -240,7 +240,8 @@ export default {
             applyRanking: '랭킹 적용',
             comparisons: '{{count}}개의 비교가 생성됩니다',
             draws: '{{count}}개의 동점',
-            applied: '{{position}} 랭킹이 적용되었습니다! {{count}}개의 비교가 처리되었습니다.'
+            applied: '{{position}} 랭킹이 적용되었습니다! {{count}}개의 비교가 처리되었습니다.',
+            confirmReset: '{{position}}에 이미 {{count}}개의 비교가 있습니다. 랭킹을 적용하면 모두 초기화됩니다. 계속하시겠습니까?'
         },
 
         // Reset Modal

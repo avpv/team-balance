@@ -240,7 +240,8 @@ export default {
             applyRanking: 'Rangliste anwenden',
             comparisons: '{{count}} Vergleiche werden erstellt',
             draws: '{{count}} Gleichstände',
-            applied: '{{position}} Rangliste angewendet! {{count}} Vergleiche verarbeitet.'
+            applied: '{{position}} Rangliste angewendet! {{count}} Vergleiche verarbeitet.',
+            confirmReset: '{{position}} hat bereits {{count}} Vergleiche. Das Anwenden der Rangliste setzt alle zurück. Fortfahren?'
         },
 
         // Reset Modal

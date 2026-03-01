@@ -240,7 +240,8 @@ export default {
             applyRanking: 'Apply Ranking',
             comparisons: '{{count}} comparisons will be created',
             draws: '{{count}} ties',
-            applied: '{{position}} ranking applied! {{count}} comparisons processed.'
+            applied: '{{position}} ranking applied! {{count}} comparisons processed.',
+            confirmReset: '{{position}} already has {{count}} comparisons. Applying ranking will reset them all. Continue?'
         },
 
         // Reset Modal

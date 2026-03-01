@@ -429,12 +429,23 @@ class ComparePage extends BasePage {
     }
 
     handleRankingApply(tiers) {
+        const positionName = this.activityConfig.positions[this.selectedPosition];
+
+        // Warn if there are existing comparisons that will be overwritten
+        const progress = this.comparisonService.getProgress(this.selectedPosition);
+        if (progress.completed > 0) {
+            const confirmed = confirm(t('compare.ranking.confirmReset', {
+                position: positionName,
+                count: progress.completed
+            }));
+            if (!confirmed) return;
+        }
+
         try {
             // Suppress per-comparison re-renders during batch processing
             this._suppressUpdates = true;
             const result = this.comparisonService.processRanking(tiers, this.selectedPosition);
             this._suppressUpdates = false;
-            const positionName = this.activityConfig.positions[this.selectedPosition];
             toast.success(t('compare.ranking.applied', {
                 position: positionName,
                 count: result.totalComparisons

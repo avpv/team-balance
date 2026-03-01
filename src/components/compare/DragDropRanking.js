@@ -257,31 +257,43 @@ class DragDropRanking extends BaseComponent {
     moveItem(fromIndex, toIndex) {
         if (toIndex < 0 || toIndex >= this.orderedIds.length) return;
 
-        // Move the player ID
-        const [movedId] = this.orderedIds.splice(fromIndex, 1);
-        this.orderedIds.splice(toIndex, 0, movedId);
+        // Save adjacency pairs and their tie status before moving
+        const oldAdjacency = new Map();
+        for (let i = 0; i < this.tieWithNext.length; i++) {
+            const pairKey = this.orderedIds[i] + '|' + this.orderedIds[i + 1];
+            oldAdjacency.set(pairKey, this.tieWithNext[i]);
+        }
+        const movedId = this.orderedIds[fromIndex];
 
-        // Adjust tie markers
-        this.adjustTiesAfterMove(fromIndex, toIndex);
+        // Move the player ID
+        const [removed] = this.orderedIds.splice(fromIndex, 1);
+        this.orderedIds.splice(toIndex, 0, removed);
+
+        // Rebuild tie markers preserving ties between non-moved items that remain adjacent
+        this.rebuildTiesAfterMove(oldAdjacency, movedId);
         this.rerender();
     }
 
-    adjustTiesAfterMove(fromIndex, toIndex) {
-        // When an item moves, the tie connections between its old neighbors break
-        // and new ties need to be reevaluated. Simplest approach: clear ties at affected positions.
-        const affected = new Set();
-        // Old position ties
-        if (fromIndex > 0) affected.add(fromIndex - 1);
-        if (fromIndex < this.tieWithNext.length) affected.add(fromIndex);
-        // New position ties
-        if (toIndex > 0) affected.add(toIndex - 1);
-        if (toIndex < this.tieWithNext.length) affected.add(toIndex);
+    rebuildTiesAfterMove(oldAdjacency, movedId) {
+        const newTies = new Array(this.tieWithNext.length).fill(false);
 
-        for (const idx of affected) {
-            if (idx >= 0 && idx < this.tieWithNext.length) {
-                this.tieWithNext[idx] = false;
+        for (let i = 0; i < newTies.length; i++) {
+            const a = this.orderedIds[i];
+            const b = this.orderedIds[i + 1];
+
+            // Ties involving the moved item are always cleared
+            if (a === movedId || b === movedId) {
+                continue;
+            }
+
+            // If this pair was adjacent before, preserve the old tie status
+            const pairKey = a + '|' + b;
+            if (oldAdjacency.has(pairKey)) {
+                newTies[i] = oldAdjacency.get(pairKey);
             }
         }
+
+        this.tieWithNext = newTies;
     }
 
     startDrag(index, event) {

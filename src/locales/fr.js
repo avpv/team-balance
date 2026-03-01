@@ -240,7 +240,8 @@ export default {
             applyRanking: 'Appliquer le classement',
             comparisons: '{{count}} comparaisons seront créées',
             draws: '{{count}} égalités',
-            applied: 'Classement de {{position}} appliqué ! {{count}} comparaisons traitées.'
+            applied: 'Classement de {{position}} appliqué ! {{count}} comparaisons traitées.',
+            confirmReset: '{{position}} a déjà {{count}} comparaisons. Appliquer le classement les réinitialisera toutes. Continuer ?'
         },
 
         // Reset Modal

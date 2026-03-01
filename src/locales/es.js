@@ -240,7 +240,8 @@ export default {
             applyRanking: 'Aplicar clasificación',
             comparisons: '{{count}} comparaciones serán creadas',
             draws: '{{count}} empates',
-            applied: '¡Clasificación de {{position}} aplicada! {{count}} comparaciones procesadas.'
+            applied: '¡Clasificación de {{position}} aplicada! {{count}} comparaciones procesadas.',
+            confirmReset: '{{position}} ya tiene {{count}} comparaciones. Aplicar la clasificación las restablecerá todas. ¿Continuar?'
         },
 
         // Reset Modal

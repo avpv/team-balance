@@ -240,7 +240,8 @@ export default {
             applyRanking: 'Применить рейтинг',
             comparisons: '{{count}} сравнений будет создано',
             draws: '{{count}} ничьих',
-            applied: 'Рейтинг для {{position}} применён! Обработано {{count}} сравнений.'
+            applied: 'Рейтинг для {{position}} применён! Обработано {{count}} сравнений.',
+            confirmReset: '{{position}} уже имеет {{count}} сравнений. Применение рейтинга сбросит их все. Продолжить?'
         },
 
         // Reset Modal

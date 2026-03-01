@@ -592,8 +592,9 @@ class ComparisonService {
     }
 
     /**
-     * Process a full ranking for a position.
-     * Resets the position first, then processes all implied pairwise comparisons.
+     * Process a full ranking for a position using snapshot-based batch calculation.
+     * Resets the position first, then computes all rating changes from the uniform
+     * post-reset state, ensuring the result is completely order-independent.
      *
      * Supports ties: players in the same tier are treated as draws,
      * players in higher tiers beat all players in lower tiers.
@@ -605,13 +606,20 @@ class ComparisonService {
      * @returns {Object} Summary of processed comparisons
      */
     processRanking(tiers, position) {
-        // Validate tiers
         const allIds = tiers.flat();
+
+        // Validate: at least 2 players
         if (allIds.length < 2) {
             throw new Error('Need at least 2 players for ranking');
         }
 
-        // Validate all players exist and play this position
+        // Validate: no duplicate IDs
+        if (new Set(allIds).size !== allIds.length) {
+            throw new Error('Duplicate player IDs in ranking');
+        }
+
+        // Validate all players exist and play this position, build name lookup
+        const playerNameById = new Map();
         for (const id of allIds) {
             const player = this.playerRepository.getById(id);
             if (!player) {
@@ -620,39 +628,139 @@ class ComparisonService {
             if (!player.positions.includes(position)) {
                 throw new Error(`Player ${player.name} does not play ${position}`);
             }
+            playerNameById.set(id, player.name);
         }
 
-        // Reset position to start fresh
+        // Reset position to start fresh (all players → 1500, RD=350, vol=0.06, comparisons=0)
         this.resetPosition(position);
+
+        // --- Snapshot-based batch calculation ---
+        // After reset all players have identical state, so expected scores = 0.5,
+        // K-factors are identical, and rating changes are purely additive.
+        // This makes the result completely order-independent.
+
+        const poolSize = this.playerRepository.countByPosition(position);
+        const snapshotRating = 1500;
+        const snapshotRd = 350;
+        const snapshotVol = 0.06;
+
+        // K-factor is identical for all players (same state after reset)
+        const effectiveK = this.eloService.calculateEffectiveKFactor(0, snapshotRating, poolSize, snapshotRd);
+        const halfK = effectiveK / 2;
+
+        // Count wins, losses, draws for each player
+        const playerResults = new Map();
+        for (const id of allIds) {
+            playerResults.set(id, { wins: 0, losses: 0, draws: 0, opponentIds: new Set(), wonAgainstIds: new Set() });
+        }
 
         let winsProcessed = 0;
         let drawsProcessed = 0;
 
-        // Process within-tier draws
+        // Within-tier draws
         for (const tier of tiers) {
             for (let i = 0; i < tier.length; i++) {
                 for (let j = i + 1; j < tier.length; j++) {
-                    this.processDraw(tier[i], tier[j], position);
+                    const r1 = playerResults.get(tier[i]);
+                    const r2 = playerResults.get(tier[j]);
+                    r1.draws++;
+                    r2.draws++;
+                    r1.opponentIds.add(tier[j]);
+                    r2.opponentIds.add(tier[i]);
                     drawsProcessed++;
                 }
             }
         }
 
-        // Process cross-tier wins (higher tier beats lower tier)
+        // Cross-tier wins (higher tier beats lower tier)
         for (let t1 = 0; t1 < tiers.length; t1++) {
             for (let t2 = t1 + 1; t2 < tiers.length; t2++) {
                 for (const winnerId of tiers[t1]) {
                     for (const loserId of tiers[t2]) {
-                        this.processComparison(winnerId, loserId, position);
+                        const wr = playerResults.get(winnerId);
+                        const lr = playerResults.get(loserId);
+                        wr.wins++;
+                        lr.losses++;
+                        wr.opponentIds.add(loserId);
+                        lr.opponentIds.add(winnerId);
+                        wr.wonAgainstIds.add(loserId);
                         winsProcessed++;
                     }
                 }
             }
         }
 
+        // Compute Glicko-2 batch update constants (all opponents have same state)
+        const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
+        const phiJ = phi;
+        const mu = this.eloService.toGlicko2Scale(snapshotRating);
+        const gPhiJ = this.eloService.g(phiJ);
+        const eMuJ = this.eloService.E(mu, mu, phiJ); // 0.5 since μ = μj
+        const g2 = this.eloService.GLICKO2;
+
+        // Re-read players after reset for correct current state (preserves other positions)
+        const freshPlayers = new Map();
+        for (const id of allIds) {
+            freshPlayers.set(id, this.playerRepository.getById(id));
+        }
+
+        // Build batch updates
+        const updates = [];
+        for (const id of allIds) {
+            const res = playerResults.get(id);
+            const player = freshPlayers.get(id);
+            const totalComparisons = res.wins + res.losses + res.draws;
+
+            // Rating: purely additive from snapshot (wins-losses)*K/2
+            const newRating = snapshotRating + (res.wins - res.losses) * halfK;
+
+            // Glicko-2 multi-opponent batch update
+            // v = 1 / (n * g(φj)² * E * (1-E))
+            const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
+            // Δ = v * g(φj) * Σ(sj - E) = v * g(φj) * (wins - losses) / 2
+            const delta = v * gPhiJ * ((res.wins - res.losses) / 2);
+
+            // New volatility
+            let newSigma = this.eloService.calculateNewVolatility(snapshotVol, phi, v, delta);
+            newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
+
+            // New RD: φ* = sqrt(φ² + σ'²), φ' = 1/sqrt(1/φ*² + 1/v)
+            const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
+            const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
+            let newRd = this.eloService.rdFromGlicko2Scale(newPhi);
+            newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
+            newRd = Math.round(newRd * 10) / 10;
+            newSigma = Math.round(newSigma * 10000) / 10000;
+
+            // Build comparedWith and winsAgainst lists
+            const comparedWithNames = [...res.opponentIds].map(oid => playerNameById.get(oid));
+            const winsAgainstNames = [...res.wonAgainstIds].map(oid => playerNameById.get(oid));
+
+            updates.push({
+                id,
+                updates: {
+                    ratings: { ...player.ratings, [position]: newRating },
+                    comparisons: { ...player.comparisons, [position]: totalComparisons },
+                    comparedWith: { ...player.comparedWith, [position]: comparedWithNames },
+                    winsAgainst: { ...(player.winsAgainst || {}), [position]: winsAgainstNames },
+                    rd: { ...(player.rd || {}), [position]: newRd },
+                    volatility: { ...(player.volatility || {}), [position]: newSigma }
+                }
+            });
+        }
+
+        // Apply all rating changes in a single batch
+        this.playerRepository.updateMany(updates);
+
+        // Increment session comparison counter
+        const totalComparisons = winsProcessed + drawsProcessed;
+        for (let i = 0; i < totalComparisons; i++) {
+            this.playerRepository.incrementSessionComparison();
+        }
+
         const result = {
             position,
-            totalComparisons: winsProcessed + drawsProcessed,
+            totalComparisons,
             winsProcessed,
             drawsProcessed,
             tiersCount: tiers.length,
