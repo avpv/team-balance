@@ -535,12 +535,16 @@ class ComparisonService {
         }
 
         // Reset each player's data for this position (including Glicko-2 fields)
+        const defaultRating = this.eloService.DEFAULT_RATING;
+        const initialRd = this.eloService.GLICKO2.INITIAL_RD;
+        const initialVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
+
         const updates = players.map(player => ({
             id: player.id,
             updates: {
                 ratings: {
                     ...player.ratings,
-                    [position]: 1500
+                    [position]: defaultRating
                 },
                 comparisons: {
                     ...player.comparisons,
@@ -552,11 +556,11 @@ class ComparisonService {
                 },
                 rd: {
                     ...(player.rd || {}),
-                    [position]: 350
+                    [position]: initialRd
                 },
                 volatility: {
                     ...(player.volatility || {}),
-                    [position]: 0.06
+                    [position]: initialVol
                 },
                 winsAgainst: {
                     ...(player.winsAgainst || {}),
