@@ -37,27 +37,27 @@ class PositionSelector extends BaseComponent {
                                     </div>
                                 ` : ''}
                             </div>
-                        </div>
-                        <div class="position-selector__header-actions">
-                            <div class="compare-mode-toggle" role="radiogroup" aria-label="${t('compare.modeToggle.label')}">
-                                <button class="compare-mode-btn ${this.compareMode === 'pairwise' ? 'compare-mode-btn--active' : ''}"
-                                        data-mode="pairwise"
-                                        role="radio"
-                                        aria-checked="${this.compareMode === 'pairwise'}"
-                                        title="${t('compare.modeToggle.pairwiseHint')}">
-                                    ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
-                                    ${t('compare.modeToggle.pairwise')}
-                                </button>
-                                <button class="compare-mode-btn ${this.compareMode === 'ranking' ? 'compare-mode-btn--active' : ''}"
-                                        data-mode="ranking"
-                                        role="radio"
-                                        aria-checked="${this.compareMode === 'ranking'}"
-                                        title="${t('compare.modeToggle.rankingHint')}">
-                                    ${getIcon('list-ordered', { size: 14, className: 'btn-icon' })}
-                                    ${t('compare.modeToggle.ranking')}
-                                </button>
+                            <div class="position-selector__mode-section">
+                                <p class="position-selector__mode-label">${t('compare.modeToggle.label')}</p>
+                                <div class="compare-mode-toggle" role="radiogroup" aria-label="${t('compare.modeToggle.label')}">
+                                    <button class="compare-mode-btn ${this.compareMode === 'pairwise' ? 'compare-mode-btn--active' : ''}"
+                                            data-mode="pairwise"
+                                            role="radio"
+                                            aria-checked="${this.compareMode === 'pairwise'}"
+                                            title="${t('compare.modeToggle.pairwiseHint')}">
+                                        ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
+                                        ${t('compare.modeToggle.pairwise')}
+                                    </button>
+                                    <button class="compare-mode-btn ${this.compareMode === 'ranking' ? 'compare-mode-btn--active' : ''}"
+                                            data-mode="ranking"
+                                            role="radio"
+                                            aria-checked="${this.compareMode === 'ranking'}"
+                                            title="${t('compare.modeToggle.rankingHint')}">
+                                        ${getIcon('list-ordered', { size: 14, className: 'btn-icon' })}
+                                        ${t('compare.modeToggle.ranking')}
+                                    </button>
+                                </div>
                             </div>
-                            <p class="position-selector__instruction">${t('compare.modeToggle.label')}</p>
                         </div>
                     </div>
                 </div>
