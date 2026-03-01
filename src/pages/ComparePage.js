@@ -321,8 +321,13 @@ class ComparePage extends BasePage {
             }
         }
 
-        // Scroll to comparison area if there are pairs to compare
-        if (this.currentPair) {
+        // Scroll to comparison area
+        if (this.compareMode === 'ranking') {
+            const players = this.playerService.getByPosition(this.selectedPosition);
+            if (players.length >= 2) {
+                this.scrollToComparisonArea();
+            }
+        } else if (this.currentPair) {
             this.scrollToComparisonArea();
         }
     }
@@ -364,7 +369,7 @@ class ComparePage extends BasePage {
     scrollToComparisonArea() {
         // Wait for DOM to update after this.update()
         setTimeout(() => {
-            const comparisonArea = this.$('.comparison-area');
+            const comparisonArea = this.$('.comparison-area') || this.$('.ranking-area');
             if (comparisonArea) {
                 comparisonArea.scrollIntoView({
                     behavior: 'smooth',
