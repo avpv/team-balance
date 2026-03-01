@@ -33,7 +33,7 @@ class ComparePage extends BasePage {
         this.selectedPosition = '';
         this.currentPair = null;
         this.sidebar = null;
-        this.compareMode = 'pairwise'; // 'pairwise' or 'ranking'
+        this.compareMode = 'ranking'; // 'pairwise' or 'ranking'
 
         this.positionSelector = null;
         this.comparisonArea = null;
@@ -459,8 +459,8 @@ class ComparePage extends BasePage {
                 draws: result.drawsProcessed
             });
 
-            // Switch back to pairwise to show the completed state
-            this.compareMode = 'pairwise';
+            // Switch back to ranking to show the completed state
+            this.compareMode = 'ranking';
             this.loadNextPair();
             this.update();
         } catch (error) {
@@ -470,7 +470,7 @@ class ComparePage extends BasePage {
     }
 
     handleRankingCancel() {
-        this.compareMode = 'pairwise';
+        this.compareMode = 'ranking';
         this.update();
     }
 

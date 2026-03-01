@@ -12,7 +12,7 @@ class PositionSelector extends BaseComponent {
         this.progress = props.progress || {};
         this.selectedPosition = props.selectedPosition || '';
         this.playerService = props.playerService;
-        this.compareMode = props.compareMode || 'pairwise';
+        this.compareMode = props.compareMode || 'ranking';
         this.onSelect = props.onSelect;
         this.onReset = props.onReset;
         this.onResetAll = props.onResetAll;
@@ -30,12 +30,6 @@ class PositionSelector extends BaseComponent {
                                 <p class="position-selector__instruction">
                                     ${t('compare.positionSelector.pickPosition')}
                                 </p>
-                                ${this.compareMode === 'pairwise' ? `
-                                    <div class="position-selector__shortcuts">
-                                        ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
-                                        <span class="shortcuts__text">${t('compare.positionSelector.quickKeys')} <kbd>A</kbd> ${t('compare.comparison.leftKeyHint').toLowerCase()} • <kbd>D</kbd> ${t('compare.comparison.rightKeyHint').toLowerCase()} • <kbd>W</kbd> ${t('compare.comparison.draw').toLowerCase()}</span>
-                                    </div>
-                                ` : ''}
                             </div>
                             <div class="position-selector__mode-section">
                                 <p class="position-selector__mode-label">${t('compare.modeToggle.label')}</p>
@@ -58,6 +52,12 @@ class PositionSelector extends BaseComponent {
                                     </button>
                                 </div>
                             </div>
+                            ${this.compareMode === 'pairwise' ? `
+                                <div class="position-selector__shortcuts">
+                                    ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
+                                    <span class="shortcuts__text">${t('compare.positionSelector.quickKeys')} <kbd>A</kbd> ${t('compare.comparison.leftKeyHint').toLowerCase()} • <kbd>D</kbd> ${t('compare.comparison.rightKeyHint').toLowerCase()} • <kbd>W</kbd> ${t('compare.comparison.draw').toLowerCase()}</span>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
