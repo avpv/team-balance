@@ -216,6 +216,33 @@ export default {
             resetSuccess: 'Las comparaciones de {{position}} han sido restablecidas'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: 'Modo de comparación',
+            pairwise: 'Por parejas',
+            ranking: 'Clasificación',
+            pairwiseHint: 'Comparar jugadores de dos en dos',
+            rankingHint: 'Arrastra y suelta para clasificar a todos los jugadores a la vez'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'Clasificación arrastrando',
+            orderPlayers: 'Clasificar jugadores de',
+            dragHint: 'Arrastra jugadores para reordenar. Usa ">" para orden estricto y "=" para empates.',
+            playerOrder: 'Orden de jugadores',
+            rank: 'posición',
+            dragToReorder: 'Arrastra para reordenar',
+            moveUp: 'Subir',
+            moveDown: 'Bajar',
+            markEqual: 'Marcar como iguales (empate)',
+            markDifferent: 'Marcar como diferentes (orden estricto)',
+            applyRanking: 'Aplicar clasificación',
+            comparisons: '{{count}} comparaciones serán creadas',
+            draws: '{{count}} empates',
+            applied: '¡Clasificación de {{position}} aplicada! {{count}} comparaciones procesadas.'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'Restablecer Todas las Comparaciones',

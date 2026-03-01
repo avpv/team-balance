@@ -12,6 +12,7 @@ import { t } from '../core/I18nManager.js';
 // Components
 import PositionSelector from '../components/compare/PositionSelector.js';
 import ComparisonArea from '../components/compare/ComparisonArea.js';
+import DragDropRanking from '../components/compare/DragDropRanking.js';
 
 const { ELEMENT_IDS, KEYBOARD_KEYS, MESSAGES, TOAST } = uiConfig;
 
@@ -32,13 +33,18 @@ class ComparePage extends BasePage {
         this.selectedPosition = '';
         this.currentPair = null;
         this.sidebar = null;
+        this.compareMode = 'pairwise'; // 'pairwise' or 'ranking'
 
         this.positionSelector = null;
         this.comparisonArea = null;
+        this.dragDropRanking = null;
     }
 
     onCreate() {
+        this._suppressUpdates = false;
+
         this.on('comparison:completed', () => {
+            if (this._suppressUpdates) return;
             // Load next pair
             if (this.selectedPosition) {
                 this.loadNextPair();
@@ -46,9 +52,9 @@ class ComparePage extends BasePage {
             this.update();
         });
 
-        this.on('player:added', () => this.update());
-        this.on('player:removed', () => this.update());
-        this.on('state:changed', () => this.update());
+        this.on('player:added', () => { if (!this._suppressUpdates) this.update(); });
+        this.on('player:removed', () => { if (!this._suppressUpdates) this.update(); });
+        this.on('state:changed', () => { if (!this._suppressUpdates) this.update(); });
         this.on('session:activated', () => {
             // Reset comparison state when session changes
             this.selectedPosition = '';
@@ -125,17 +131,37 @@ class ComparePage extends BasePage {
                 progress,
                 selectedPosition: this.selectedPosition,
                 playerService: this.playerService,
+                compareMode: this.compareMode,
                 onSelect: (key) => this.handlePositionSelect(key),
                 onReset: (key) => this.handlePositionReset(key),
-                onResetAll: () => this.showResetAllModal()
+                onResetAll: () => this.showResetAllModal(),
+                onModeChange: (mode) => this.handleModeChange(mode)
             });
             this.positionSelector.mount();
             this.addComponent(this.positionSelector);
         }
 
-        // 2. Comparison Area
         const comparisonAreaContainer = this.$('.comparison-area-container');
-        if (comparisonAreaContainer && this.selectedPosition) {
+        if (!comparisonAreaContainer || !this.selectedPosition) return;
+
+        if (this.compareMode === 'ranking') {
+            // 2a. Drag & Drop Ranking mode
+            const players = this.playerService.getByPosition(this.selectedPosition);
+            const positionName = this.activityConfig.positions[this.selectedPosition];
+
+            if (players.length >= 2) {
+                this.dragDropRanking = new DragDropRanking(comparisonAreaContainer, {
+                    position: this.selectedPosition,
+                    positionName,
+                    players,
+                    onApply: (tiers) => this.handleRankingApply(tiers),
+                    onCancel: () => this.handleRankingCancel()
+                });
+                this.dragDropRanking.mount();
+                this.addComponent(this.dragDropRanking);
+            }
+        } else {
+            // 2b. Pairwise Comparison mode
             const status = this.comparisonService.checkStatus(this.selectedPosition);
             const progress = this.comparisonService.getProgress(this.selectedPosition);
             const positionName = this.activityConfig.positions[this.selectedPosition];
@@ -172,6 +198,10 @@ class ComparePage extends BasePage {
         if (this.comparisonArea) {
             this.comparisonArea.destroy();
             this.comparisonArea = null;
+        }
+        if (this.dragDropRanking) {
+            this.dragDropRanking.destroy();
+            this.dragDropRanking = null;
         }
     }
 
@@ -386,6 +416,51 @@ class ComparePage extends BasePage {
         } catch (error) {
             toast.error(error.message);
         }
+    }
+
+    handleModeChange(mode) {
+        this.compareMode = mode;
+        this.update();
+
+        trackEvent('compare_mode_changed', {
+            event_category: 'compare',
+            mode
+        });
+    }
+
+    handleRankingApply(tiers) {
+        try {
+            // Suppress per-comparison re-renders during batch processing
+            this._suppressUpdates = true;
+            const result = this.comparisonService.processRanking(tiers, this.selectedPosition);
+            this._suppressUpdates = false;
+            const positionName = this.activityConfig.positions[this.selectedPosition];
+            toast.success(t('compare.ranking.applied', {
+                position: positionName,
+                count: result.totalComparisons
+            }));
+
+            trackEvent('ranking_applied', {
+                event_category: 'compare',
+                position: this.selectedPosition,
+                players: result.playersCount,
+                comparisons: result.totalComparisons,
+                draws: result.drawsProcessed
+            });
+
+            // Switch back to pairwise to show the completed state
+            this.compareMode = 'pairwise';
+            this.loadNextPair();
+            this.update();
+        } catch (error) {
+            this._suppressUpdates = false;
+            toast.error(error.message);
+        }
+    }
+
+    handleRankingCancel() {
+        this.compareMode = 'pairwise';
+        this.update();
     }
 
     showResetAllModal() {

@@ -216,6 +216,33 @@ export default {
             resetSuccess: 'Les comparaisons de {{position}} ont été réinitialisées'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: 'Mode de comparaison',
+            pairwise: 'Par paires',
+            ranking: 'Classement',
+            pairwiseHint: 'Comparer les joueurs deux par deux',
+            rankingHint: 'Glisser-déposer pour classer tous les joueurs en une fois'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'Classement par glisser-déposer',
+            orderPlayers: 'Classer les joueurs pour',
+            dragHint: 'Faites glisser les joueurs pour réorganiser. Utilisez ">" pour un ordre strict et "=" pour les égalités.',
+            playerOrder: 'Ordre des joueurs',
+            rank: 'rang',
+            dragToReorder: 'Glisser pour réorganiser',
+            moveUp: 'Monter',
+            moveDown: 'Descendre',
+            markEqual: 'Marquer comme égaux (égalité)',
+            markDifferent: 'Marquer comme différents (ordre strict)',
+            applyRanking: 'Appliquer le classement',
+            comparisons: '{{count}} comparaisons seront créées',
+            draws: '{{count}} égalités',
+            applied: 'Classement de {{position}} appliqué ! {{count}} comparaisons traitées.'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'Réinitialiser Toutes les Comparaisons',

@@ -1,0 +1,377 @@
+import BaseComponent from '../BaseComponent.js';
+import { getIcon } from '../base/Icons.js';
+import { generateAvatar } from '../../utils/avatarGenerator.js';
+import { t } from '../../core/I18nManager.js';
+
+class DragDropRanking extends BaseComponent {
+    constructor(container, props = {}) {
+        super(container);
+        this.position = props.position;
+        this.positionName = props.positionName;
+        this.players = props.players || [];
+        this.onApply = props.onApply;
+        this.onCancel = props.onCancel;
+
+        // Ordered list of player IDs (best first, sorted by current ELO)
+        this.orderedIds = [...this.players]
+            .sort((a, b) => (b.ratings[this.position] || 1500) - (a.ratings[this.position] || 1500))
+            .map(p => p.id);
+
+        // Tie markers: tieWithNext[i] = true means player at index i is tied with i+1
+        this.tieWithNext = new Array(Math.max(0, this.orderedIds.length - 1)).fill(false);
+
+        // Drag state
+        this.dragState = null;
+        this.boundPointerMove = this.handlePointerMove.bind(this);
+        this.boundPointerUp = this.handlePointerUp.bind(this);
+    }
+
+    getPlayerById(id) {
+        return this.players.find(p => p.id === id);
+    }
+
+    getTiers() {
+        const tiers = [];
+        let currentTier = [this.orderedIds[0]];
+
+        for (let i = 0; i < this.tieWithNext.length; i++) {
+            if (this.tieWithNext[i]) {
+                currentTier.push(this.orderedIds[i + 1]);
+            } else {
+                tiers.push(currentTier);
+                currentTier = [this.orderedIds[i + 1]];
+            }
+        }
+        tiers.push(currentTier);
+        return tiers;
+    }
+
+    getRankNumber(index) {
+        let rank = 1;
+        for (let i = 0; i < index; i++) {
+            if (!this.tieWithNext[i]) {
+                rank = i + 2;
+            }
+        }
+        return rank;
+    }
+
+    getComparisonSummary() {
+        const tiers = this.getTiers();
+        let wins = 0;
+        let draws = 0;
+
+        for (const tier of tiers) {
+            draws += (tier.length * (tier.length - 1)) / 2;
+        }
+
+        for (let t1 = 0; t1 < tiers.length; t1++) {
+            for (let t2 = t1 + 1; t2 < tiers.length; t2++) {
+                wins += tiers[t1].length * tiers[t2].length;
+            }
+        }
+
+        return { wins, draws, total: wins + draws };
+    }
+
+    render() {
+        if (!this.orderedIds.length) return '';
+
+        const summary = this.getComparisonSummary();
+
+        return `
+            <div class="ranking-area" role="region" aria-label="${t('compare.ranking.title')}">
+                <div class="ranking-header">
+                    <div class="ranking-header__info">
+                        <h3 class="ranking-header__title">${t('compare.ranking.orderPlayers')} <strong>${this.escape(this.positionName)}</strong></h3>
+                        <p class="ranking-header__hint">${t('compare.ranking.dragHint')}</p>
+                    </div>
+                </div>
+
+                <div class="ranking-list" id="rankingList" role="list" aria-label="${t('compare.ranking.playerOrder')}">
+                    ${this.orderedIds.map((id, index) => this.renderItem(id, index)).join('')}
+                </div>
+
+                <div class="ranking-summary">
+                    <div class="ranking-summary__stats">
+                        <span class="ranking-summary__stat">${t('compare.ranking.comparisons', { count: summary.total })}</span>
+                        ${summary.draws > 0 ? `<span class="ranking-summary__stat ranking-summary__stat--draws">${t('compare.ranking.draws', { count: summary.draws })}</span>` : ''}
+                    </div>
+                </div>
+
+                <div class="ranking-actions">
+                    <button class="btn btn-secondary ranking-actions__cancel" id="rankingCancel">
+                        ${t('common.cancel')}
+                    </button>
+                    <button class="btn btn-primary ranking-actions__apply" id="rankingApply">
+                        ${getIcon('check', { size: 16, className: 'btn-icon' })}
+                        ${t('compare.ranking.applyRanking')}
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    renderItem(playerId, index) {
+        const player = this.getPlayerById(playerId);
+        if (!player) return '';
+
+        const rating = Math.round(player.ratings[this.position] || 1500);
+        const rank = this.getRankNumber(index);
+        const avatarSvg = generateAvatar(player.name, 40, rating);
+        const isDragging = this.dragState?.dragIndex === index;
+
+        let tierSeparator = '';
+        if (index < this.orderedIds.length - 1) {
+            const isTied = this.tieWithNext[index];
+            tierSeparator = `
+                <div class="ranking-tier-separator" data-separator-index="${index}">
+                    <button class="ranking-tier-toggle ${isTied ? 'ranking-tier-toggle--tied' : ''}"
+                            data-toggle-index="${index}"
+                            aria-label="${isTied ? t('compare.ranking.markDifferent') : t('compare.ranking.markEqual')}"
+                            title="${isTied ? t('compare.ranking.markDifferent') : t('compare.ranking.markEqual')}">
+                        <span class="ranking-tier-toggle__symbol">${isTied ? '=' : '>'}</span>
+                    </button>
+                    <div class="ranking-tier-separator__line ${isTied ? 'ranking-tier-separator__line--tied' : ''}"></div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="ranking-item ${isDragging ? 'ranking-item--dragging' : ''}"
+                 data-player-id="${playerId}"
+                 data-index="${index}"
+                 role="listitem"
+                 aria-label="${player.name}, ${t('compare.ranking.rank')} ${rank}">
+
+                <div class="ranking-item__rank">${rank}</div>
+
+                <div class="ranking-item__grip" data-grip-index="${index}"
+                     aria-label="${t('compare.ranking.dragToReorder')}"
+                     role="button" tabindex="0">
+                    ${getIcon('grip-vertical', { size: 16 })}
+                </div>
+
+                <div class="ranking-item__avatar">${avatarSvg}</div>
+
+                <div class="ranking-item__info">
+                    <span class="ranking-item__name">${this.escape(player.name)}</span>
+                    <span class="ranking-item__rating">${rating} ELO</span>
+                </div>
+
+                <div class="ranking-item__arrows">
+                    <button class="ranking-item__arrow-btn" data-move-up="${index}"
+                            ${index === 0 ? 'disabled' : ''}
+                            aria-label="${t('compare.ranking.moveUp')}" title="${t('compare.ranking.moveUp')}">
+                        ${getIcon('chevron-up', { size: 14 })}
+                    </button>
+                    <button class="ranking-item__arrow-btn" data-move-down="${index}"
+                            ${index === this.orderedIds.length - 1 ? 'disabled' : ''}
+                            aria-label="${t('compare.ranking.moveDown')}" title="${t('compare.ranking.moveDown')}">
+                        ${getIcon('chevron-down', { size: 14 })}
+                    </button>
+                </div>
+            </div>
+            ${tierSeparator}
+        `;
+    }
+
+    onMount() {
+        // Apply button
+        const applyBtn = this.$('#rankingApply');
+        if (applyBtn) {
+            this.addEventListener(applyBtn, 'click', () => {
+                if (this.onApply) {
+                    this.onApply(this.getTiers());
+                }
+            });
+        }
+
+        // Cancel button
+        const cancelBtn = this.$('#rankingCancel');
+        if (cancelBtn) {
+            this.addEventListener(cancelBtn, 'click', () => {
+                if (this.onCancel) {
+                    this.onCancel();
+                }
+            });
+        }
+
+        // Tier toggle buttons
+        this.$$('.ranking-tier-toggle').forEach(btn => {
+            this.addEventListener(btn, 'click', (e) => {
+                e.preventDefault();
+                const index = parseInt(btn.dataset.toggleIndex);
+                this.toggleTie(index);
+            });
+        });
+
+        // Arrow move buttons
+        this.$$('[data-move-up]').forEach(btn => {
+            this.addEventListener(btn, 'click', (e) => {
+                e.preventDefault();
+                const index = parseInt(btn.dataset.moveUp);
+                this.moveItem(index, index - 1);
+            });
+        });
+
+        this.$$('[data-move-down]').forEach(btn => {
+            this.addEventListener(btn, 'click', (e) => {
+                e.preventDefault();
+                const index = parseInt(btn.dataset.moveDown);
+                this.moveItem(index, index + 1);
+            });
+        });
+
+        // Drag grips - pointer events for desktop + mobile
+        this.$$('.ranking-item__grip').forEach(grip => {
+            this.addEventListener(grip, 'pointerdown', (e) => {
+                e.preventDefault();
+                const index = parseInt(grip.dataset.gripIndex);
+                this.startDrag(index, e);
+            });
+        });
+
+        // Keyboard support on grips
+        this.$$('.ranking-item__grip').forEach(grip => {
+            this.addEventListener(grip, 'keydown', (e) => {
+                const index = parseInt(grip.dataset.gripIndex);
+                if (e.key === 'ArrowUp' && index > 0) {
+                    e.preventDefault();
+                    this.moveItem(index, index - 1);
+                } else if (e.key === 'ArrowDown' && index < this.orderedIds.length - 1) {
+                    e.preventDefault();
+                    this.moveItem(index, index + 1);
+                }
+            });
+        });
+    }
+
+    toggleTie(index) {
+        if (index >= 0 && index < this.tieWithNext.length) {
+            this.tieWithNext[index] = !this.tieWithNext[index];
+            this.rerender();
+        }
+    }
+
+    moveItem(fromIndex, toIndex) {
+        if (toIndex < 0 || toIndex >= this.orderedIds.length) return;
+
+        // Move the player ID
+        const [movedId] = this.orderedIds.splice(fromIndex, 1);
+        this.orderedIds.splice(toIndex, 0, movedId);
+
+        // Adjust tie markers
+        this.adjustTiesAfterMove(fromIndex, toIndex);
+        this.rerender();
+    }
+
+    adjustTiesAfterMove(fromIndex, toIndex) {
+        // When an item moves, the tie connections between its old neighbors break
+        // and new ties need to be reevaluated. Simplest approach: clear ties at affected positions.
+        const affected = new Set();
+        // Old position ties
+        if (fromIndex > 0) affected.add(fromIndex - 1);
+        if (fromIndex < this.tieWithNext.length) affected.add(fromIndex);
+        // New position ties
+        if (toIndex > 0) affected.add(toIndex - 1);
+        if (toIndex < this.tieWithNext.length) affected.add(toIndex);
+
+        for (const idx of affected) {
+            if (idx >= 0 && idx < this.tieWithNext.length) {
+                this.tieWithNext[idx] = false;
+            }
+        }
+    }
+
+    startDrag(index, event) {
+        const listEl = this.$('#rankingList');
+        if (!listEl) return;
+
+        const items = this.$$('.ranking-item');
+        const draggedEl = items[index];
+        if (!draggedEl) return;
+
+        const rect = draggedEl.getBoundingClientRect();
+        const listRect = listEl.getBoundingClientRect();
+
+        this.dragState = {
+            dragIndex: index,
+            currentIndex: index,
+            startY: event.clientY,
+            offsetY: event.clientY - rect.top,
+            itemHeight: rect.height + this.getSeparatorHeight(),
+            listTop: listRect.top,
+            listEl
+        };
+
+        draggedEl.classList.add('ranking-item--dragging');
+        listEl.classList.add('ranking-list--dragging');
+        draggedEl.setPointerCapture(event.pointerId);
+
+        document.addEventListener('pointermove', this.boundPointerMove);
+        document.addEventListener('pointerup', this.boundPointerUp);
+    }
+
+    getSeparatorHeight() {
+        const sep = this.$('.ranking-tier-separator');
+        return sep ? sep.getBoundingClientRect().height : 8;
+    }
+
+    handlePointerMove(event) {
+        if (!this.dragState) return;
+
+        const { dragIndex, itemHeight, listTop, listEl } = this.dragState;
+        const items = this.$$('.ranking-item');
+        const relativeY = event.clientY - listTop;
+        const newIndex = Math.max(0, Math.min(this.orderedIds.length - 1,
+            Math.floor(relativeY / itemHeight)));
+
+        if (newIndex !== this.dragState.currentIndex) {
+            this.dragState.currentIndex = newIndex;
+            // Visual feedback: add placeholder class
+            items.forEach((item, i) => {
+                item.classList.remove('ranking-item--drop-above', 'ranking-item--drop-below');
+                if (i === newIndex && newIndex !== dragIndex) {
+                    item.classList.add(newIndex < dragIndex ? 'ranking-item--drop-above' : 'ranking-item--drop-below');
+                }
+            });
+        }
+    }
+
+    handlePointerUp(event) {
+        document.removeEventListener('pointermove', this.boundPointerMove);
+        document.removeEventListener('pointerup', this.boundPointerUp);
+
+        if (!this.dragState) return;
+
+        const { dragIndex, currentIndex } = this.dragState;
+        this.dragState = null;
+
+        if (dragIndex !== currentIndex) {
+            this.moveItem(dragIndex, currentIndex);
+        } else {
+            this.rerender();
+        }
+    }
+
+    rerender() {
+        if (!this.isMounted) return;
+        // Clean up old listeners then re-render
+        this.eventUnsubscribers.forEach(unsub => unsub());
+        this.eventUnsubscribers = [];
+
+        const html = this.render();
+        if (typeof html === 'string') {
+            this.container.innerHTML = html;
+        }
+        this.onMount();
+    }
+
+    onDestroy() {
+        document.removeEventListener('pointermove', this.boundPointerMove);
+        document.removeEventListener('pointerup', this.boundPointerUp);
+    }
+}
+
+export default DragDropRanking;

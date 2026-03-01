@@ -590,6 +590,79 @@ class ComparisonService {
             playersAffected: this.playerRepository.count()
         });
     }
+
+    /**
+     * Process a full ranking for a position.
+     * Resets the position first, then processes all implied pairwise comparisons.
+     *
+     * Supports ties: players in the same tier are treated as draws,
+     * players in higher tiers beat all players in lower tiers.
+     *
+     * @param {Array<Array<string>>} tiers - Array of tiers, each tier is an array of player IDs.
+     *   Players within a tier are equal; tiers are ordered best-first.
+     *   Example: [[idA, idB], [idC], [idD, idE]] means A=B > C > D=E
+     * @param {string} position - Position being ranked
+     * @returns {Object} Summary of processed comparisons
+     */
+    processRanking(tiers, position) {
+        // Validate tiers
+        const allIds = tiers.flat();
+        if (allIds.length < 2) {
+            throw new Error('Need at least 2 players for ranking');
+        }
+
+        // Validate all players exist and play this position
+        for (const id of allIds) {
+            const player = this.playerRepository.getById(id);
+            if (!player) {
+                throw new Error(`Player not found: ${id}`);
+            }
+            if (!player.positions.includes(position)) {
+                throw new Error(`Player ${player.name} does not play ${position}`);
+            }
+        }
+
+        // Reset position to start fresh
+        this.resetPosition(position);
+
+        let winsProcessed = 0;
+        let drawsProcessed = 0;
+
+        // Process within-tier draws
+        for (const tier of tiers) {
+            for (let i = 0; i < tier.length; i++) {
+                for (let j = i + 1; j < tier.length; j++) {
+                    this.processDraw(tier[i], tier[j], position);
+                    drawsProcessed++;
+                }
+            }
+        }
+
+        // Process cross-tier wins (higher tier beats lower tier)
+        for (let t1 = 0; t1 < tiers.length; t1++) {
+            for (let t2 = t1 + 1; t2 < tiers.length; t2++) {
+                for (const winnerId of tiers[t1]) {
+                    for (const loserId of tiers[t2]) {
+                        this.processComparison(winnerId, loserId, position);
+                        winsProcessed++;
+                    }
+                }
+            }
+        }
+
+        const result = {
+            position,
+            totalComparisons: winsProcessed + drawsProcessed,
+            winsProcessed,
+            drawsProcessed,
+            tiersCount: tiers.length,
+            playersCount: allIds.length
+        };
+
+        this.eventBus.emit('ranking:applied', result);
+
+        return result;
+    }
 }
 
 export default ComparisonService;

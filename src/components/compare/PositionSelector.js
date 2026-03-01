@@ -12,9 +12,11 @@ class PositionSelector extends BaseComponent {
         this.progress = props.progress || {};
         this.selectedPosition = props.selectedPosition || '';
         this.playerService = props.playerService;
-        this.onSelect = props.onSelect; // Callback for position selection
-        this.onReset = props.onReset; // Callback for resetting position
-        this.onResetAll = props.onResetAll; // Callback for resetting all
+        this.compareMode = props.compareMode || 'pairwise';
+        this.onSelect = props.onSelect;
+        this.onReset = props.onReset;
+        this.onResetAll = props.onResetAll;
+        this.onModeChange = props.onModeChange;
     }
 
     render() {
@@ -28,11 +30,31 @@ class PositionSelector extends BaseComponent {
                                 <p class="position-selector__instruction">
                                     ${t('compare.positionSelector.pickPosition')}
                                 </p>
-                                <div class="position-selector__shortcuts">
-                                    ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
-                                    <span class="shortcuts__text">${t('compare.positionSelector.quickKeys')} <kbd>A</kbd> ${t('compare.comparison.leftKeyHint').toLowerCase()} • <kbd>D</kbd> ${t('compare.comparison.rightKeyHint').toLowerCase()} • <kbd>W</kbd> ${t('compare.comparison.draw').toLowerCase()}</span>
-                                </div>
+                                ${this.compareMode === 'pairwise' ? `
+                                    <div class="position-selector__shortcuts">
+                                        ${getIcon('keyboard', { size: 16, className: 'shortcuts__icon' })}
+                                        <span class="shortcuts__text">${t('compare.positionSelector.quickKeys')} <kbd>A</kbd> ${t('compare.comparison.leftKeyHint').toLowerCase()} • <kbd>D</kbd> ${t('compare.comparison.rightKeyHint').toLowerCase()} • <kbd>W</kbd> ${t('compare.comparison.draw').toLowerCase()}</span>
+                                    </div>
+                                ` : ''}
                             </div>
+                        </div>
+                        <div class="compare-mode-toggle" role="radiogroup" aria-label="${t('compare.modeToggle.label')}">
+                            <button class="compare-mode-btn ${this.compareMode === 'pairwise' ? 'compare-mode-btn--active' : ''}"
+                                    data-mode="pairwise"
+                                    role="radio"
+                                    aria-checked="${this.compareMode === 'pairwise'}"
+                                    title="${t('compare.modeToggle.pairwiseHint')}">
+                                ${getIcon('arrows-swap', { size: 14, className: 'btn-icon' })}
+                                ${t('compare.modeToggle.pairwise')}
+                            </button>
+                            <button class="compare-mode-btn ${this.compareMode === 'ranking' ? 'compare-mode-btn--active' : ''}"
+                                    data-mode="ranking"
+                                    role="radio"
+                                    aria-checked="${this.compareMode === 'ranking'}"
+                                    title="${t('compare.modeToggle.rankingHint')}">
+                                ${getIcon('list-ordered', { size: 14, className: 'btn-icon' })}
+                                ${t('compare.modeToggle.ranking')}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -159,6 +181,18 @@ class PositionSelector extends BaseComponent {
     }
 
     onMount() {
+        // Mode toggle buttons
+        const modeButtons = this.container.querySelectorAll('.compare-mode-btn');
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const mode = btn.dataset.mode;
+                if (mode && mode !== this.compareMode && this.onModeChange) {
+                    this.onModeChange(mode);
+                }
+            });
+        });
+
         // Position cards
         const positionCards = this.container.querySelectorAll('.position-card');
         positionCards.forEach(card => {
