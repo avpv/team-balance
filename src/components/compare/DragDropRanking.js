@@ -190,7 +190,9 @@ class DragDropRanking extends BaseComponent {
         // Cancel button
         const cancelBtn = this.$('#rankingCancel');
         if (cancelBtn) {
-            this.addEventListener(cancelBtn, 'click', () => {
+            this.addEventListener(cancelBtn, 'click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (this.onCancel) {
                     this.onCancel();
                 }
