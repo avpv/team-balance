@@ -216,6 +216,34 @@ export default {
             resetSuccess: '{{position}}的比较已重置'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: '比较模式',
+            pairwise: '两两比较',
+            ranking: '排名',
+            pairwiseHint: '每次比较两名球员',
+            rankingHint: '拖放排列所有球员'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: '拖放排名',
+            orderPlayers: '为以下位置排列球员',
+            dragHint: '拖动球员重新排序。使用">"表示严格排序，"="表示并列。',
+            playerOrder: '球员顺序',
+            rank: '排名',
+            dragToReorder: '拖动重新排序',
+            moveUp: '上移',
+            moveDown: '下移',
+            markEqual: '标记为并列（平局）',
+            markDifferent: '标记为不同（严格排序）',
+            applyRanking: '应用排名',
+            comparisons: '将创建 {{count}} 次比较',
+            draws: '{{count}} 次平局',
+            applied: '{{position}} 排名已应用！已处理 {{count}} 次比较。',
+            confirmReset: '{{position}} 已有 {{count}} 次比较。应用排名将重置所有比较。是否继续？'
+        },
+
         // Reset Modal
         resetModal: {
             title: '重置所有比较',

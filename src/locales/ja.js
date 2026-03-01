@@ -216,6 +216,34 @@ export default {
             resetSuccess: '{{position}}の比較がリセットされました'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: '比較モード',
+            pairwise: 'ペア比較',
+            ranking: 'ランキング',
+            pairwiseHint: 'プレイヤーを2人ずつ比較',
+            rankingHint: 'ドラッグ＆ドロップで全プレイヤーを一括ランキング'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'ドラッグ＆ドロップランキング',
+            orderPlayers: 'プレイヤーをランク付け：',
+            dragHint: 'プレイヤーをドラッグして並べ替え。">"で厳密な順序、"="で同順位を設定できます。',
+            playerOrder: 'プレイヤー順序',
+            rank: '順位',
+            dragToReorder: 'ドラッグして並べ替え',
+            moveUp: '上に移動',
+            moveDown: '下に移動',
+            markEqual: '同順位にする（引き分け）',
+            markDifferent: '異なる順位にする（厳密な順序）',
+            applyRanking: 'ランキングを適用',
+            comparisons: '{{count}}件の比較が作成されます',
+            draws: '{{count}}件の引き分け',
+            applied: '{{position}}のランキングが適用されました！{{count}}件の比較を処理しました。',
+            confirmReset: '{{position}}には既に{{count}}件の比較があります。ランキングを適用するとすべてリセットされます。続行しますか？'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'すべての比較をリセット',

@@ -216,6 +216,34 @@ export default {
             resetSuccess: 'Сравнения для {{position}} сброшены'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: 'Режим сравнения',
+            pairwise: 'Попарно',
+            ranking: 'Рейтинг',
+            pairwiseHint: 'Сравнивать игроков по двое',
+            rankingHint: 'Перетаскивайте для ранжирования всех игроков сразу'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'Ранжирование перетаскиванием',
+            orderPlayers: 'Ранжировать игроков на позиции',
+            dragHint: 'Перетаскивайте игроков для изменения порядка. Используйте ">" для строгого порядка и "=" для ничьей.',
+            playerOrder: 'Порядок игроков',
+            rank: 'место',
+            dragToReorder: 'Перетащите для изменения порядка',
+            moveUp: 'Переместить вверх',
+            moveDown: 'Переместить вниз',
+            markEqual: 'Отметить как равных (ничья)',
+            markDifferent: 'Отметить как разных (строгий порядок)',
+            applyRanking: 'Применить рейтинг',
+            comparisons: '{{count}} сравнений будет создано',
+            draws: '{{count}} ничьих',
+            applied: 'Рейтинг для {{position}} применён! Обработано {{count}} сравнений.',
+            confirmReset: '{{position}} уже имеет {{count}} сравнений. Применение рейтинга сбросит их все. Продолжить?'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'Сбросить все сравнения',

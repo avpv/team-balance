@@ -216,6 +216,34 @@ export default {
             resetSuccess: '{{position}} comparisons have been reset'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: 'Comparison mode',
+            pairwise: 'Pairwise',
+            ranking: 'Ranking',
+            pairwiseHint: 'Compare players two at a time',
+            rankingHint: 'Drag and drop to rank all players at once'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'Drag & Drop Ranking',
+            orderPlayers: 'Rank players for',
+            dragHint: 'Drag players to reorder. Use ">" for strict order and "=" to mark ties.',
+            playerOrder: 'Player order',
+            rank: 'rank',
+            dragToReorder: 'Drag to reorder',
+            moveUp: 'Move up',
+            moveDown: 'Move down',
+            markEqual: 'Mark as equal (tie)',
+            markDifferent: 'Mark as different (strict order)',
+            applyRanking: 'Apply Ranking',
+            comparisons: '{{count}} comparisons will be created',
+            draws: '{{count}} ties',
+            applied: '{{position}} ranking applied! {{count}} comparisons processed.',
+            confirmReset: '{{position}} already has {{count}} comparisons. Applying ranking will reset them all. Continue?'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'Reset All Comparisons',

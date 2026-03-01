@@ -424,12 +424,20 @@ class PlayerRepository {
      * Should be called after each comparison
      */
     incrementSessionComparison() {
+        this.incrementSessionComparisonBy(1);
+    }
+
+    /**
+     * Increment session comparison counter by a given amount
+     * @param {number} count - Number of comparisons to add
+     */
+    incrementSessionComparisonBy(count) {
         const session = this._getActiveSession();
         if (!session) {
             throw new Error('No active session found');
         }
 
-        const newCount = (session.comparisons || 0) + 1;
+        const newCount = (session.comparisons || 0) + count;
         this._updateActiveSession({ comparisons: newCount });
     }
 

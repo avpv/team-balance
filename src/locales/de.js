@@ -216,6 +216,34 @@ export default {
             resetSuccess: '{{position}}-Vergleiche wurden zurückgesetzt'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: 'Vergleichsmodus',
+            pairwise: 'Paarweise',
+            ranking: 'Rangliste',
+            pairwiseHint: 'Spieler paarweise vergleichen',
+            rankingHint: 'Per Drag & Drop alle Spieler auf einmal einordnen'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: 'Drag & Drop Rangliste',
+            orderPlayers: 'Spieler einordnen für',
+            dragHint: 'Spieler ziehen zum Umsortieren. Verwende ">" für strikte Reihenfolge und "=" für Gleichstand.',
+            playerOrder: 'Spielerreihenfolge',
+            rank: 'Rang',
+            dragToReorder: 'Ziehen zum Umsortieren',
+            moveUp: 'Nach oben',
+            moveDown: 'Nach unten',
+            markEqual: 'Als gleich markieren (Gleichstand)',
+            markDifferent: 'Als unterschiedlich markieren (strikte Reihenfolge)',
+            applyRanking: 'Rangliste anwenden',
+            comparisons: '{{count}} Vergleiche werden erstellt',
+            draws: '{{count}} Gleichstände',
+            applied: '{{position}} Rangliste angewendet! {{count}} Vergleiche verarbeitet.',
+            confirmReset: '{{position}} hat bereits {{count}} Vergleiche. Das Anwenden der Rangliste setzt alle zurück. Fortfahren?'
+        },
+
         // Reset Modal
         resetModal: {
             title: 'Alle Vergleiche zurücksetzen',

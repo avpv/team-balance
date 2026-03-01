@@ -216,6 +216,34 @@ export default {
             resetSuccess: '{{position}} 비교가 초기화되었습니다'
         },
 
+        // Mode Toggle
+        modeToggle: {
+            label: '비교 모드',
+            pairwise: '1대1',
+            ranking: '랭킹',
+            pairwiseHint: '선수를 둘씩 비교',
+            rankingHint: '드래그 앤 드롭으로 모든 선수를 한 번에 순위 매기기'
+        },
+
+        // Drag & Drop Ranking
+        ranking: {
+            title: '드래그 앤 드롭 랭킹',
+            orderPlayers: '선수 순위 매기기:',
+            dragHint: '선수를 드래그하여 순서를 변경하세요. ">"는 엄격한 순서, "="는 동점을 나타냅니다.',
+            playerOrder: '선수 순서',
+            rank: '순위',
+            dragToReorder: '드래그하여 순서 변경',
+            moveUp: '위로 이동',
+            moveDown: '아래로 이동',
+            markEqual: '동점으로 표시',
+            markDifferent: '다른 순위로 표시 (엄격한 순서)',
+            applyRanking: '랭킹 적용',
+            comparisons: '{{count}}개의 비교가 생성됩니다',
+            draws: '{{count}}개의 동점',
+            applied: '{{position}} 랭킹이 적용되었습니다! {{count}}개의 비교가 처리되었습니다.',
+            confirmReset: '{{position}}에 이미 {{count}}개의 비교가 있습니다. 랭킹을 적용하면 모두 초기화됩니다. 계속하시겠습니까?'
+        },
+
         // Reset Modal
         resetModal: {
             title: '모든 비교 초기화',
