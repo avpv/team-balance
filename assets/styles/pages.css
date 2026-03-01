@@ -2781,7 +2781,7 @@
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     text-align: center;
-    margin: 0;
+    margin: 0 auto;
 }
 
 /* Ranking List */
