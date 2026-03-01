@@ -56,28 +56,8 @@ class DragDropRanking extends BaseComponent {
         return rank;
     }
 
-    getComparisonSummary() {
-        const tiers = this.getTiers();
-        let wins = 0;
-        let draws = 0;
-
-        for (const tier of tiers) {
-            draws += (tier.length * (tier.length - 1)) / 2;
-        }
-
-        for (let t1 = 0; t1 < tiers.length; t1++) {
-            for (let t2 = t1 + 1; t2 < tiers.length; t2++) {
-                wins += tiers[t1].length * tiers[t2].length;
-            }
-        }
-
-        return { wins, draws, total: wins + draws };
-    }
-
     render() {
         if (!this.orderedIds.length) return '';
-
-        const summary = this.getComparisonSummary();
 
         return `
             <div class="ranking-area" role="region" aria-label="${t('compare.ranking.title')}">
@@ -90,13 +70,6 @@ class DragDropRanking extends BaseComponent {
 
                 <div class="ranking-list" id="rankingList" role="list" aria-label="${t('compare.ranking.playerOrder')}">
                     ${this.orderedIds.map((id, index) => this.renderItem(id, index)).join('')}
-                </div>
-
-                <div class="ranking-summary">
-                    <div class="ranking-summary__stats">
-                        <span class="ranking-summary__stat">${t('compare.ranking.comparisons', { count: summary.total })}</span>
-                        ${summary.draws > 0 ? `<span class="ranking-summary__stat ranking-summary__stat--draws">${t('compare.ranking.draws', { count: summary.draws })}</span>` : ''}
-                    </div>
                 </div>
 
                 <div class="ranking-actions">

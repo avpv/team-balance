@@ -238,8 +238,6 @@ export default {
             markEqual: 'Отметить как равных (ничья)',
             markDifferent: 'Отметить как разных (строгий порядок)',
             applyRanking: 'Применить рейтинг',
-            comparisons: '{{count}} сравнений будет создано',
-            draws: '{{count}} ничьих',
             applied: 'Рейтинг для {{position}} применён! Обработано {{count}} сравнений.',
             confirmReset: '{{position}} уже имеет {{count}} сравнений. Применение рейтинга сбросит их все. Продолжить?'
         },
