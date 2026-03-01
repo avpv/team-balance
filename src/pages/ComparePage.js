@@ -475,7 +475,8 @@ class ComparePage extends BasePage {
     }
 
     handleRankingCancel() {
-        this.compareMode = 'ranking';
+        this.selectedPosition = '';
+        this.currentPair = null;
         this.update();
     }
 
