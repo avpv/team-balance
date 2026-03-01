@@ -238,8 +238,6 @@ export default {
             markEqual: 'Als gleich markieren (Gleichstand)',
             markDifferent: 'Als unterschiedlich markieren (strikte Reihenfolge)',
             applyRanking: 'Rangliste anwenden',
-            comparisons: '{{count}} Vergleiche werden erstellt',
-            draws: '{{count}} Gleichstände',
             applied: '{{position}} Rangliste angewendet! {{count}} Vergleiche verarbeitet.',
             confirmReset: '{{position}} hat bereits {{count}} Vergleiche. Das Anwenden der Rangliste setzt alle zurück. Fortfahren?'
         },

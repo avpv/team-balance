@@ -238,8 +238,6 @@ export default {
             markEqual: '同順位にする（引き分け）',
             markDifferent: '異なる順位にする（厳密な順序）',
             applyRanking: 'ランキングを適用',
-            comparisons: '{{count}}件の比較が作成されます',
-            draws: '{{count}}件の引き分け',
             applied: '{{position}}のランキングが適用されました！{{count}}件の比較を処理しました。',
             confirmReset: '{{position}}には既に{{count}}件の比較があります。ランキングを適用するとすべてリセットされます。続行しますか？'
         },

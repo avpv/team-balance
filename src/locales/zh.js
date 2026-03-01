@@ -238,8 +238,6 @@ export default {
             markEqual: '标记为并列（平局）',
             markDifferent: '标记为不同（严格排序）',
             applyRanking: '应用排名',
-            comparisons: '将创建 {{count}} 次比较',
-            draws: '{{count}} 次平局',
             applied: '{{position}} 排名已应用！已处理 {{count}} 次比较。',
             confirmReset: '{{position}} 已有 {{count}} 次比较。应用排名将重置所有比较。是否继续？'
         },

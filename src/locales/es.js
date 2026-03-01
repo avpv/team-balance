@@ -238,8 +238,6 @@ export default {
             markEqual: 'Marcar como iguales (empate)',
             markDifferent: 'Marcar como diferentes (orden estricto)',
             applyRanking: 'Aplicar clasificación',
-            comparisons: '{{count}} comparaciones serán creadas',
-            draws: '{{count}} empates',
             applied: '¡Clasificación de {{position}} aplicada! {{count}} comparaciones procesadas.',
             confirmReset: '{{position}} ya tiene {{count}} comparaciones. Aplicar la clasificación las restablecerá todas. ¿Continuar?'
         },
