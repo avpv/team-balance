@@ -154,6 +154,7 @@ class ComparePage extends BasePage {
                     position: this.selectedPosition,
                     positionName,
                     players,
+                    onChange: (tiers) => this.handleRankingChange(tiers),
                     onApply: (tiers) => this.handleRankingApply(tiers),
                     onCancel: () => this.handleRankingCancel()
                 });
@@ -298,6 +299,7 @@ class ComparePage extends BasePage {
 
     handlePositionSelect(positionKey) {
         this.selectedPosition = positionKey;
+        this._rankingOverwriteConfirmed = false;
         this.loadNextPair();
         this.update();
 
@@ -431,6 +433,31 @@ class ComparePage extends BasePage {
             event_category: 'compare',
             mode
         });
+    }
+
+    handleRankingChange(tiers) {
+        // Auto-apply ranking on every change (swap/toggle)
+        const progress = this.comparisonService.getProgress(this.selectedPosition);
+
+        // Confirm overwrite only once on the first change
+        if (progress.completed > 0 && !this._rankingOverwriteConfirmed) {
+            const positionName = this.activityConfig.positions[this.selectedPosition];
+            const confirmed = confirm(t('compare.ranking.confirmReset', {
+                position: positionName,
+                count: progress.completed
+            }));
+            if (!confirmed) return;
+            this._rankingOverwriteConfirmed = true;
+        }
+
+        try {
+            this._suppressUpdates = true;
+            this.comparisonService.processRanking(tiers, this.selectedPosition);
+            this._suppressUpdates = false;
+        } catch (error) {
+            this._suppressUpdates = false;
+            toast.error(error.message);
+        }
     }
 
     handleRankingApply(tiers) {
