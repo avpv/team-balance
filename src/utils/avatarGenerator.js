@@ -179,7 +179,8 @@ function generateChernoffFace(hash, size, elo = null) {
     const eyeRx = size * eyeSize; // Horizontal radius
     const eyeRyLeft = eyeRx * eyeHeightLeft; // Vertical radius for left eye
     const eyeRyRight = eyeRx * eyeHeightRight; // Vertical radius for right eye
-    const pupilR = eyeRx * pupilSize;
+    // Clamp pupil radius so it fits inside both eyes vertically
+    const pupilR = Math.min(eyeRx * pupilSize, Math.min(eyeRyLeft, eyeRyRight) * 0.85);
 
     // Eyebrow positions
     const browY = eyeY - eyeRx * 2.2;
@@ -202,7 +203,9 @@ function generateChernoffFace(hash, size, elo = null) {
     const earLeft = center - faceRadiusX;
     const earRight = center + faceRadiusX;
     const earY = center * 0.95;
-    const earR = size * earSize;
+    // Clamp ear radius so ears don't overflow the viewBox
+    const maxEarR = (center - faceRadiusX) / 0.6;  // earLeft - earR*0.6 ≥ 0
+    const earR = Math.min(size * earSize, maxEarR * 0.9);
 
     // === GENERATE SVG ELEMENTS ===
 
