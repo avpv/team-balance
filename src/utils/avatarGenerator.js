@@ -32,58 +32,70 @@
  * - Academic style: Clean geometric shapes, 1-3px lines, symmetric
  * - Statistical: Similar to R/Python Chernoff faces libraries
  *
- * @version 6.0.0 - Highly Expressive Chernoff Faces with 19 Parameters
+ * @version 7.0.0 - Improved distinctiveness via FNV-1a hash, Mulberry32 PRNG, continuous color hues, wider parameter ranges
  */
 
 /**
- * Simple hash function to convert string to number
- * @param {string} str - Input string (player name)
- * @returns {number} - Hash value
+ * Mulberry32 - high-quality 32-bit PRNG seeded from a number.
+ * Returns a function that produces successive pseudo-random 0-1 floats.
+ * @param {number} seed
+ * @returns {function(): number}
  */
-function hashString(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32-bit integer
-    }
-    return Math.abs(hash);
+function mulberry32(seed) {
+    return function () {
+        seed |= 0;
+        seed = (seed + 0x6D2B79F5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
 }
 
 /**
- * Get a value from hash within a range
- * @param {number} hash - Hash value
- * @param {number} index - Seed index
+ * Convert a player name into a well-distributed 32-bit seed.
+ * Uses FNV-1a which has excellent avalanche properties – a single
+ * character change flips roughly half the output bits.
+ * @param {string} str - Input string (player name)
+ * @returns {number} - Hash seed
+ */
+function hashString(str) {
+    let h = 0x811c9dc5; // FNV offset basis
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 0x01000193); // FNV prime
+    }
+    return h >>> 0; // ensure unsigned
+}
+
+/**
+ * Get a value from hash within a range using a seeded PRNG.
+ * Each (hash, index) pair produces an independent, well-distributed value.
+ * @param {function(): number} rng - PRNG function (mulberry32 instance)
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
  * @returns {number} - Value in range
  */
-function getHashValue(hash, index, min, max) {
-    const value = (hash + index * 1327) % 1000;
-    return min + (value / 1000) * (max - min);
+function getHashValue(rng, min, max) {
+    return min + rng() * (max - min);
 }
 
 /**
- * Get avatar color scheme from hash (Academic/Scientific style)
- * @param {number} hash - Hash value
+ * Get avatar color scheme using PRNG (Academic/Scientific style).
+ * Hue is quantised to 15° steps (24 perceptually distinct buckets).
+ * @param {function(): number} rng - PRNG function (mulberry32 instance)
  * @returns {object} - Color scheme with background, face, and features
  */
-function getColorScheme(hash) {
-    const schemes = [
-        { bg: 'hsl(210, 50%, 92%)', face: 'hsl(210, 40%, 80%)', features: 'hsl(210, 60%, 30%)' }, // Blue
-        { bg: 'hsl(160, 45%, 90%)', face: 'hsl(160, 35%, 75%)', features: 'hsl(160, 55%, 28%)' }, // Teal
-        { bg: 'hsl(280, 40%, 92%)', face: 'hsl(280, 30%, 80%)', features: 'hsl(280, 50%, 32%)' }, // Purple
-        { bg: 'hsl(340, 50%, 92%)', face: 'hsl(340, 40%, 80%)', features: 'hsl(340, 60%, 32%)' }, // Pink
-        { bg: 'hsl(30, 55%, 90%)', face: 'hsl(30, 45%, 75%)', features: 'hsl(30, 65%, 28%)' },    // Orange
-        { bg: 'hsl(120, 40%, 90%)', face: 'hsl(120, 30%, 75%)', features: 'hsl(120, 50%, 28%)' }, // Green
-        { bg: 'hsl(190, 50%, 90%)', face: 'hsl(190, 40%, 78%)', features: 'hsl(190, 60%, 30%)' }, // Cyan
-        { bg: 'hsl(50, 60%, 90%)', face: 'hsl(50, 50%, 73%)', features: 'hsl(50, 70%, 25%)' },    // Yellow
-        { bg: 'hsl(15, 55%, 90%)', face: 'hsl(15, 45%, 75%)', features: 'hsl(15, 65%, 28%)' },    // Red-Orange
-        { bg: 'hsl(260, 45%, 90%)', face: 'hsl(260, 35%, 78%)', features: 'hsl(260, 55%, 30%)' }, // Indigo
-        { bg: 'hsl(90, 40%, 90%)', face: 'hsl(90, 30%, 75%)', features: 'hsl(90, 50%, 28%)' },    // Lime
-        { bg: 'hsl(320, 50%, 90%)', face: 'hsl(320, 40%, 78%)', features: 'hsl(320, 60%, 30%)' }, // Magenta
-    ];
-    return schemes[hash % schemes.length];
+function getColorScheme(rng) {
+    // 24 perceptually distinct hue buckets (every 15°)
+    const hue = Math.floor(rng() * 24) * 15;
+    const satBg = 40 + rng() * 25;   // 40-65
+    const satFace = 30 + rng() * 20;  // 30-50
+    const satFeat = 45 + rng() * 25;  // 45-70
+    return {
+        bg: `hsl(${hue}, ${satBg.toFixed(0)}%, 91%)`,
+        face: `hsl(${hue}, ${satFace.toFixed(0)}%, 77%)`,
+        features: `hsl(${hue}, ${satFeat.toFixed(0)}%, 29%)`
+    };
 }
 
 /**
@@ -120,73 +132,44 @@ function eloToSmile(elo) {
  */
 function generateChernoffFace(hash, size, elo = null) {
     const center = size / 2;
-    const colors = getColorScheme(hash);
+    // Create a dedicated PRNG stream from the hash – every call to rng()
+    // yields an independent, well-distributed value in [0, 1).
+    const rng = mulberry32(hash);
+    const colors = getColorScheme(rng);
 
     // === 19 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
-    // All parameters are continuous numeric values for proper statistical encoding
+    // All parameters are generated independently (fixed rng consumption order).
+    // Geometric constraints are applied later in the DIMENSIONS section so
+    // that the PRNG stream stays uncorrelated across all 19 variables.
 
-    // Variable 1: Head size (overall face radius)
-    const headSize = getHashValue(hash, 1, 0.65, 0.85);
-
-    // Variable 2: Face width/roundness (aspect ratio: 0.8=tall, 1.0=circle, 1.2=wide)
-    const faceAspect = getHashValue(hash, 2, 0.8, 1.2);
-
-    // Variable 19: Chin shape (pointedness: 0=round, 1=pointed/angular)
-    const chinShape = getHashValue(hash, 19, 0.0, 1.0);
-
-    // Variable 3: Eye size (horizontal radius of eye ellipses)
-    const eyeSize = getHashValue(hash, 3, 0.06, 0.14);
-
-    // Variable 4: Eye separation (distance between eyes)
-    const eyeSeparation = getHashValue(hash, 4, 0.22, 0.40);
-
-    // Variable 12: Left eye height (vertical radius as ratio of horizontal)
-    const eyeHeightLeft = getHashValue(hash, 12, 0.6, 1.0);
-
-    // Variable 13: Right eye height (vertical radius as ratio of horizontal)
-    const eyeHeightRight = getHashValue(hash, 13, 0.6, 1.0);
-
-    // Variable 5: Pupil size (size of pupils within eyes, 0.3-0.7 of eye size)
-    const pupilSize = getHashValue(hash, 5, 0.3, 0.7);
-
-    // Variable 14: Pupil X position (horizontal gaze direction: -0.3=left, 0=center, 0.3=right)
-    const pupilOffsetX = getHashValue(hash, 14, -0.3, 0.3);
-
-    // Variable 15: Pupil Y position (vertical gaze direction: -0.2=up, 0=center, 0.2=down)
-    const pupilOffsetY = getHashValue(hash, 15, -0.2, 0.2);
-
-    // Variable 6: Eyebrow angle (-0.15=sad, 0=neutral, 0.15=surprised)
-    const eyebrowAngle = getHashValue(hash, 6, -0.15, 0.15);
-
-    // Variable 16: Eyebrow curvature (arc depth: 0.1=slight, 0.5=strong)
-    const eyebrowCurve = getHashValue(hash, 16, 0.15, 0.5);
-
-    // Variable 7: Nose length (0.5-1.5 times eye radius)
-    const noseLength = getHashValue(hash, 7, 0.5, 1.5);
-
-    // Variable 11: Nose width (width of nose base)
-    const noseWidth = getHashValue(hash, 11, 0.03, 0.08);
-
-    // Variable 17: Nostril size (size of nostrils)
-    const nostrilSize = getHashValue(hash, 17, 0.01, 0.025);
-
-    // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
-    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(hash, 8, -0.08, 0.12);
-
-    // Variable 9: Mouth width (horizontal width)
-    const mouthWidth = getHashValue(hash, 9, 0.25, 0.50);
-
-    // Variable 18: Lip thickness (fullness of lips)
-    const lipThickness = getHashValue(hash, 18, 0.008, 0.025);
-
-    // Variable 10: Ear size (size of ears)
-    const earSize = getHashValue(hash, 10, 0.08, 0.15);
+    const headSize      = getHashValue(rng, 0.62, 0.88);   // V1: head radius
+    const faceAspect    = getHashValue(rng, 0.75, 1.25);   // V2: width/height ratio
+    const chinShape     = getHashValue(rng, 0.0, 1.0);     // V19: round→pointed
+    const eyeSize       = getHashValue(rng, 0.05, 0.15);   // V3: eye horiz radius
+    const eyeSeparation = getHashValue(rng, 0.18, 0.40);   // V4: distance between eyes
+    const eyeHeightLeft = getHashValue(rng, 0.50, 1.1);    // V12: left eye vert ratio
+    const eyeHeightRight = getHashValue(rng, 0.50, 1.1);   // V13: right eye vert ratio
+    const pupilSize     = getHashValue(rng, 0.25, 0.65);   // V5: pupil/eye ratio
+    const pupilOffsetX  = getHashValue(rng, -0.30, 0.30);  // V14: horizontal gaze
+    const pupilOffsetY  = getHashValue(rng, -0.20, 0.20);  // V15: vertical gaze
+    const eyebrowAngle  = getHashValue(rng, -0.20, 0.20);  // V6: brow tilt
+    const eyebrowCurve  = getHashValue(rng, 0.10, 0.55);   // V16: brow arc depth
+    const noseLength    = getHashValue(rng, 0.4, 1.6);     // V7: nose height
+    const noseWidth     = getHashValue(rng, 0.025, 0.09);  // V11: nose base width
+    const nostrilSize   = getHashValue(rng, 0.008, 0.028); // V17: nostril radius
+    // V8: Mouth curvature – always consume the rng slot for stream stability
+    const mouthCurveHash = getHashValue(rng, -0.10, 0.14);
+    const mouthCurve = elo !== null ? eloToSmile(elo) : mouthCurveHash;
+    const mouthWidth    = getHashValue(rng, 0.22, 0.52);   // V9: mouth width
+    const lipThickness  = getHashValue(rng, 0.007, 0.028); // V18: lip fullness
+    const earSize       = getHashValue(rng, 0.06, 0.16);   // V10: ear radius
 
     // === CALCULATE POSITIONS AND DIMENSIONS ===
+    // Geometric safety clamps applied here (not above) to keep PRNG independent.
 
-    // Face dimensions
+    // Face dimensions – clamp so face + ears fit inside the viewBox
     const faceRadius = center * headSize;
-    const faceRadiusX = faceRadius * faceAspect;
+    const faceRadiusX = Math.min(faceRadius * faceAspect, center * 0.92);
     const faceRadiusY = faceRadius;
 
     // Eye positions and dimensions
@@ -196,7 +179,8 @@ function generateChernoffFace(hash, size, elo = null) {
     const eyeRx = size * eyeSize; // Horizontal radius
     const eyeRyLeft = eyeRx * eyeHeightLeft; // Vertical radius for left eye
     const eyeRyRight = eyeRx * eyeHeightRight; // Vertical radius for right eye
-    const pupilR = eyeRx * pupilSize;
+    // Clamp pupil radius so it fits inside both eyes vertically
+    const pupilR = Math.min(eyeRx * pupilSize, Math.min(eyeRyLeft, eyeRyRight) * 0.85);
 
     // Eyebrow positions
     const browY = eyeY - eyeRx * 2.2;
@@ -219,7 +203,9 @@ function generateChernoffFace(hash, size, elo = null) {
     const earLeft = center - faceRadiusX;
     const earRight = center + faceRadiusX;
     const earY = center * 0.95;
-    const earR = size * earSize;
+    // Clamp ear radius so ears don't overflow the viewBox
+    const maxEarR = (center - faceRadiusX) / 0.6;  // earLeft - earR*0.6 ≥ 0
+    const earR = Math.min(size * earSize, maxEarR * 0.9);
 
     // === GENERATE SVG ELEMENTS ===
 
@@ -246,11 +232,16 @@ function generateChernoffFace(hash, size, elo = null) {
         <ellipse cx="${earRight}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
     `;
 
-    // Calculate pupil positions with gaze offset
-    const pupilLeftX = eyeLeft + (eyeRx * pupilOffsetX);
-    const pupilLeftY = eyeY + (eyeRyLeft * pupilOffsetY);
-    const pupilRightX = eyeRight + (eyeRx * pupilOffsetX);
-    const pupilRightY = eyeY + (eyeRyRight * pupilOffsetY);
+    // Calculate pupil positions with gaze offset.
+    // Clamp so the pupil circle stays inside the eye ellipse.
+    const maxOfsX = Math.max(0, 1 - pupilSize) * 0.85;
+    const maxOfsY = Math.max(0, 1 - pupilSize) * 0.85;
+    const clampedOfsX = Math.max(-maxOfsX, Math.min(maxOfsX, pupilOffsetX));
+    const clampedOfsY = Math.max(-maxOfsY, Math.min(maxOfsY, pupilOffsetY));
+    const pupilLeftX = eyeLeft + (eyeRx * clampedOfsX);
+    const pupilLeftY = eyeY + (eyeRyLeft * clampedOfsY);
+    const pupilRightX = eyeRight + (eyeRx * clampedOfsX);
+    const pupilRightY = eyeY + (eyeRyRight * clampedOfsY);
 
     // Eyes (ellipses with pupils)
     const eyesHTML = `
