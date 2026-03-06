@@ -9,8 +9,6 @@ class DragDropRanking extends BaseComponent {
         this.position = props.position;
         this.positionName = props.positionName;
         this.players = props.players || [];
-        this.onApply = props.onApply;
-        this.onCancel = props.onCancel;
         this.onChange = props.onChange;
 
         // Ordered list of player IDs (best first, sorted by current ELO)
@@ -79,13 +77,6 @@ class DragDropRanking extends BaseComponent {
 
                 <div class="ranking-list" id="rankingList" role="list" aria-label="${t('compare.ranking.playerOrder')}">
                     ${this.orderedIds.map((id, index) => this.renderItem(id, index)).join('')}
-                </div>
-
-                <div class="ranking-actions">
-                    <button class="btn btn-secondary ranking-actions__cancel" id="rankingCancel">
-                        ${getIcon('arrow-left', { size: 16, className: 'btn-icon' })}
-                        ${t('common.cancel')}
-                    </button>
                 </div>
             </div>
         `;
@@ -156,18 +147,6 @@ class DragDropRanking extends BaseComponent {
     }
 
     onMount() {
-        // Back button
-        const cancelBtn = this.$('#rankingCancel');
-        if (cancelBtn) {
-            this.addEventListener(cancelBtn, 'click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (this.onCancel) {
-                    this.onCancel();
-                }
-            });
-        }
-
         // Tier toggle buttons
         this.$$('.ranking-tier-toggle').forEach(btn => {
             this.addEventListener(btn, 'click', (e) => {

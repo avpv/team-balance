@@ -154,9 +154,7 @@ class ComparePage extends BasePage {
                     position: this.selectedPosition,
                     positionName,
                     players,
-                    onChange: (tiers) => this.handleRankingChange(tiers),
-                    onApply: (tiers) => this.handleRankingApply(tiers),
-                    onCancel: () => this.handleRankingCancel()
+                    onChange: (tiers) => this.handleRankingChange(tiers)
                 });
                 this.dragDropRanking.mount();
                 this.addComponent(this.dragDropRanking);
@@ -460,52 +458,6 @@ class ComparePage extends BasePage {
         }
     }
 
-    handleRankingApply(tiers) {
-        const positionName = this.activityConfig.positions[this.selectedPosition];
-
-        // Warn if there are existing comparisons that will be overwritten
-        const progress = this.comparisonService.getProgress(this.selectedPosition);
-        if (progress.completed > 0) {
-            const confirmed = confirm(t('compare.ranking.confirmReset', {
-                position: positionName,
-                count: progress.completed
-            }));
-            if (!confirmed) return;
-        }
-
-        try {
-            // Suppress per-comparison re-renders during batch processing
-            this._suppressUpdates = true;
-            const result = this.comparisonService.processRanking(tiers, this.selectedPosition);
-            this._suppressUpdates = false;
-            toast.success(t('compare.ranking.applied', {
-                position: positionName,
-                count: result.totalComparisons
-            }));
-
-            trackEvent('ranking_applied', {
-                event_category: 'compare',
-                position: this.selectedPosition,
-                players: result.playersCount,
-                comparisons: result.totalComparisons,
-                draws: result.drawsProcessed
-            });
-
-            // Switch back to ranking to show the completed state
-            this.compareMode = 'ranking';
-            this.loadNextPair();
-            this.update();
-        } catch (error) {
-            this._suppressUpdates = false;
-            toast.error(error.message);
-        }
-    }
-
-    handleRankingCancel() {
-        this.selectedPosition = '';
-        this.currentPair = null;
-        this.update();
-    }
 
     showResetAllModal() {
         const progress = this.comparisonService.getAllProgress();
