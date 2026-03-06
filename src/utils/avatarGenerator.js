@@ -141,49 +141,53 @@ function generateChernoffFace(hash, size, elo = null) {
     // Ranges widened vs. v6 for stronger visual differentiation.
 
     // Variable 1: Head size (overall face radius)
-    const headSize = getHashValue(rng, 0.58, 0.88);
+    const headSize = getHashValue(rng, 0.62, 0.88);
 
-    // Variable 2: Face width/roundness (aspect ratio: 0.7=tall, 1.0=circle, 1.3=wide)
-    const faceAspect = getHashValue(rng, 0.70, 1.30);
+    // Variable 2: Face width/roundness (aspect ratio: 0.75=tall, 1.25=wide)
+    // Constrained so headSize * faceAspect ≤ ~0.95 (face fits with ear margin)
+    const rawFaceAspect = getHashValue(rng, 0.75, 1.25);
+    const faceAspect = Math.min(rawFaceAspect, 0.95 / headSize);
 
     // Variable 19: Chin shape (pointedness: 0=round, 1=pointed/angular)
     const chinShape = getHashValue(rng, 0.0, 1.0);
 
     // Variable 3: Eye size (horizontal radius of eye ellipses)
-    const eyeSize = getHashValue(rng, 0.05, 0.16);
+    const eyeSize = getHashValue(rng, 0.05, 0.15);
 
     // Variable 4: Eye separation (distance between eyes)
-    const eyeSeparation = getHashValue(rng, 0.18, 0.42);
+    const eyeSeparation = getHashValue(rng, 0.18, 0.40);
 
     // Variable 12: Left eye height (vertical radius as ratio of horizontal)
-    const eyeHeightLeft = getHashValue(rng, 0.45, 1.1);
+    const eyeHeightLeft = getHashValue(rng, 0.50, 1.1);
 
     // Variable 13: Right eye height (vertical radius as ratio of horizontal)
-    const eyeHeightRight = getHashValue(rng, 0.45, 1.1);
+    const eyeHeightRight = getHashValue(rng, 0.50, 1.1);
 
-    // Variable 5: Pupil size (size of pupils within eyes, 0.2-0.75 of eye size)
-    const pupilSize = getHashValue(rng, 0.20, 0.75);
+    // Variable 5: Pupil size (size of pupils within eyes)
+    const pupilSize = getHashValue(rng, 0.25, 0.65);
 
     // Variable 14: Pupil X position (horizontal gaze direction)
-    const pupilOffsetX = getHashValue(rng, -0.35, 0.35);
+    // Constrained so pupil stays inside the eye: |offset| + pupilSize ≤ 0.85
+    const maxPupilOffset = Math.max(0.05, 0.85 - pupilSize);
+    const pupilOffsetX = getHashValue(rng, -maxPupilOffset, maxPupilOffset);
 
     // Variable 15: Pupil Y position (vertical gaze direction)
-    const pupilOffsetY = getHashValue(rng, -0.25, 0.25);
+    const pupilOffsetY = getHashValue(rng, -maxPupilOffset * 0.7, maxPupilOffset * 0.7);
 
-    // Variable 6: Eyebrow angle (-0.25=sad, 0=neutral, 0.25=surprised)
-    const eyebrowAngle = getHashValue(rng, -0.25, 0.25);
+    // Variable 6: Eyebrow angle (-0.20=sad, 0=neutral, 0.20=surprised)
+    const eyebrowAngle = getHashValue(rng, -0.20, 0.20);
 
-    // Variable 16: Eyebrow curvature (arc depth: 0.08=slight, 0.6=strong)
-    const eyebrowCurve = getHashValue(rng, 0.08, 0.60);
+    // Variable 16: Eyebrow curvature (arc depth: 0.10=slight, 0.55=strong)
+    const eyebrowCurve = getHashValue(rng, 0.10, 0.55);
 
-    // Variable 7: Nose length (0.3-1.8 times eye radius)
-    const noseLength = getHashValue(rng, 0.3, 1.8);
+    // Variable 7: Nose length (0.4-1.6 times eye radius)
+    const noseLength = getHashValue(rng, 0.4, 1.6);
 
     // Variable 11: Nose width (width of nose base)
-    const noseWidth = getHashValue(rng, 0.02, 0.10);
+    const noseWidth = getHashValue(rng, 0.025, 0.09);
 
     // Variable 17: Nostril size (size of nostrils)
-    const nostrilSize = getHashValue(rng, 0.008, 0.030);
+    const nostrilSize = getHashValue(rng, 0.008, 0.028);
 
     // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
     // Always consume the rng slot so subsequent parameters stay stable
@@ -192,13 +196,13 @@ function generateChernoffFace(hash, size, elo = null) {
     const mouthCurve = elo !== null ? eloToSmile(elo) : mouthCurveHash;
 
     // Variable 9: Mouth width (horizontal width)
-    const mouthWidth = getHashValue(rng, 0.20, 0.55);
+    const mouthWidth = getHashValue(rng, 0.22, 0.52);
 
     // Variable 18: Lip thickness (fullness of lips)
-    const lipThickness = getHashValue(rng, 0.006, 0.030);
+    const lipThickness = getHashValue(rng, 0.007, 0.028);
 
     // Variable 10: Ear size (size of ears)
-    const earSize = getHashValue(rng, 0.06, 0.18);
+    const earSize = getHashValue(rng, 0.06, 0.16);
 
     // === CALCULATE POSITIONS AND DIMENSIONS ===
 
