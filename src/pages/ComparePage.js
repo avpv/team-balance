@@ -150,6 +150,21 @@ class ComparePage extends BasePage {
             const positionName = this.activityConfig.positions[this.selectedPosition];
 
             if (players.length >= 2) {
+                // Confirm overwrite upfront when entering ranking mode
+                const progress = this.comparisonService.getProgress(this.selectedPosition);
+                if (progress.completed > 0 && !this._rankingOverwriteConfirmed) {
+                    const confirmed = confirm(t('compare.ranking.confirmReset', {
+                        position: positionName,
+                        count: progress.completed
+                    }));
+                    if (!confirmed) {
+                        this.selectedPosition = '';
+                        this.update();
+                        return;
+                    }
+                    this._rankingOverwriteConfirmed = true;
+                }
+
                 this.dragDropRanking = new DragDropRanking(comparisonAreaContainer, {
                     position: this.selectedPosition,
                     positionName,
@@ -434,20 +449,6 @@ class ComparePage extends BasePage {
     }
 
     handleRankingChange(tiers) {
-        // Auto-apply ranking on every change (swap/toggle)
-        const progress = this.comparisonService.getProgress(this.selectedPosition);
-
-        // Confirm overwrite only once on the first change
-        if (progress.completed > 0 && !this._rankingOverwriteConfirmed) {
-            const positionName = this.activityConfig.positions[this.selectedPosition];
-            const confirmed = confirm(t('compare.ranking.confirmReset', {
-                position: positionName,
-                count: progress.completed
-            }));
-            if (!confirmed) return;
-            this._rankingOverwriteConfirmed = true;
-        }
-
         try {
             this._suppressUpdates = true;
             this.comparisonService.processRanking(tiers, this.selectedPosition);
@@ -457,7 +458,6 @@ class ComparePage extends BasePage {
             toast.error(error.message);
         }
     }
-
 
     showResetAllModal() {
         const progress = this.comparisonService.getAllProgress();
