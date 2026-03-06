@@ -453,6 +453,10 @@ class ComparePage extends BasePage {
         } catch (error) {
             this._suppressUpdates = false;
             toast.error(error.message);
+            // Still rerender to reflect the new order even if rating update failed
+            if (this.dragDropRanking) {
+                this.dragDropRanking.rerender();
+            }
         }
     }
 
