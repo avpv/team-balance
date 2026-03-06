@@ -448,8 +448,7 @@ class ComparePage extends BasePage {
             // Refresh player data in DragDropRanking to show updated ELO ratings
             if (this.dragDropRanking) {
                 const freshPlayers = this.playerService.getByPosition(this.selectedPosition);
-                this.dragDropRanking.players = freshPlayers;
-                this.dragDropRanking.rerender();
+                this.dragDropRanking.updatePlayers(freshPlayers);
             }
         } catch (error) {
             this._suppressUpdates = false;

@@ -200,7 +200,6 @@ class DragDropRanking extends BaseComponent {
     toggleTie(index) {
         if (index >= 0 && index < this.tieWithNext.length) {
             this.tieWithNext[index] = !this.tieWithNext[index];
-            this.rerender();
             this.notifyChange();
         }
     }
@@ -222,7 +221,6 @@ class DragDropRanking extends BaseComponent {
 
         // Rebuild tie markers preserving ties between non-moved items that remain adjacent
         this.rebuildTiesAfterMove(oldAdjacency, movedId);
-        this.rerender();
         this.notifyChange();
     }
 
@@ -259,6 +257,15 @@ class DragDropRanking extends BaseComponent {
         if (this.onChange) {
             this.onChange(this.getTiers());
         }
+    }
+
+    /**
+     * Update player data (e.g. after ELO recalculation) and re-render.
+     * Preserves current order and tie markers.
+     */
+    updatePlayers(players) {
+        this.players = players;
+        this.rerender();
     }
 
     startDrag(index, event) {
