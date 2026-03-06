@@ -18,7 +18,15 @@ class DragDropRanking extends BaseComponent {
             .map(p => p.id);
 
         // Tie markers: tieWithNext[i] = true means player at index i is tied with i+1
-        this.tieWithNext = new Array(Math.max(0, this.orderedIds.length - 1)).fill(false);
+        // Auto-detect ties for players with equal ratings
+        this.tieWithNext = this.orderedIds.slice(0, -1).map((id, i) => {
+            const nextId = this.orderedIds[i + 1];
+            const currentPlayer = this.getPlayerById(id);
+            const nextPlayer = this.getPlayerById(nextId);
+            const currentRating = currentPlayer?.ratings[this.position] || 1500;
+            const nextRating = nextPlayer?.ratings[this.position] || 1500;
+            return currentRating === nextRating;
+        });
 
         // Drag state
         this.dragState = null;
