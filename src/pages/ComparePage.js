@@ -154,8 +154,7 @@ class ComparePage extends BasePage {
                     position: this.selectedPosition,
                     positionName,
                     players,
-                    onApply: (tiers) => this.handleRankingApply(tiers),
-                    onCancel: () => this.handleRankingCancel()
+                    onChange: (tiers) => this.handleRankingChange(tiers)
                 });
                 this.dragDropRanking.mount();
                 this.addComponent(this.dragDropRanking);
@@ -297,6 +296,9 @@ class ComparePage extends BasePage {
     }
 
     handlePositionSelect(positionKey) {
+        if (this.compareMode === 'ranking' && !this.confirmRankingOverwrite(positionKey)) {
+            return;
+        }
         this.selectedPosition = positionKey;
         this.loadNextPair();
         this.update();
@@ -424,6 +426,10 @@ class ComparePage extends BasePage {
     }
 
     handleModeChange(mode) {
+        if (mode === 'ranking' && this.selectedPosition
+            && !this.confirmRankingOverwrite(this.selectedPosition)) {
+            return;
+        }
         this.compareMode = mode;
         this.update();
 
@@ -433,51 +439,26 @@ class ComparePage extends BasePage {
         });
     }
 
-    handleRankingApply(tiers) {
-        const positionName = this.activityConfig.positions[this.selectedPosition];
-
-        // Warn if there are existing comparisons that will be overwritten
-        const progress = this.comparisonService.getProgress(this.selectedPosition);
-        if (progress.completed > 0) {
-            const confirmed = confirm(t('compare.ranking.confirmReset', {
-                position: positionName,
-                count: progress.completed
-            }));
-            if (!confirmed) return;
-        }
-
+    handleRankingChange(tiers) {
         try {
-            // Suppress per-comparison re-renders during batch processing
             this._suppressUpdates = true;
-            const result = this.comparisonService.processRanking(tiers, this.selectedPosition);
+            this.comparisonService.processRanking(tiers, this.selectedPosition);
             this._suppressUpdates = false;
-            toast.success(t('compare.ranking.applied', {
-                position: positionName,
-                count: result.totalComparisons
-            }));
-
-            trackEvent('ranking_applied', {
-                event_category: 'compare',
-                position: this.selectedPosition,
-                players: result.playersCount,
-                comparisons: result.totalComparisons,
-                draws: result.drawsProcessed
-            });
-
-            // Switch back to ranking to show the completed state
-            this.compareMode = 'ranking';
-            this.loadNextPair();
-            this.update();
         } catch (error) {
             this._suppressUpdates = false;
             toast.error(error.message);
         }
     }
 
-    handleRankingCancel() {
-        this.selectedPosition = '';
-        this.currentPair = null;
-        this.update();
+    confirmRankingOverwrite(positionKey) {
+        const progress = this.comparisonService.getProgress(positionKey);
+        if (progress.completed === 0) return true;
+
+        const positionName = this.activityConfig.positions[positionKey];
+        return confirm(t('compare.ranking.confirmReset', {
+            position: positionName,
+            count: progress.completed
+        }));
     }
 
     showResetAllModal() {

@@ -9,8 +9,7 @@ class DragDropRanking extends BaseComponent {
         this.position = props.position;
         this.positionName = props.positionName;
         this.players = props.players || [];
-        this.onApply = props.onApply;
-        this.onCancel = props.onCancel;
+        this.onChange = props.onChange;
 
         // Ordered list of player IDs (best first, sorted by current ELO)
         this.orderedIds = [...this.players]
@@ -78,16 +77,6 @@ class DragDropRanking extends BaseComponent {
 
                 <div class="ranking-list" id="rankingList" role="list" aria-label="${t('compare.ranking.playerOrder')}">
                     ${this.orderedIds.map((id, index) => this.renderItem(id, index)).join('')}
-                </div>
-
-                <div class="ranking-actions">
-                    <button class="btn btn-secondary ranking-actions__cancel" id="rankingCancel">
-                        ${t('common.cancel')}
-                    </button>
-                    <button class="btn btn-primary ranking-actions__apply" id="rankingApply">
-                        ${getIcon('check', { size: 16, className: 'btn-icon' })}
-                        ${t('compare.ranking.applyRanking')}
-                    </button>
                 </div>
             </div>
         `;
@@ -158,28 +147,6 @@ class DragDropRanking extends BaseComponent {
     }
 
     onMount() {
-        // Apply button
-        const applyBtn = this.$('#rankingApply');
-        if (applyBtn) {
-            this.addEventListener(applyBtn, 'click', () => {
-                if (this.onApply) {
-                    this.onApply(this.getTiers());
-                }
-            });
-        }
-
-        // Cancel button
-        const cancelBtn = this.$('#rankingCancel');
-        if (cancelBtn) {
-            this.addEventListener(cancelBtn, 'click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (this.onCancel) {
-                    this.onCancel();
-                }
-            });
-        }
-
         // Tier toggle buttons
         this.$$('.ranking-tier-toggle').forEach(btn => {
             this.addEventListener(btn, 'click', (e) => {
@@ -234,6 +201,7 @@ class DragDropRanking extends BaseComponent {
         if (index >= 0 && index < this.tieWithNext.length) {
             this.tieWithNext[index] = !this.tieWithNext[index];
             this.rerender();
+            this.notifyChange();
         }
     }
 
@@ -255,6 +223,7 @@ class DragDropRanking extends BaseComponent {
         // Rebuild tie markers preserving ties between non-moved items that remain adjacent
         this.rebuildTiesAfterMove(oldAdjacency, movedId);
         this.rerender();
+        this.notifyChange();
     }
 
     rebuildTiesAfterMove(oldAdjacency, movedId) {
@@ -264,19 +233,32 @@ class DragDropRanking extends BaseComponent {
             const a = this.orderedIds[i];
             const b = this.orderedIds[i + 1];
 
-            // Ties involving the moved item are always cleared
-            if (a === movedId || b === movedId) {
-                continue;
-            }
-
-            // If this pair was adjacent before, preserve the old tie status
             const pairKey = a + '|' + b;
-            if (oldAdjacency.has(pairKey)) {
-                newTies[i] = oldAdjacency.get(pairKey);
+            const reversePairKey = b + '|' + a;
+
+            if (a === movedId || b === movedId) {
+                // For pairs involving the moved player, check both directions
+                // so that swapping two tied adjacent players preserves the tie
+                if (oldAdjacency.has(pairKey)) {
+                    newTies[i] = oldAdjacency.get(pairKey);
+                } else if (oldAdjacency.has(reversePairKey)) {
+                    newTies[i] = oldAdjacency.get(reversePairKey);
+                }
+            } else {
+                // Non-moved pairs: preserve tie if they were adjacent before
+                if (oldAdjacency.has(pairKey)) {
+                    newTies[i] = oldAdjacency.get(pairKey);
+                }
             }
         }
 
         this.tieWithNext = newTies;
+    }
+
+    notifyChange() {
+        if (this.onChange) {
+            this.onChange(this.getTiers());
+        }
     }
 
     startDrag(index, event) {
