@@ -261,6 +261,26 @@ class DragDropRanking extends BaseComponent {
         }
     }
 
+    /**
+     * Update player data (e.g. after ELO recalculation).
+     * Targeted DOM patch — only updates rating text and avatars,
+     * without full rerender or event listener re-setup.
+     */
+    updatePlayers(players) {
+        this.players = players;
+        for (const id of this.orderedIds) {
+            const player = this.getPlayerById(id);
+            if (!player) continue;
+            const rating = Math.round(player.ratings[this.position] || 1500);
+            const item = this.container.querySelector(`[data-player-id="${id}"]`);
+            if (!item) continue;
+            const ratingEl = item.querySelector('.ranking-item__rating');
+            if (ratingEl) ratingEl.textContent = `${rating} ELO`;
+            const avatarEl = item.querySelector('.ranking-item__avatar');
+            if (avatarEl) avatarEl.innerHTML = generateAvatar(player.name, 40, rating);
+        }
+    }
+
     startDrag(index, event) {
         const listEl = this.$('#rankingList');
         if (!listEl) return;

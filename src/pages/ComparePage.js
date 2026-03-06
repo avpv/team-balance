@@ -443,10 +443,16 @@ class ComparePage extends BasePage {
         try {
             this._suppressUpdates = true;
             this.comparisonService.processRanking(tiers, this.selectedPosition);
-            this._suppressUpdates = false;
+
+            // Patch ELO values in-place (moveItem already rerendered the new order)
+            if (this.dragDropRanking) {
+                const freshPlayers = this.playerService.getByPosition(this.selectedPosition);
+                this.dragDropRanking.updatePlayers(freshPlayers);
+            }
         } catch (error) {
-            this._suppressUpdates = false;
             toast.error(error.message);
+        } finally {
+            this._suppressUpdates = false;
         }
     }
 
