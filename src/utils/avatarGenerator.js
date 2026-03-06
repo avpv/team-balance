@@ -138,77 +138,38 @@ function generateChernoffFace(hash, size, elo = null) {
     const colors = getColorScheme(rng);
 
     // === 19 STATISTICAL PARAMETERS (Chernoff Face Variables) ===
-    // Ranges widened vs. v6 for stronger visual differentiation.
+    // All parameters are generated independently (fixed rng consumption order).
+    // Geometric constraints are applied later in the DIMENSIONS section so
+    // that the PRNG stream stays uncorrelated across all 19 variables.
 
-    // Variable 1: Head size (overall face radius)
-    const headSize = getHashValue(rng, 0.62, 0.88);
-
-    // Variable 2: Face width/roundness (aspect ratio: 0.75=tall, 1.25=wide)
-    // Constrained so headSize * faceAspect ≤ ~0.95 (face fits with ear margin)
-    const rawFaceAspect = getHashValue(rng, 0.75, 1.25);
-    const faceAspect = Math.min(rawFaceAspect, 0.95 / headSize);
-
-    // Variable 19: Chin shape (pointedness: 0=round, 1=pointed/angular)
-    const chinShape = getHashValue(rng, 0.0, 1.0);
-
-    // Variable 3: Eye size (horizontal radius of eye ellipses)
-    const eyeSize = getHashValue(rng, 0.05, 0.15);
-
-    // Variable 4: Eye separation (distance between eyes)
-    const eyeSeparation = getHashValue(rng, 0.18, 0.40);
-
-    // Variable 12: Left eye height (vertical radius as ratio of horizontal)
-    const eyeHeightLeft = getHashValue(rng, 0.50, 1.1);
-
-    // Variable 13: Right eye height (vertical radius as ratio of horizontal)
-    const eyeHeightRight = getHashValue(rng, 0.50, 1.1);
-
-    // Variable 5: Pupil size (size of pupils within eyes)
-    const pupilSize = getHashValue(rng, 0.25, 0.65);
-
-    // Variable 14: Pupil X position (horizontal gaze direction)
-    // Constrained so pupil stays inside the eye: |offset| + pupilSize ≤ 0.85
-    const maxPupilOffset = Math.max(0.05, 0.85 - pupilSize);
-    const pupilOffsetX = getHashValue(rng, -maxPupilOffset, maxPupilOffset);
-
-    // Variable 15: Pupil Y position (vertical gaze direction)
-    const pupilOffsetY = getHashValue(rng, -maxPupilOffset * 0.7, maxPupilOffset * 0.7);
-
-    // Variable 6: Eyebrow angle (-0.20=sad, 0=neutral, 0.20=surprised)
-    const eyebrowAngle = getHashValue(rng, -0.20, 0.20);
-
-    // Variable 16: Eyebrow curvature (arc depth: 0.10=slight, 0.55=strong)
-    const eyebrowCurve = getHashValue(rng, 0.10, 0.55);
-
-    // Variable 7: Nose length (0.4-1.6 times eye radius)
-    const noseLength = getHashValue(rng, 0.4, 1.6);
-
-    // Variable 11: Nose width (width of nose base)
-    const noseWidth = getHashValue(rng, 0.025, 0.09);
-
-    // Variable 17: Nostril size (size of nostrils)
-    const nostrilSize = getHashValue(rng, 0.008, 0.028);
-
-    // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
-    // Always consume the rng slot so subsequent parameters stay stable
-    // regardless of whether ELO is provided.
+    const headSize      = getHashValue(rng, 0.62, 0.88);   // V1: head radius
+    const faceAspect    = getHashValue(rng, 0.75, 1.25);   // V2: width/height ratio
+    const chinShape     = getHashValue(rng, 0.0, 1.0);     // V19: round→pointed
+    const eyeSize       = getHashValue(rng, 0.05, 0.15);   // V3: eye horiz radius
+    const eyeSeparation = getHashValue(rng, 0.18, 0.40);   // V4: distance between eyes
+    const eyeHeightLeft = getHashValue(rng, 0.50, 1.1);    // V12: left eye vert ratio
+    const eyeHeightRight = getHashValue(rng, 0.50, 1.1);   // V13: right eye vert ratio
+    const pupilSize     = getHashValue(rng, 0.25, 0.65);   // V5: pupil/eye ratio
+    const pupilOffsetX  = getHashValue(rng, -0.30, 0.30);  // V14: horizontal gaze
+    const pupilOffsetY  = getHashValue(rng, -0.20, 0.20);  // V15: vertical gaze
+    const eyebrowAngle  = getHashValue(rng, -0.20, 0.20);  // V6: brow tilt
+    const eyebrowCurve  = getHashValue(rng, 0.10, 0.55);   // V16: brow arc depth
+    const noseLength    = getHashValue(rng, 0.4, 1.6);     // V7: nose height
+    const noseWidth     = getHashValue(rng, 0.025, 0.09);  // V11: nose base width
+    const nostrilSize   = getHashValue(rng, 0.008, 0.028); // V17: nostril radius
+    // V8: Mouth curvature – always consume the rng slot for stream stability
     const mouthCurveHash = getHashValue(rng, -0.10, 0.14);
     const mouthCurve = elo !== null ? eloToSmile(elo) : mouthCurveHash;
-
-    // Variable 9: Mouth width (horizontal width)
-    const mouthWidth = getHashValue(rng, 0.22, 0.52);
-
-    // Variable 18: Lip thickness (fullness of lips)
-    const lipThickness = getHashValue(rng, 0.007, 0.028);
-
-    // Variable 10: Ear size (size of ears)
-    const earSize = getHashValue(rng, 0.06, 0.16);
+    const mouthWidth    = getHashValue(rng, 0.22, 0.52);   // V9: mouth width
+    const lipThickness  = getHashValue(rng, 0.007, 0.028); // V18: lip fullness
+    const earSize       = getHashValue(rng, 0.06, 0.16);   // V10: ear radius
 
     // === CALCULATE POSITIONS AND DIMENSIONS ===
+    // Geometric safety clamps applied here (not above) to keep PRNG independent.
 
-    // Face dimensions
+    // Face dimensions – clamp so face + ears fit inside the viewBox
     const faceRadius = center * headSize;
-    const faceRadiusX = faceRadius * faceAspect;
+    const faceRadiusX = Math.min(faceRadius * faceAspect, center * 0.92);
     const faceRadiusY = faceRadius;
 
     // Eye positions and dimensions
@@ -268,11 +229,16 @@ function generateChernoffFace(hash, size, elo = null) {
         <ellipse cx="${earRight}" cy="${earY}" rx="${earR * 0.6}" ry="${earR}" fill="${colors.face}" stroke="${colors.features}" stroke-width="1.5"/>
     `;
 
-    // Calculate pupil positions with gaze offset
-    const pupilLeftX = eyeLeft + (eyeRx * pupilOffsetX);
-    const pupilLeftY = eyeY + (eyeRyLeft * pupilOffsetY);
-    const pupilRightX = eyeRight + (eyeRx * pupilOffsetX);
-    const pupilRightY = eyeY + (eyeRyRight * pupilOffsetY);
+    // Calculate pupil positions with gaze offset.
+    // Clamp so the pupil circle stays inside the eye ellipse.
+    const maxOfsX = Math.max(0, 1 - pupilSize) * 0.85;
+    const maxOfsY = Math.max(0, 1 - pupilSize) * 0.85;
+    const clampedOfsX = Math.max(-maxOfsX, Math.min(maxOfsX, pupilOffsetX));
+    const clampedOfsY = Math.max(-maxOfsY, Math.min(maxOfsY, pupilOffsetY));
+    const pupilLeftX = eyeLeft + (eyeRx * clampedOfsX);
+    const pupilLeftY = eyeY + (eyeRyLeft * clampedOfsY);
+    const pupilRightX = eyeRight + (eyeRx * clampedOfsX);
+    const pupilRightY = eyeY + (eyeRyRight * clampedOfsY);
 
     // Eyes (ellipses with pupils)
     const eyesHTML = `
