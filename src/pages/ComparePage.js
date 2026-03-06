@@ -150,21 +150,6 @@ class ComparePage extends BasePage {
             const positionName = this.activityConfig.positions[this.selectedPosition];
 
             if (players.length >= 2) {
-                // Confirm overwrite upfront when entering ranking mode
-                const progress = this.comparisonService.getProgress(this.selectedPosition);
-                if (progress.completed > 0 && !this._rankingOverwriteConfirmed) {
-                    const confirmed = confirm(t('compare.ranking.confirmReset', {
-                        position: positionName,
-                        count: progress.completed
-                    }));
-                    if (!confirmed) {
-                        this.selectedPosition = '';
-                        this.update();
-                        return;
-                    }
-                    this._rankingOverwriteConfirmed = true;
-                }
-
                 this.dragDropRanking = new DragDropRanking(comparisonAreaContainer, {
                     position: this.selectedPosition,
                     positionName,
@@ -311,8 +296,10 @@ class ComparePage extends BasePage {
     }
 
     handlePositionSelect(positionKey) {
+        if (this.compareMode === 'ranking' && !this.confirmRankingOverwrite(positionKey)) {
+            return;
+        }
         this.selectedPosition = positionKey;
-        this._rankingOverwriteConfirmed = false;
         this.loadNextPair();
         this.update();
 
@@ -439,6 +426,10 @@ class ComparePage extends BasePage {
     }
 
     handleModeChange(mode) {
+        if (mode === 'ranking' && this.selectedPosition
+            && !this.confirmRankingOverwrite(this.selectedPosition)) {
+            return;
+        }
         this.compareMode = mode;
         this.update();
 
@@ -457,6 +448,17 @@ class ComparePage extends BasePage {
             this._suppressUpdates = false;
             toast.error(error.message);
         }
+    }
+
+    confirmRankingOverwrite(positionKey) {
+        const progress = this.comparisonService.getProgress(positionKey);
+        if (progress.completed === 0) return true;
+
+        const positionName = this.activityConfig.positions[positionKey];
+        return confirm(t('compare.ranking.confirmReset', {
+            position: positionName,
+            count: progress.completed
+        }));
     }
 
     showResetAllModal() {
