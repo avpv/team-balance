@@ -443,20 +443,16 @@ class ComparePage extends BasePage {
         try {
             this._suppressUpdates = true;
             this.comparisonService.processRanking(tiers, this.selectedPosition);
-            this._suppressUpdates = false;
 
-            // Refresh player data in DragDropRanking to show updated ELO ratings
+            // Patch ELO values in-place (moveItem already rerendered the new order)
             if (this.dragDropRanking) {
                 const freshPlayers = this.playerService.getByPosition(this.selectedPosition);
                 this.dragDropRanking.updatePlayers(freshPlayers);
             }
         } catch (error) {
-            this._suppressUpdates = false;
             toast.error(error.message);
-            // Still rerender to reflect the new order even if rating update failed
-            if (this.dragDropRanking) {
-                this.dragDropRanking.rerender();
-            }
+        } finally {
+            this._suppressUpdates = false;
         }
     }
 
