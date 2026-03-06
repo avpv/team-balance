@@ -2984,6 +2984,15 @@
     background-color: var(--color-surface-overlay);
 }
 
+.ranking-area .ranking-tier-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+}
+
+.ranking-area .ranking-tier-toggle:active {
+    transform: scale(0.92);
+}
+
 .ranking-area .ranking-tier-toggle__symbol {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
@@ -2994,7 +3003,12 @@
 
 .ranking-area .ranking-tier-toggle--tied {
     border-color: var(--color-warning);
-    background-color: rgba(158, 106, 3, 0.1);
+    background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+}
+
+.ranking-area .ranking-tier-toggle--tied:hover {
+    border-color: var(--color-warning);
+    background-color: color-mix(in srgb, var(--color-warning) 20%, transparent);
 }
 
 .ranking-area .ranking-tier-toggle--tied .ranking-tier-toggle__symbol {
