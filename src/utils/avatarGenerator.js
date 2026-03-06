@@ -80,13 +80,14 @@ function getHashValue(rng, min, max) {
 }
 
 /**
- * Get avatar color scheme from hash (Academic/Scientific style)
- * @param {number} hash - Hash value
+ * Get avatar color scheme using PRNG (Academic/Scientific style).
+ * Hue is quantised to 15° steps (24 perceptually distinct buckets).
+ * @param {function(): number} rng - PRNG function (mulberry32 instance)
  * @returns {object} - Color scheme with background, face, and features
  */
 function getColorScheme(rng) {
-    // Generate a unique hue from the PRNG for maximum color diversity
-    const hue = Math.floor(rng() * 360);
+    // 24 perceptually distinct hue buckets (every 15°)
+    const hue = Math.floor(rng() * 24) * 15;
     const satBg = 40 + rng() * 25;   // 40-65
     const satFace = 30 + rng() * 20;  // 30-50
     const satFeat = 45 + rng() * 25;  // 45-70
@@ -185,7 +186,10 @@ function generateChernoffFace(hash, size, elo = null) {
     const nostrilSize = getHashValue(rng, 0.008, 0.030);
 
     // Variable 8: Mouth curvature (smile/frown, can be ELO-based)
-    const mouthCurve = elo !== null ? eloToSmile(elo) : getHashValue(rng, -0.10, 0.14);
+    // Always consume the rng slot so subsequent parameters stay stable
+    // regardless of whether ELO is provided.
+    const mouthCurveHash = getHashValue(rng, -0.10, 0.14);
+    const mouthCurve = elo !== null ? eloToSmile(elo) : mouthCurveHash;
 
     // Variable 9: Mouth width (horizontal width)
     const mouthWidth = getHashValue(rng, 0.20, 0.55);
