@@ -281,11 +281,6 @@ class DragDropRanking extends BaseComponent {
             if (!item) continue;
             const ratingEl = item.querySelector('.ranking-item__rating');
             if (ratingEl) ratingEl.textContent = `${rating} ELO`;
-            const avatarEl = item.querySelector('.ranking-item__avatar');
-            if (avatarEl) {
-                const player = this.getPlayerById(id);
-                if (player) avatarEl.innerHTML = generateAvatar(player.name, 40, rating);
-            }
         }
     }
 
