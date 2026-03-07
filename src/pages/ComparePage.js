@@ -154,7 +154,8 @@ class ComparePage extends BasePage {
                     position: this.selectedPosition,
                     positionName,
                     players,
-                    onApply: (tiers) => this.handleRankingApply(tiers)
+                    onApply: (tiers) => this.handleRankingApply(tiers),
+                    onPreview: (tiers) => this.comparisonService.previewRanking(tiers, this.selectedPosition)
                 });
                 this.dragDropRanking.mount();
                 this.addComponent(this.dragDropRanking);

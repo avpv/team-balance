@@ -609,6 +609,39 @@ class ComparisonService {
      * @param {string} position - Position being ranked
      * @returns {Object} Summary of processed comparisons
      */
+    previewRanking(tiers, position) {
+        const allIds = tiers.flat();
+        if (allIds.length < 2) return {};
+
+        const poolSize = this.playerRepository.countByPosition(position);
+        const snapshotRating = this.eloService.DEFAULT_RATING;
+        const snapshotRd = this.eloService.GLICKO2.INITIAL_RD;
+        const effectiveK = this.eloService.calculateEffectiveKFactor(0, snapshotRating, poolSize, snapshotRd);
+        const halfK = effectiveK / 2;
+
+        const winsLosses = new Map();
+        for (const id of allIds) {
+            winsLosses.set(id, { wins: 0, losses: 0 });
+        }
+
+        for (let t1 = 0; t1 < tiers.length; t1++) {
+            for (let t2 = t1 + 1; t2 < tiers.length; t2++) {
+                for (const winnerId of tiers[t1]) {
+                    for (const loserId of tiers[t2]) {
+                        winsLosses.get(winnerId).wins++;
+                        winsLosses.get(loserId).losses++;
+                    }
+                }
+            }
+        }
+
+        const ratings = {};
+        for (const [id, res] of winsLosses) {
+            ratings[id] = Math.round(snapshotRating + (res.wins - res.losses) * halfK);
+        }
+        return ratings;
+    }
+
     processRanking(tiers, position) {
         const allIds = tiers.flat();
 
