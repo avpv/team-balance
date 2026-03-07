@@ -148,8 +148,26 @@ class ComparePage extends BasePage {
             // 2a. Drag & Drop Ranking mode
             const players = this.playerService.getByPosition(this.selectedPosition);
             const positionName = this.activityConfig.positions[this.selectedPosition];
+            const status = this.comparisonService.checkStatus(this.selectedPosition);
+            const progress = this.comparisonService.getProgress(this.selectedPosition);
 
-            if (players.length >= 2) {
+            if (!status.canCompare && progress.percentage === 100) {
+                // Position is complete — show completion UI same as pairwise mode
+                const suggestion = this.getNextPositionSuggestion();
+                this.comparisonArea = new ComparisonArea(comparisonAreaContainer, {
+                    selectedPosition: this.selectedPosition,
+                    positionName,
+                    status,
+                    progress,
+                    currentPair: null,
+                    nextPair: null,
+                    suggestion,
+                    violations: [],
+                    onSuggestionClick: (key) => this.handlePositionSelect(key)
+                });
+                this.comparisonArea.mount();
+                this.addComponent(this.comparisonArea);
+            } else if (players.length >= 2) {
                 this.dragDropRanking = new DragDropRanking(comparisonAreaContainer, {
                     position: this.selectedPosition,
                     positionName,
