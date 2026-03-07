@@ -17,10 +17,7 @@ export const NAME_VALIDATION = {
     MAX_LENGTH: 50,
 
     /** Valid name pattern (any letter, numbers, spaces, hyphens, underscores, apostrophes) */
-    PATTERN: /^[\p{Letter}\p{Mark}0-9\s\-_.'']+$/u,
-
-    /** Extended pattern (same as PATTERN) */
-    PATTERN_EXTENDED: /^[\p{Letter}\p{Mark}0-9\s\-_.'']+$/u
+    PATTERN: /^[\p{Letter}\p{Mark}0-9\s\-_.'']+$/u
 };
 
 /**
