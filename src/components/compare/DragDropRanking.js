@@ -96,7 +96,7 @@ class DragDropRanking extends BaseComponent {
 
         const rating = Math.round(player.ratings[this.position] || 1500);
         const rank = this.getRankNumber(index);
-        const avatarSvg = generateAvatar(player.name, 40, rating);
+        const avatarSvg = generateAvatar(player.name, 40);
         const isDragging = this.dragState?.dragIndex === index;
 
         let tierSeparator = '';
