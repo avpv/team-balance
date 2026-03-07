@@ -1,5 +1,7 @@
 // src/services/ValidationService.js
 
+import { NAME_VALIDATION } from '../config/validation.js';
+
 /**
  * ValidationService - Centralized validation logic
  *
@@ -27,9 +29,9 @@ class ValidationService {
         // Validation rules
         this.rules = {
             playerName: {
-                minLength: 1,
-                maxLength: 50,
-                pattern: /^[a-zA-Z\s\u0400-\u04FF'-]+$/,
+                minLength: NAME_VALIDATION.MIN_LENGTH,
+                maxLength: NAME_VALIDATION.MAX_LENGTH,
+                pattern: NAME_VALIDATION.PATTERN,
                 patternMessage: 'Player name contains invalid characters'
             }
         };
