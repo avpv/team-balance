@@ -29,7 +29,7 @@ class ValidationService {
             playerName: {
                 minLength: 1,
                 maxLength: 50,
-                pattern: /^[a-zA-Z\s\u0400-\u04FF'-]+$/,
+                pattern: /^[a-zA-ZÀ-ÖØ-öø-ÿĀ-žḀ-ỿ0-9\s\u0400-\u04FF\-_.'']+$/,
                 patternMessage: 'Player name contains invalid characters'
             }
         };
