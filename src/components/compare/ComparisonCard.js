@@ -23,8 +23,7 @@ class ComparisonCard extends BaseComponent {
         const rating = Math.round(player.ratings[positionKey]);
         const comparisons = player.comparisons[positionKey];
 
-        // Generate SVG avatar with ELO-based smile
-        const avatarSvg = generateAvatar(player.name, 96, rating);
+        const avatarSvg = generateAvatar(player.name, 96);
 
         return `
             <button
