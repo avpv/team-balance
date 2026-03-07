@@ -10,7 +10,6 @@ class DragDropRanking extends BaseComponent {
         this.positionName = props.positionName;
         this.players = props.players || [];
         this.onApply = props.onApply;
-        this.onCancel = props.onCancel;
 
         // Ordered list of player IDs (best first, sorted by current ELO)
         this.orderedIds = [...this.players]
@@ -81,9 +80,6 @@ class DragDropRanking extends BaseComponent {
                 </div>
 
                 <div class="ranking-actions">
-                    <button class="btn btn-secondary ranking-actions__cancel" id="rankingCancel">
-                        ${t('common.cancel')}
-                    </button>
                     <button class="btn btn-primary ranking-actions__apply" id="rankingApply">
                         ${getIcon('check', { size: 16, className: 'btn-icon' })}
                         ${t('compare.ranking.applyRanking')}
@@ -164,18 +160,6 @@ class DragDropRanking extends BaseComponent {
             this.addEventListener(applyBtn, 'click', () => {
                 if (this.onApply) {
                     this.onApply(this.getTiers());
-                }
-            });
-        }
-
-        // Cancel button
-        const cancelBtn = this.$('#rankingCancel');
-        if (cancelBtn) {
-            this.addEventListener(cancelBtn, 'click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (this.onCancel) {
-                    this.onCancel();
                 }
             });
         }

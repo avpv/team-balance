@@ -154,8 +154,7 @@ class ComparePage extends BasePage {
                     position: this.selectedPosition,
                     positionName,
                     players,
-                    onApply: (tiers) => this.handleRankingApply(tiers),
-                    onCancel: () => this.handleRankingCancel()
+                    onApply: (tiers) => this.handleRankingApply(tiers)
                 });
                 this.dragDropRanking.mount();
                 this.addComponent(this.dragDropRanking);
@@ -469,12 +468,6 @@ class ComparePage extends BasePage {
         } finally {
             this._suppressUpdates = false;
         }
-    }
-
-    handleRankingCancel() {
-        this.selectedPosition = '';
-        this.currentPair = null;
-        this.update();
     }
 
     showResetAllModal() {
