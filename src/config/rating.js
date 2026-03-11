@@ -1,15 +1,8 @@
 /**
  * Rating System Configuration
- * Centralized configuration for ELO rating calculations and thresholds
- *
- * This file provides a single source of truth for all rating-related constants
- * across the application, ensuring consistency and ease of modification.
+ * Single source of truth for all Glicko-2 rating constants.
  */
 
-/**
- * Core Rating Constants
- * Default values for player ratings and boundaries
- */
 export const RATING_CONSTANTS = {
     /** Default starting rating for new players */
     DEFAULT: 1500,
@@ -18,41 +11,28 @@ export const RATING_CONSTANTS = {
     MIN: 0,
 
     /** Maximum possible rating value */
-    MAX: 3000,
-
-    /** Rating difference formula divisor (standard ELO) */
-    RATING_DIVISOR: 400,
-
-    /** Base for probability calculation (standard ELO) */
-    PROBABILITY_BASE: 10
+    MAX: 3000
 };
 
 /**
  * Glicko-2 Rating Deviation (RD) Configuration
- * Tracks individual uncertainty for each player's rating.
  *
  * RD represents how confident we are in a player's rating:
  *   - Low RD (~50) = very confident, rating is accurate
  *   - High RD (~350) = uncertain, rating may be inaccurate
- *
- * RD increases over time without comparisons (rating becomes stale).
- * RD decreases as more comparisons are made.
  */
 export const GLICKO2 = {
     /**
      * Initial RD for new players.
-     * Tuned for single-session use: players have 3-10 comparisons total,
-     * not hundreds. RD=250 (vs standard 350) gives:
-     * - g(φ)≈0.78 at start (vs 0.67) → less order-dependence in step-by-step
-     * - After 5 comparisons RD drops to ~130 → "medium" confidence
-     * - Batch spread for 6 players: ~550 pts (enough for team balancing)
+     * Tuned for single-session use: players have 3-10 comparisons total.
+     * RD=250 (vs standard 350) gives g(φ)≈0.78 at start → less order-dependence.
      */
     INITIAL_RD: 250,
 
-    /** Minimum RD (maximum confidence, never drops below this) */
+    /** Minimum RD (maximum confidence) */
     MIN_RD: 30,
 
-    /** Maximum RD (matches INITIAL_RD for single-session context) */
+    /** Maximum RD */
     MAX_RD: 250,
 
     /** Initial volatility (σ) for new players */
@@ -67,8 +47,7 @@ export const GLICKO2 = {
     /**
      * System constant (τ) - constrains volatility change rate.
      * Standard Glicko-2 recommends 0.3-1.2.
-     * Higher value = ratings adapt faster, appropriate for single-session
-     * where every comparison carries significant information.
+     * Higher = ratings adapt faster, appropriate for single-session.
      */
     TAU: 0.9,
 
@@ -83,9 +62,8 @@ export const GLICKO2 = {
 
     /**
      * Adaptive RD: scale initial RD with pool size.
-     * Small pools (3-4) → lower RD (converge fast with few comparisons).
-     * Large pools (10+) → higher RD (more comparisons available for spread).
-     * Formula: INITIAL_RD * sqrt(poolSize / REFERENCE_POOL), clamped to [MIN, MAX].
+     * Small pools (3-4) → lower RD; large pools (10+) → higher RD.
+     * Formula: INITIAL_RD * sqrt(poolSize / REFERENCE_POOL), clamped.
      */
     ADAPTIVE_RD: {
         REFERENCE_POOL: 6,
@@ -93,70 +71,15 @@ export const GLICKO2 = {
         MAX: 320
     },
 
-    /**
-     * RD confidence thresholds for UI display.
-     * Tuned for single-session: after a full round of comparisons (n-1),
-     * RD should reach "medium" or "high" confidence.
-     * With INITIAL_RD=250: after 3 comparisons RD≈160, after 5 RD≈130, after 8 RD≈100.
-     */
+    /** RD confidence thresholds for UI display */
     CONFIDENCE: {
-        /** Very confident in rating (RD≤110, ~8+ comparisons) */
         HIGH: 110,
-        /** Moderately confident (RD≤170, ~3+ comparisons) */
         MEDIUM: 170,
-        /** Low confidence (RD≤230, ~1 comparison) */
         LOW: 230
     }
 };
 
-/**
- * Balance Thresholds
- * Defines what constitutes balanced teams or matchups
- */
-export const BALANCE_THRESHOLDS = {
-    /** Rating difference for "balanced" 1v1 matchup */
-    MATCHUP_BALANCED: 200,
-
-    /** Maximum weighted rating difference for balanced teams */
-    TEAM_BALANCED: 350
-};
-
-/**
- * Confidence Level Configuration
- * Determines confidence in rating accuracy based on comparison count
- */
-export const CONFIDENCE_LEVELS = {
-    /** Minimum comparisons percentage for each confidence level */
-    VERY_LOW: 0,   // < 20% of possible comparisons
-    LOW: 20,       // 20-39% of possible comparisons
-    MEDIUM: 40,    // 40-59% of possible comparisons
-    HIGH: 60,      // 60-79% of possible comparisons
-    VERY_HIGH: 80  // >= 80% of possible comparisons
-};
-
-/**
- * Percentile Calculation Settings
- * Configuration for ranking players within position pools
- */
-export const PERCENTILE_CONFIG = {
-    /** Top percentile value (best player) */
-    TOP: 100,
-
-    /** Bottom percentile value (lowest player) */
-    BOTTOM: 0,
-
-    /** Enable percentile caching for performance */
-    CACHE_ENABLED: false
-};
-
-/**
- * Export default configuration object
- * Provides all rating configuration in one place
- */
 export default {
     RATING_CONSTANTS,
-    GLICKO2,
-    BALANCE_THRESHOLDS,
-    CONFIDENCE_LEVELS,
-    PERCENTILE_CONFIG
+    GLICKO2
 };
