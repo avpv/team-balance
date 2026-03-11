@@ -701,27 +701,12 @@ class TeamsPage extends BasePage {
             Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
             try {
-                // Generate multiple variants in parallel, each with a unique seed
-                // to ensure algorithms converge to different solutions
-                const variantPromises = [];
-                for (let i = 0; i < VARIANT_COUNT; i++) {
-                    variantPromises.push(
-                        this.teamOptimizerService.optimize(composition, teamCount, players, { variantSeed: i + 1 })
-                    );
-                }
-
-                const allVariants = await Promise.all(variantPromises);
-
-                // Deduplicate variants that produced identical team compositions
-                const seen = new Set();
-                const variants = allVariants.filter(variant => {
-                    const key = variant.teams.map(team =>
-                        team.map(p => p.name).sort().join(',')
-                    ).sort().join('|');
-                    if (seen.has(key)) return false;
-                    seen.add(key);
-                    return true;
-                });
+                // Generate multiple variants in a single optimization run.
+                // The optimizer runs all algorithms, collects unique solutions,
+                // refines each with local search, and returns the top-N.
+                const variants = await this.teamOptimizerService.optimize(
+                    composition, teamCount, players, { variantCount: VARIANT_COUNT }
+                );
 
                 // Sort variants by weighted balance (best first)
                 variants.sort((a, b) => {
