@@ -31,8 +31,8 @@ class TeamOptimizerServiceWrapper {
      * @param {Array} players - Available players
      * @returns {Promise<Object>} Optimization result
      */
-    async optimize(composition, teamCount, players) {
-        return await this.optimizer.optimize(composition, teamCount, players);
+    async optimize(composition, teamCount, players, options = {}) {
+        return await this.optimizer.optimize(composition, teamCount, players, options);
     }
 
     /**
