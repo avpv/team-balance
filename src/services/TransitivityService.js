@@ -136,6 +136,7 @@ class TransitivityService {
     _buildWinGraph(players, position) {
         const wins = new Map();
         const nameToId = new Map(players.map(p => [p.name, p.id]));
+        const idSet = new Set(players.map(p => p.id));
 
         for (const player of players) {
             const beaten = player.winsAgainst?.[position] || [];
@@ -143,8 +144,14 @@ class TransitivityService {
 
             const winnerWins = wins.get(player.id) || new Set();
 
-            for (const loserName of beaten) {
-                const loserId = nameToId.get(loserName);
+            for (const loserRef of beaten) {
+                // Support both ID-based (new) and name-based (legacy) entries
+                let loserId;
+                if (idSet.has(loserRef)) {
+                    loserId = loserRef;
+                } else {
+                    loserId = nameToId.get(loserRef);
+                }
                 if (loserId) {
                     winnerWins.add(loserId);
                 }
