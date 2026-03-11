@@ -158,22 +158,7 @@ export const BALANCE_THRESHOLDS = {
     MATCHUP_BALANCED: 200,
 
     /** Maximum weighted rating difference for balanced teams */
-    TEAM_BALANCED: 350,
-
-    /** Thresholds for balance quality indicators */
-    QUALITY: {
-        /** Excellent balance (very close teams) */
-        EXCELLENT: 100,
-
-        /** Good balance */
-        GOOD: 200,
-
-        /** Fair balance */
-        FAIR: 300,
-
-        /** Poor balance (approaching threshold) */
-        POOR: 500
-    }
+    TEAM_BALANCED: 350
 };
 
 /**

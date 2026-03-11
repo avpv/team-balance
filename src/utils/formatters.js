@@ -2,7 +2,6 @@
 
 import { activities } from '../config/activities/index.js';
 import storage from '../core/StorageAdapter.js';
-import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
 
 /**
@@ -159,19 +158,6 @@ export function formatComparisonCount(count) {
 }
 
 /**
- * Format team balance
- * Uses thresholds from rating.js for consistency
- */
-export function formatBalance(difference) {
-    const thresholds = ratingConfig.BALANCE_THRESHOLDS.QUALITY;
-    if (difference < thresholds.EXCELLENT) return 'Excellent';
-    if (difference < thresholds.GOOD) return 'Very Good';
-    if (difference < thresholds.FAIR) return 'Good';
-    if (difference < thresholds.POOR) return 'Fair';
-    return 'Poor';
-}
-
-/**
  * Format ordinal number (1st, 2nd, 3rd, etc.)
  */
 export function formatOrdinal(num) {
@@ -217,7 +203,6 @@ export default {
     truncate,
     pluralize,
     formatComparisonCount,
-    formatBalance,
     formatOrdinal,
     formatRelativeTime
 };
