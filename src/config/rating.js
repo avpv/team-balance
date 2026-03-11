@@ -88,14 +88,21 @@ export const K_FACTORS = {
  * RD decreases as more comparisons are made.
  */
 export const GLICKO2 = {
-    /** Initial RD for new players (maximum uncertainty) */
-    INITIAL_RD: 350,
+    /**
+     * Initial RD for new players.
+     * Tuned for single-session use: players have 3-10 comparisons total,
+     * not hundreds. RD=250 (vs standard 350) gives:
+     * - g(φ)≈0.78 at start (vs 0.67) → less order-dependence in step-by-step
+     * - After 5 comparisons RD drops to ~130 → "medium" confidence
+     * - Batch spread for 6 players: ~550 pts (enough for team balancing)
+     */
+    INITIAL_RD: 250,
 
     /** Minimum RD (maximum confidence, never drops below this) */
     MIN_RD: 30,
 
-    /** Maximum RD (full uncertainty) */
-    MAX_RD: 350,
+    /** Maximum RD (matches INITIAL_RD for single-session context) */
+    MAX_RD: 250,
 
     /** Initial volatility (σ) for new players */
     INITIAL_VOLATILITY: 0.06,
@@ -104,12 +111,15 @@ export const GLICKO2 = {
     MIN_VOLATILITY: 0.01,
 
     /** Maximum volatility */
-    MAX_VOLATILITY: 0.12,
+    MAX_VOLATILITY: 0.15,
 
-    /** System constant (τ) - constrains volatility change rate.
-     *  Lower value = more conservative volatility changes.
-     *  Glicko-2 recommends 0.3-1.2 depending on domain. */
-    TAU: 0.5,
+    /**
+     * System constant (τ) - constrains volatility change rate.
+     * Standard Glicko-2 recommends 0.3-1.2.
+     * Higher value = ratings adapt faster, appropriate for single-session
+     * where every comparison carries significant information.
+     */
+    TAU: 0.9,
 
     /** Convergence tolerance for volatility iteration */
     CONVERGENCE_TOLERANCE: 0.000001,
@@ -120,14 +130,19 @@ export const GLICKO2 = {
     /** Glicko-2 scaling factor: 173.7178 = 400/ln(10) */
     SCALE: 173.7178,
 
-    /** RD confidence thresholds for UI display */
+    /**
+     * RD confidence thresholds for UI display.
+     * Tuned for single-session: after a full round of comparisons (n-1),
+     * RD should reach "medium" or "high" confidence.
+     * With INITIAL_RD=250: after 3 comparisons RD≈160, after 5 RD≈130, after 8 RD≈100.
+     */
     CONFIDENCE: {
-        /** Very confident in rating */
-        HIGH: 75,
-        /** Moderately confident */
-        MEDIUM: 150,
-        /** Low confidence */
-        LOW: 250
+        /** Very confident in rating (RD≤110, ~8+ comparisons) */
+        HIGH: 110,
+        /** Moderately confident (RD≤170, ~3+ comparisons) */
+        MEDIUM: 170,
+        /** Low confidence (RD≤230, ~1 comparison) */
+        LOW: 230
     }
 };
 
