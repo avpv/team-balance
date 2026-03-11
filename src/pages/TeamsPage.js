@@ -424,16 +424,9 @@ class TeamsPage extends BasePage {
                         ${getIcon(quality.icon, { size: ICON_SIZES.XXLARGE, className: 'balance-icon-svg' })}
                     </div>
                     <div class="balance-content">
-                        <span class="balance-label d-flex items-center gap-2">
-                            ${t('teams.results.balanceQuality')}
-                            <span class="status-badge status-badge--${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'success' : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'in-progress' : 'warning'}">
-                                ${quality.label}
-                            </span>
-                        </span>
                         <span class="balance-value">${t('teams.results.eloDifference', { value: weightedBalance })}</span>
                     </div>
                     <div class="balance-explanation">
-                        ${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? t('teams.results.excellentMsg') : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? t('teams.results.goodMsg') : t('teams.results.poorMsg')}
                         ${t('teams.results.lowerIsBetter')}
                     </div>
                 </div>
@@ -453,7 +446,6 @@ class TeamsPage extends BasePage {
             <div class="variant-selector" role="tablist" aria-label="${t('teams.results.variantSelectorLabel')}">
                 ${variants.map((variant, index) => {
                     const balance = this.calculateWeightedBalance(variant.teams);
-                    const quality = this.getBalanceQuality(balance);
                     const isActive = index === activeVariant;
                     return `
                         <button
@@ -487,11 +479,11 @@ class TeamsPage extends BasePage {
 
     getBalanceQuality(weightedBalance) {
         const thresholds = ratingConfig.BALANCE_THRESHOLDS.QUALITY;
-        if (weightedBalance <= thresholds.EXCELLENT) return { label: t('teams.results.excellent'), class: 'excellent', icon: 'target' };
-        if (weightedBalance <= thresholds.GOOD) return { label: t('teams.results.veryGood'), class: 'good', icon: 'award' };
-        if (weightedBalance <= thresholds.FAIR) return { label: t('teams.results.good'), class: 'okay', icon: 'thumbs-up' };
-        if (weightedBalance <= thresholds.POOR) return { label: t('teams.results.fair'), class: 'fair', icon: 'scale' };
-        return { label: t('teams.results.poor'), class: 'poor', icon: 'alert-triangle' };
+        if (weightedBalance <= thresholds.EXCELLENT) return { class: 'excellent', icon: 'target' };
+        if (weightedBalance <= thresholds.GOOD) return { class: 'good', icon: 'award' };
+        if (weightedBalance <= thresholds.FAIR) return { class: 'okay', icon: 'thumbs-up' };
+        if (weightedBalance <= thresholds.POOR) return { class: 'fair', icon: 'scale' };
+        return { class: 'poor', icon: 'alert-triangle' };
     }
 
     renderTeam(team, index) {
