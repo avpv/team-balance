@@ -158,6 +158,21 @@ class EloService {
         return this.calculateKFactor(comparisons, rating);
     }
 
+    /**
+     * Get adaptive initial RD based on pool size.
+     * Scales RD so that smaller pools converge faster and larger pools spread more.
+     *
+     * @param {number} poolSize - Number of players in the position pool
+     * @returns {number} Initial RD for this pool size
+     */
+    getInitialRD(poolSize) {
+        const g2 = this.GLICKO2;
+        const adaptive = g2.ADAPTIVE_RD;
+        if (!adaptive || !poolSize || poolSize <= 2) return g2.INITIAL_RD;
+        const scaled = Math.round(g2.INITIAL_RD * Math.sqrt(poolSize / adaptive.REFERENCE_POOL));
+        return Math.max(adaptive.MIN, Math.min(adaptive.MAX, scaled));
+    }
+
     // ==========================================
     // Glicko-2 Rating Deviation & Volatility
     // ==========================================

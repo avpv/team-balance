@@ -131,6 +131,18 @@ export const GLICKO2 = {
     SCALE: 173.7178,
 
     /**
+     * Adaptive RD: scale initial RD with pool size.
+     * Small pools (3-4) → lower RD (converge fast with few comparisons).
+     * Large pools (10+) → higher RD (more comparisons available for spread).
+     * Formula: INITIAL_RD * sqrt(poolSize / REFERENCE_POOL), clamped to [MIN, MAX].
+     */
+    ADAPTIVE_RD: {
+        REFERENCE_POOL: 6,
+        MIN: 200,
+        MAX: 320
+    },
+
+    /**
      * RD confidence thresholds for UI display.
      * Tuned for single-session: after a full round of comparisons (n-1),
      * RD should reach "medium" or "high" confidence.

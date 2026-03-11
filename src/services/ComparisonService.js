@@ -170,28 +170,53 @@ class ComparisonService {
         // Check if already compared
         this.checkAlreadyCompared(winner, loser, position);
 
-        // Calculate rating changes
+        // Save old ratings for change reporting
+        const winnerOldRating = winner.ratings?.[position] || this.eloService.DEFAULT_RATING;
+        const loserOldRating = loser.ratings?.[position] || this.eloService.DEFAULT_RATING;
         const poolSize = this.playerRepository.countByPosition(position);
-        const changes = this.eloService.calculateRatingChange(
-            winner,
-            loser,
-            position,
-            poolSize
-        );
 
-        // Update player data
+        // Record comparison metadata only (comparedWith, winsAgainst, comparisons)
         this.updatePlayersAfterComparison(
-            winnerId,
-            loserId,
-            position,
-            changes,
-            winner.name,
-            loser.name
+            winnerId, loserId, position, winner.name, loser.name
         );
 
-        // Get updated players
+        // Batch recalculate ALL ratings from scratch → order-independent
+        this._batchRecalculateRatings(position);
+
+        // Get updated players (with batch-calculated ratings)
         const updatedWinner = this.playerRepository.getById(winnerId);
         const updatedLoser = this.playerRepository.getById(loserId);
+
+        // Build changes from actual batch results
+        const winnerExpected = this.eloService.calculateExpectedScore(
+            winnerOldRating, loserOldRating
+        );
+        const loserExpected = this.eloService.calculateExpectedScore(
+            loserOldRating, winnerOldRating
+        );
+
+        const changes = {
+            winner: {
+                oldRating: winnerOldRating,
+                newRating: updatedWinner.ratings[position],
+                change: updatedWinner.ratings[position] - winnerOldRating,
+                kFactor: 0, baseKFactor: 0,
+                expected: winnerExpected,
+                newRd: updatedWinner.rd?.[position],
+                newVolatility: updatedWinner.volatility?.[position]
+            },
+            loser: {
+                oldRating: loserOldRating,
+                newRating: updatedLoser.ratings[position],
+                change: updatedLoser.ratings[position] - loserOldRating,
+                kFactor: 0, baseKFactor: 0,
+                expected: loserExpected,
+                newRd: updatedLoser.rd?.[position],
+                newVolatility: updatedLoser.volatility?.[position]
+            },
+            poolSize: poolSize || null,
+            poolAdjusted: false
+        };
 
         // Build result
         const result = {
@@ -231,28 +256,50 @@ class ComparisonService {
         // Check if already compared
         this.checkAlreadyCompared(player1, player2, position);
 
-        // Calculate rating changes for Win-Win
+        // Save old ratings for change reporting
+        const p1OldRating = player1.ratings?.[position] || this.eloService.DEFAULT_RATING;
+        const p2OldRating = player2.ratings?.[position] || this.eloService.DEFAULT_RATING;
         const poolSize = this.playerRepository.countByPosition(position);
-        const changes = this.eloService.calculateDrawRatingChange(
-            player1,
-            player2,
-            position,
-            poolSize
-        );
 
-        // Update player data
+        // Record comparison metadata only (no winsAgainst for draws)
         this.updatePlayersAfterDraw(
-            player1Id,
-            player2Id,
-            position,
-            changes,
-            player1.name,
-            player2.name
+            player1Id, player2Id, position, player1.name, player2.name
         );
 
-        // Get updated players
+        // Batch recalculate ALL ratings from scratch → order-independent
+        this._batchRecalculateRatings(position);
+
+        // Get updated players (with batch-calculated ratings)
         const updatedPlayer1 = this.playerRepository.getById(player1Id);
         const updatedPlayer2 = this.playerRepository.getById(player2Id);
+
+        // Build changes from actual batch results
+        const p1Expected = this.eloService.calculateExpectedScore(p1OldRating, p2OldRating);
+        const p2Expected = this.eloService.calculateExpectedScore(p2OldRating, p1OldRating);
+
+        const changes = {
+            player1: {
+                oldRating: p1OldRating,
+                newRating: updatedPlayer1.ratings[position],
+                change: updatedPlayer1.ratings[position] - p1OldRating,
+                kFactor: 0, baseKFactor: 0,
+                expected: p1Expected,
+                newRd: updatedPlayer1.rd?.[position],
+                newVolatility: updatedPlayer1.volatility?.[position]
+            },
+            player2: {
+                oldRating: p2OldRating,
+                newRating: updatedPlayer2.ratings[position],
+                change: updatedPlayer2.ratings[position] - p2OldRating,
+                kFactor: 0, baseKFactor: 0,
+                expected: p2Expected,
+                newRd: updatedPlayer2.rd?.[position],
+                newVolatility: updatedPlayer2.volatility?.[position]
+            },
+            poolSize: poolSize || null,
+            poolAdjusted: false,
+            isDraw: true
+        };
 
         // Build result
         const result = {
@@ -312,82 +359,54 @@ class ComparisonService {
     }
 
     /**
-     * Update players after comparison
+     * Record comparison metadata (no rating update — batch recalc handles that)
      * @private
      */
-    updatePlayersAfterComparison(winnerId, loserId, position, changes, winnerName, loserName) {
-        // Update both players in a single batch operation
+    updatePlayersAfterComparison(winnerId, loserId, position, winnerName, loserName) {
         this.playerRepository.updateMany([
             {
                 id: winnerId,
                 updates: {
-                    ratings: this.buildUpdatedRatings(winnerId, position, changes.winner.newRating),
                     comparisons: this.buildUpdatedComparisons(winnerId, position),
                     comparedWith: this.buildUpdatedComparedWith(winnerId, position, loserName),
-                    winsAgainst: this.buildUpdatedWinsAgainst(winnerId, position, loserName),
-                    rd: this.buildUpdatedRd(winnerId, position, changes.winner.newRd),
-                    volatility: this.buildUpdatedVolatility(winnerId, position, changes.winner.newVolatility)
+                    winsAgainst: this.buildUpdatedWinsAgainst(winnerId, position, loserName)
                 }
             },
             {
                 id: loserId,
                 updates: {
-                    ratings: this.buildUpdatedRatings(loserId, position, changes.loser.newRating),
                     comparisons: this.buildUpdatedComparisons(loserId, position),
-                    comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName),
-                    rd: this.buildUpdatedRd(loserId, position, changes.loser.newRd),
-                    volatility: this.buildUpdatedVolatility(loserId, position, changes.loser.newVolatility)
+                    comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName)
                 }
             }
         ]);
 
-        // Increment session comparison counter
         this.playerRepository.incrementSessionComparison();
     }
 
     /**
-     * Update players after Win-Win
+     * Record draw metadata (no rating update — batch recalc handles that)
      * @private
      */
-    updatePlayersAfterDraw(player1Id, player2Id, position, changes, player1Name, player2Name) {
-        // Update both players in a single batch operation
+    updatePlayersAfterDraw(player1Id, player2Id, position, player1Name, player2Name) {
         this.playerRepository.updateMany([
             {
                 id: player1Id,
                 updates: {
-                    ratings: this.buildUpdatedRatings(player1Id, position, changes.player1.newRating),
                     comparisons: this.buildUpdatedComparisons(player1Id, position),
-                    comparedWith: this.buildUpdatedComparedWith(player1Id, position, player2Name),
-                    rd: this.buildUpdatedRd(player1Id, position, changes.player1.newRd),
-                    volatility: this.buildUpdatedVolatility(player1Id, position, changes.player1.newVolatility)
+                    comparedWith: this.buildUpdatedComparedWith(player1Id, position, player2Name)
                 }
             },
             {
                 id: player2Id,
                 updates: {
-                    ratings: this.buildUpdatedRatings(player2Id, position, changes.player2.newRating),
                     comparisons: this.buildUpdatedComparisons(player2Id, position),
-                    comparedWith: this.buildUpdatedComparedWith(player2Id, position, player1Name),
-                    rd: this.buildUpdatedRd(player2Id, position, changes.player2.newRd),
-                    volatility: this.buildUpdatedVolatility(player2Id, position, changes.player2.newVolatility)
+                    comparedWith: this.buildUpdatedComparedWith(player2Id, position, player1Name)
                 }
             }
         ]);
 
-        // Increment session comparison counter
         this.playerRepository.incrementSessionComparison();
-    }
-
-    /**
-     * Build updated ratings object
-     * @private
-     */
-    buildUpdatedRatings(playerId, position, newRating) {
-        const player = this.playerRepository.getById(playerId);
-        return {
-            ...player.ratings,
-            [position]: newRating
-        };
     }
 
     /**
@@ -399,30 +418,6 @@ class ComparisonService {
         return {
             ...player.comparisons,
             [position]: (player.comparisons[position] || 0) + 1
-        };
-    }
-
-    /**
-     * Build updated rd (Rating Deviation) object
-     * @private
-     */
-    buildUpdatedRd(playerId, position, newRd) {
-        const player = this.playerRepository.getById(playerId);
-        return {
-            ...(player.rd || {}),
-            [position]: newRd
-        };
-    }
-
-    /**
-     * Build updated volatility object
-     * @private
-     */
-    buildUpdatedVolatility(playerId, position, newVolatility) {
-        const player = this.playerRepository.getById(playerId);
-        return {
-            ...(player.volatility || {}),
-            [position]: newVolatility
         };
     }
 
@@ -453,6 +448,93 @@ class ComparisonService {
             ...player.comparedWith,
             [position]: [...new Set([...currentCompared, opponentName])]
         };
+    }
+
+    /**
+     * Batch recalculate all ratings for a position from scratch.
+     * Uses the same Glicko-2 batch formula as processRanking.
+     * Called after each step-by-step comparison to ensure order-independence:
+     * regardless of comparison order, the resulting ratings are identical.
+     *
+     * @private
+     * @param {string} position - Position to recalculate
+     */
+    _batchRecalculateRatings(position) {
+        const players = this.playerRepository.getByPosition(position);
+        if (players.length < 2) return;
+
+        const poolSize = players.length;
+        const snapshotRating = this.eloService.DEFAULT_RATING;
+        const snapshotRd = this.eloService.getInitialRD(poolSize);
+        const snapshotVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
+        const g2 = this.eloService.GLICKO2;
+
+        // Glicko-2 batch constants (all start from same initial state)
+        const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
+        const mu = this.eloService.toGlicko2Scale(snapshotRating);
+        const gPhiJ = this.eloService.g(phi);
+        const eMuJ = this.eloService.E(mu, mu, phi); // 0.5
+
+        // Build name→player map for win/loss reconstruction
+        const nameToPlayer = new Map();
+        for (const p of players) nameToPlayer.set(p.name, p);
+
+        const updates = [];
+        for (const player of players) {
+            const compared = player.comparedWith[position] || [];
+            if (compared.length === 0) continue;
+
+            const winsAgainstSet = new Set(player.winsAgainst?.[position] || []);
+
+            // Reconstruct wins/losses/draws from metadata
+            let wins = 0, losses = 0, draws = 0;
+            for (const oppName of compared) {
+                if (winsAgainstSet.has(oppName)) {
+                    wins++;
+                } else {
+                    const opp = nameToPlayer.get(oppName);
+                    const oppWins = new Set(opp?.winsAgainst?.[position] || []);
+                    if (oppWins.has(player.name)) {
+                        losses++;
+                    } else {
+                        draws++;
+                    }
+                }
+            }
+
+            const totalComparisons = wins + losses + draws;
+            if (totalComparisons === 0) continue;
+
+            // Glicko-2 multi-opponent batch update
+            const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
+            const delta = v * gPhiJ * ((wins - losses) / 2);
+
+            let newSigma = this.eloService.calculateNewVolatility(snapshotVol, phi, v, delta);
+            newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
+
+            const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
+            const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
+            const newMu = mu + newPhi * newPhi * gPhiJ * ((wins - losses) / 2);
+
+            const newRating = Math.round(this.eloService.fromGlicko2Scale(newMu));
+            let newRd = this.eloService.rdFromGlicko2Scale(newPhi);
+            newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
+            newRd = Math.round(newRd * 10) / 10;
+            newSigma = Math.round(newSigma * 10000) / 10000;
+
+            updates.push({
+                id: player.id,
+                updates: {
+                    ratings: { ...player.ratings, [position]: newRating },
+                    rd: { ...(player.rd || {}), [position]: newRd },
+                    volatility: { ...(player.volatility || {}), [position]: newSigma }
+                }
+            });
+        }
+
+        if (updates.length > 0) {
+            this.playerRepository.updateMany(updates);
+        }
     }
 
     /**
@@ -536,7 +618,7 @@ class ComparisonService {
 
         // Reset each player's data for this position (including Glicko-2 fields)
         const defaultRating = this.eloService.DEFAULT_RATING;
-        const initialRd = this.eloService.GLICKO2.INITIAL_RD;
+        const initialRd = this.eloService.getInitialRD(players.length);
         const initialVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
 
         const updates = players.map(player => ({
@@ -614,7 +696,7 @@ class ComparisonService {
         if (allIds.length < 2) return {};
 
         const snapshotRating = this.eloService.DEFAULT_RATING;
-        const snapshotRd = this.eloService.GLICKO2.INITIAL_RD;
+        const snapshotRd = this.eloService.getInitialRD(allIds.length);
 
         // Compute Glicko-2 batch constants (all start from same state)
         const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
@@ -690,7 +772,7 @@ class ComparisonService {
             playerNameById.set(id, player.name);
         }
 
-        // Reset position to start fresh (all players → 1500, RD=350, vol=0.06, comparisons=0)
+        // Reset position to start fresh (all players → 1500, adaptive RD, vol=0.06, comparisons=0)
         this.resetPosition(position);
 
         // --- Snapshot-based batch Glicko-2 calculation ---
@@ -699,7 +781,7 @@ class ComparisonService {
         // This makes the result completely order-independent.
 
         const snapshotRating = this.eloService.DEFAULT_RATING;
-        const snapshotRd = this.eloService.GLICKO2.INITIAL_RD;
+        const snapshotRd = this.eloService.getInitialRD(allIds.length);
         const snapshotVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
 
         // Count wins, losses, draws for each player
