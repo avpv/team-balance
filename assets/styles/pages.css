@@ -1636,22 +1636,15 @@
 
 .balance-icon-svg {
     display: block;
+    stroke: var(--color-text-secondary);
 }
 
-
-/* Removed transform on hover - minimal aesthetic */
 
 .balance-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-1);
-}
-
-.balance-label {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
 }
 
 .balance-value {
