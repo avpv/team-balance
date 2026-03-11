@@ -324,7 +324,10 @@ export default {
             excellentMsg: '¡Excelente equilibrio!',
             goodMsg: 'Buen equilibrio',
             poorMsg: 'Considera regenerar para mejor equilibrio',
-            lowerIsBetter: 'Menor diferencia significa equipos más parejos.'
+            lowerIsBetter: 'Menor diferencia significa equipos más parejos.',
+            variantSelectorLabel: 'Variantes de generación de equipos',
+            variantNumber: 'Opción {{number}}',
+            variantLabel: 'Opción {{number}} — {{balance}} diferencia ELO'
         },
 
         // Export Modal

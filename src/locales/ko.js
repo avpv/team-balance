@@ -324,7 +324,10 @@ export default {
             excellentMsg: '훌륭한 균형!',
             goodMsg: '좋은 균형',
             poorMsg: '더 나은 균형을 위해 다시 생성하는 것을 고려하세요',
-            lowerIsBetter: '차이가 낮을수록 더 균등한 팀입니다.'
+            lowerIsBetter: '차이가 낮을수록 더 균등한 팀입니다.',
+            variantSelectorLabel: '팀 생성 변형',
+            variantNumber: '옵션 {{number}}',
+            variantLabel: '옵션 {{number}} — {{balance}} ELO 차이'
         },
 
         // Export Modal

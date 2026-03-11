@@ -324,7 +324,10 @@ export default {
             excellentMsg: '優れたバランス！',
             goodMsg: '良いバランス',
             poorMsg: 'より良いバランスのために再生成を検討してください',
-            lowerIsBetter: '差が小さいほどチームが均等です。'
+            lowerIsBetter: '差が小さいほどチームが均等です。',
+            variantSelectorLabel: 'チーム生成バリエーション',
+            variantNumber: 'オプション {{number}}',
+            variantLabel: 'オプション {{number}} — {{balance}} ELO差'
         },
 
         // Export Modal

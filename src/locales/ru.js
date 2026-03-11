@@ -324,7 +324,10 @@ export default {
             excellentMsg: 'Отличный баланс!',
             goodMsg: 'Хороший баланс',
             poorMsg: 'Попробуйте перегенерировать для лучшего баланса',
-            lowerIsBetter: 'Меньшая разница означает более равные команды.'
+            lowerIsBetter: 'Меньшая разница означает более равные команды.',
+            variantSelectorLabel: 'Варианты генерации команд',
+            variantNumber: 'Вариант {{number}}',
+            variantLabel: 'Вариант {{number}} — {{balance}} ELO разница'
         },
 
         // Export Modal

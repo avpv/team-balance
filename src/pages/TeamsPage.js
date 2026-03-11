@@ -46,6 +46,8 @@ class TeamsPage extends BasePage {
 
         this.state = {
             teams: savedTeams,
+            variants: savedTeams ? [savedTeams] : [],
+            activeVariant: 0,
             isOptimizing: false,
             showEloRatings: savedSettings.showEloRatings ?? true,
             showPositions: savedSettings.showPositions ?? true,
@@ -58,7 +60,7 @@ class TeamsPage extends BasePage {
     onCreate() {
         this.on('player:added', () => this.update());
         this.on('player:removed', () => {
-            this.setState({ teams: null });
+            this.setState({ teams: null, variants: [], activeVariant: 0 });
             this.saveTeams(null);
         });
         this.on('session:activated', () => {
@@ -67,6 +69,8 @@ class TeamsPage extends BasePage {
             const savedTeams = this.loadTeams();
             this.setState({
                 teams: savedTeams,
+                variants: savedTeams ? [savedTeams] : [],
+                activeVariant: 0,
                 showEloRatings: savedSettings.showEloRatings ?? true,
                 showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
@@ -80,6 +84,8 @@ class TeamsPage extends BasePage {
             const savedTeams = this.loadTeams();
             this.setState({
                 teams: savedTeams,
+                variants: savedTeams ? [savedTeams] : [],
+                activeVariant: 0,
                 showEloRatings: savedSettings.showEloRatings ?? true,
                 showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
@@ -366,6 +372,7 @@ class TeamsPage extends BasePage {
         const { teams, balance, algorithm } = this.state.teams;
         const weightedBalance = this.calculateWeightedBalance(teams);
         const quality = this.getBalanceQuality(weightedBalance);
+        const hasVariants = this.state.variants && this.state.variants.length > 1;
 
         return `
             <div class="teams-result" role="region" aria-label="${t('teams.results.regionLabel')}">
@@ -406,6 +413,8 @@ class TeamsPage extends BasePage {
                     </div>
                 </div>
 
+                ${hasVariants ? this.renderVariantSelector() : ''}
+
                 <div class="balance-indicator balance-indicator--${quality.class}" role="status" aria-live="polite">
                     <div class="balance-icon" aria-hidden="true">
                         ${getIcon(quality.icon, { size: ICON_SIZES.XXLARGE, className: 'balance-icon-svg' })}
@@ -428,6 +437,36 @@ class TeamsPage extends BasePage {
                 <div class="teams-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     ${teams.map((team, index) => this.renderTeam(team, index)).join('')}
                 </div>
+            </div>
+        `;
+    }
+
+    renderVariantSelector() {
+        const variants = this.state.variants;
+        const activeVariant = this.state.activeVariant;
+
+        return `
+            <div class="variant-selector" role="tablist" aria-label="${t('teams.results.variantSelectorLabel')}">
+                ${variants.map((variant, index) => {
+                    const balance = this.calculateWeightedBalance(variant.teams);
+                    const quality = this.getBalanceQuality(balance);
+                    const isActive = index === activeVariant;
+                    return `
+                        <button
+                            class="variant-tab ${isActive ? 'variant-tab--active' : ''}"
+                            role="tab"
+                            aria-selected="${isActive}"
+                            data-variant-index="${index}"
+                            aria-label="${t('teams.results.variantLabel', { number: index + 1, balance: balance })}">
+                            <span class="variant-tab-title">${t('teams.results.variantNumber', { number: index + 1 })}</span>
+                            <span class="variant-tab-balance">
+                                <span class="status-badge status-badge--${balance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'success' : balance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'in-progress' : 'warning'} status-badge--sm">
+                                    ${balance} ELO
+                                </span>
+                            </span>
+                        </button>
+                    `;
+                }).join('')}
             </div>
         `;
     }
@@ -612,6 +651,25 @@ class TeamsPage extends BasePage {
             });
         }
 
+        // Variant tabs
+        const variantTabs = this.container.querySelectorAll('.variant-tab');
+        if (variantTabs.length > 0) {
+            variantTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const index = parseInt(tab.dataset.variantIndex);
+                    if (index !== this.state.activeVariant && this.state.variants[index]) {
+                        const selectedVariant = this.state.variants[index];
+                        trackClick('variantTab', 'teams', 'switch_variant');
+                        this.setState({
+                            teams: selectedVariant,
+                            activeVariant: index
+                        });
+                        this.saveTeams(selectedVariant);
+                    }
+                });
+            });
+        }
+
         // Export button
         const exportBtn = this.$('#exportTeamsBtn');
         if (exportBtn) {
@@ -637,6 +695,8 @@ class TeamsPage extends BasePage {
     async handleOptimize() {
         if (this.state.isOptimizing) return;
 
+        const VARIANT_COUNT = 3;
+
         try {
             this.setState({ isOptimizing: true });
 
@@ -659,30 +719,43 @@ class TeamsPage extends BasePage {
             Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
             try {
-                // Optimize (async)
-                const result = await this.teamOptimizerService.optimize(
-                    composition,
-                    teamCount,
-                    players
-                );
+                // Generate multiple variants in parallel
+                const variantPromises = [];
+                for (let i = 0; i < VARIANT_COUNT; i++) {
+                    variantPromises.push(
+                        this.teamOptimizerService.optimize(composition, teamCount, players)
+                    );
+                }
 
-                // Calculate weighted balance for display
-                const weightedBalance = this.calculateWeightedBalance(result.teams);
+                const variants = await Promise.all(variantPromises);
+
+                // Sort variants by weighted balance (best first)
+                variants.sort((a, b) => {
+                    const balanceA = this.calculateWeightedBalance(a.teams);
+                    const balanceB = this.calculateWeightedBalance(b.teams);
+                    return balanceA - balanceB;
+                });
+
+                const bestResult = variants[0];
+                const weightedBalance = this.calculateWeightedBalance(bestResult.teams);
 
                 this.setState({
-                    teams: result,
+                    teams: bestResult,
+                    variants: variants,
+                    activeVariant: 0,
                     isOptimizing: false
                 });
 
-                // Save teams to active session
-                this.saveTeams(result);
+                // Save best teams to active session
+                this.saveTeams(bestResult);
 
                 // Track successful team generation
                 trackEvent('teams_generated', {
                     event_category: 'teams',
                     team_count: teamCount,
                     player_count: players.length,
-                    balance_quality: weightedBalance
+                    balance_quality: weightedBalance,
+                    variant_count: VARIANT_COUNT
                 });
 
                 toast.success(t('success.teamsCreated', { balance: weightedBalance }));
