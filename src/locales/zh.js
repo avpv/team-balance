@@ -324,7 +324,10 @@ export default {
             excellentMsg: '出色的平衡！',
             goodMsg: '良好的平衡',
             poorMsg: '考虑重新生成以获得更好的平衡',
-            lowerIsBetter: '差值越小意味着队伍越均衡。'
+            lowerIsBetter: '差值越小意味着队伍越均衡。',
+            variantSelectorLabel: '队伍生成方案',
+            variantNumber: '方案 {{number}}',
+            variantLabel: '方案 {{number}} — {{balance}} ELO差值'
         },
 
         // Export Modal
