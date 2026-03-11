@@ -42,28 +42,6 @@ export const INPUT_CONSTRAINTS = {
 };
 
 /**
- * Balance Quality Display Thresholds
- * NOTE: These should match BALANCE_THRESHOLDS.QUALITY in config/rating.js
- * Used for UI display only - calculation uses rating.js values
- */
-export const BALANCE_DISPLAY = {
-    /** Excellent balance indicator */
-    EXCELLENT: 100,
-
-    /** Very Good balance indicator */
-    VERY_GOOD: 200,
-
-    /** Good balance indicator */
-    GOOD: 300,
-
-    /** Fair balance indicator */
-    FAIR: 500,
-
-    /** Poor balance (above FAIR threshold) */
-    // POOR: > 500
-};
-
-/**
  * Animation and Transition Settings
  */
 export const ANIMATION = {
@@ -337,7 +315,6 @@ export const DATA_ATTRIBUTES = {
  */
 export default {
     INPUT_CONSTRAINTS,
-    BALANCE_DISPLAY,
     ANIMATION,
     DEBOUNCE,
     TOAST,
