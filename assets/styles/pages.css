@@ -1603,7 +1603,7 @@
     padding: 1px var(--spacing-2);
 }
 
-/* Balance Quality Indicator */
+/* Balance Indicator */
 .balance-indicator {
     display: flex;
     align-items: center;
