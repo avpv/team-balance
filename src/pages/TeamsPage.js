@@ -701,11 +701,12 @@ class TeamsPage extends BasePage {
             Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
             try {
-                // Generate multiple variants in parallel
+                // Generate multiple variants in parallel, each with a unique seed
+                // to ensure algorithms converge to different solutions
                 const variantPromises = [];
                 for (let i = 0; i < VARIANT_COUNT; i++) {
                     variantPromises.push(
-                        this.teamOptimizerService.optimize(composition, teamCount, players)
+                        this.teamOptimizerService.optimize(composition, teamCount, players, { variantSeed: i + 1 })
                     );
                 }
 
