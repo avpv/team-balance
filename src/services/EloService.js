@@ -3,11 +3,19 @@
 import ratingConfig from '../config/rating.js';
 
 /**
- * EloService - ELO rating calculations
+ * EloService - Glicko-2 rating calculations
  * Pure business logic with no state management
  *
- * This service handles all ELO rating calculations using centralized configuration
- * from rating.js, ensuring consistency across the application.
+ * This service uses a unified Glicko-2 algorithm for all rating updates.
+ * Rating, RD, and volatility are all updated by a single coherent formula.
+ *
+ * Previous hybrid ELO+Glicko-2 approach was replaced because:
+ * - ELO formula for rating + Glicko-2 for RD/volatility caused rdt rdt divergence
+ * - RD-based K-multiplier duplicated what Glicko-2 already does via newPhi
+ * - Base-10 (ELO) and base-e (Glicko-2) expected scores were incompatible
+ * - Pool adjustment was redundant with RD's natural adaptation
+ *
+ * Now: calculateFullGlicko2Update() handles everything in one coherent pass.
  */
 class EloService {
     constructor(activityConfig) {
@@ -16,14 +24,14 @@ class EloService {
 
         // Import rating constants from centralized config
         this.DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
-        this.BASE_K_FACTOR = ratingConfig.K_FACTORS.BASE;
         this.RATING_DIVISOR = ratingConfig.RATING_CONSTANTS.RATING_DIVISOR;
         this.PROBABILITY_BASE = ratingConfig.RATING_CONSTANTS.PROBABILITY_BASE;
 
-        // K-factor thresholds
+        // K-factor thresholds (kept for getEnhancedPlayerStats backward compat)
         this.K_FACTORS = ratingConfig.K_FACTORS;
+        this.BASE_K_FACTOR = ratingConfig.K_FACTORS.BASE;
 
-        // Pool adjustment settings
+        // Pool adjustment settings (kept for backward compat, no longer used in rating calc)
         this.POOL_ADJUSTMENT = ratingConfig.POOL_ADJUSTMENT;
 
         // Glicko-2 settings
@@ -35,44 +43,24 @@ class EloService {
         // Confidence levels
         this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
 
-        // Reliability threshold for expected score damping
+        // Reliability threshold (kept for backward compat)
         this.RELIABILITY_THRESHOLD = ratingConfig.RATING_CONSTANTS.RELIABILITY_THRESHOLD;
     }
 
     /**
-     * Calculate expected match outcome
-     * Uses standard ELO probability formula
+     * Calculate expected match outcome using Glicko-2 E() function.
+     * Uses base-e (consistent with Glicko-2 internals).
      *
      * @param {number} playerRating - Player's current rating
      * @param {number} opponentRating - Opponent's current rating
+     * @param {number} opponentRd - Opponent's RD (optional, defaults to INITIAL_RD)
      * @returns {number} Expected score (0-1, where 1 = 100% win probability)
      */
-    calculateExpectedScore(playerRating, opponentRating) {
-        const ratingDifference = opponentRating - playerRating;
-        return 1 / (1 + Math.pow(this.PROBABILITY_BASE, ratingDifference / this.RATING_DIVISOR));
-    }
-
-    /**
-     * Calculate expected score with RD-weighted rating difference.
-     *
-     * Uses the Glicko-2 g(φ) function to reduce the effective rating difference
-     * when the opponent's rating is uncertain (high RD). This means:
-     *   - Playing against an opponent with low RD → full rating difference applies
-     *   - Playing against an opponent with high RD → result closer to 0.5 (coin flip)
-     *
-     * @param {number} playerRating - Player's current rating
-     * @param {number} opponentRating - Opponent's current rating
-     * @param {number} opponentRd - Opponent's Rating Deviation
-     * @returns {number} Expected score (0-1)
-     */
-    calculateExpectedScoreWithRD(playerRating, opponentRating, opponentRd) {
-        const phiJ = this.rdToGlicko2Scale(opponentRd);
-        const gFactor = this.g(phiJ);
-
-        // Scale the rating difference by g(φ)
-        // g(φ) ∈ (0, 1]: low opponent RD → g≈1 (full diff), high RD → g→0 (no diff)
-        const scaledDiff = gFactor * (opponentRating - playerRating) / this.RATING_DIVISOR;
-        return 1 / (1 + Math.pow(this.PROBABILITY_BASE, scaledDiff));
+    calculateExpectedScore(playerRating, opponentRating, opponentRd) {
+        const mu = this.toGlicko2Scale(playerRating);
+        const muJ = this.toGlicko2Scale(opponentRating);
+        const phiJ = this.rdToGlicko2Scale(opponentRd ?? this.GLICKO2.INITIAL_RD);
+        return this.E(mu, muJ, phiJ);
     }
 
     /**
@@ -96,111 +84,78 @@ class EloService {
     }
 
     /**
-     * Get reliability-damped rating for expected score calculation.
-     * Blends the current rating toward DEFAULT based on comparison count.
-     * This reduces order-dependence in sequential ELO processing:
-     * players with few comparisons have unreliable ratings that shouldn't
-     * heavily influence expected scores.
+     * Full Glicko-2 update: rating, RD, and volatility in one coherent pass.
+     *
+     * This replaces the old hybrid where ELO updated rating and Glicko-2 updated RD/vol.
+     * Now all three values come from the same mathematical framework:
+     * - No K-factor needed (Glicko-2 controls update magnitude via φ')
+     * - No pool adjustment needed (RD adapts naturally to data quantity)
+     * - No damping needed (g(φ) already accounts for opponent uncertainty)
+     * - Consistent base-e throughout
      *
      * @param {number} rating - Player's current rating
-     * @param {number} comparisons - Number of comparisons completed
-     * @returns {number} Damped rating for expected score calculation
+     * @param {number} rd - Player's current RD
+     * @param {number} vol - Player's current volatility (σ)
+     * @param {number} oppRating - Opponent's rating
+     * @param {number} oppRd - Opponent's RD
+     * @param {number} score - Actual score (1=win, 0.5=draw, 0=loss)
+     * @returns {Object} { newRating, newRd, newVolatility }
      */
-    getDampedRating(rating, comparisons) {
-        const confidence = Math.min(1, comparisons / this.RELIABILITY_THRESHOLD);
-        return this.DEFAULT_RATING + (rating - this.DEFAULT_RATING) * confidence;
+    calculateFullGlicko2Update(rating, rd, vol, oppRating, oppRd, score) {
+        const g2 = this.GLICKO2;
+
+        // Step 1: Convert to Glicko-2 scale
+        const mu = this.toGlicko2Scale(rating);
+        const phi = this.rdToGlicko2Scale(rd);
+        const muJ = this.toGlicko2Scale(oppRating);
+        const phiJ = this.rdToGlicko2Scale(oppRd);
+
+        // Step 2: Compute v and delta
+        const gPhiJ = this.g(phiJ);
+        const eMuJ = this.E(mu, muJ, phiJ);
+        const v = 1 / (gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
+        const delta = v * gPhiJ * (score - eMuJ);
+
+        // Step 3: New volatility
+        let newSigma = this.calculateNewVolatility(vol, phi, v, delta);
+        newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
+
+        // Step 4: New RD
+        const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
+        const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
+
+        // Step 5: New rating (Glicko-2 formula)
+        const newMu = mu + newPhi * newPhi * gPhiJ * (score - eMuJ);
+
+        // Step 6: Convert back and clamp
+        let newRd = this.rdFromGlicko2Scale(newPhi);
+        newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
+
+        return {
+            newRating: Math.round(this.fromGlicko2Scale(newMu)),
+            newRd: Math.round(newRd * 10) / 10,
+            newVolatility: Math.round(newSigma * 10000) / 10000
+        };
     }
 
+    // === Legacy K-factor methods (kept for backward compatibility with UI stats) ===
+
     /**
-     * Dynamic K-factor based on experience and skill level
-     * Higher K-factor for new players (more volatile)
-     * Lower K-factor for experienced/high-rated players (more stable)
-     *
-     * @param {number} comparisons - Number of comparisons completed
-     * @param {number} rating - Current rating
-     * @returns {number} Calculated K-factor
+     * @deprecated Use calculateFullGlicko2Update instead. Kept for getEnhancedPlayerStats.
      */
     calculateKFactor(comparisons, rating) {
         const thresholds = this.K_FACTORS.THRESHOLDS;
-
-        // Novice players: high volatility
-        if (comparisons < thresholds.NOVICE_COMPARISONS) {
-            return this.K_FACTORS.NOVICE;
-        }
-
-        // Master players: low volatility
-        if (rating > thresholds.MASTER_RATING && comparisons > thresholds.MASTER_COMPARISONS) {
-            return this.K_FACTORS.MASTER;
-        }
-
-        // Expert players: reduced volatility
-        if (rating > thresholds.EXPERT_RATING && comparisons > thresholds.EXPERT_COMPARISONS) {
-            return this.K_FACTORS.EXPERT;
-        }
-
-        // Default: standard volatility
+        if (comparisons < thresholds.NOVICE_COMPARISONS) return this.K_FACTORS.NOVICE;
+        if (rating > thresholds.MASTER_RATING && comparisons > thresholds.MASTER_COMPARISONS) return this.K_FACTORS.MASTER;
+        if (rating > thresholds.EXPERT_RATING && comparisons > thresholds.EXPERT_COMPARISONS) return this.K_FACTORS.EXPERT;
         return this.BASE_K_FACTOR;
     }
 
     /**
-     * Pool-size adjusted K-factor for fair ELO distribution
-     * Smaller pools get higher K-factors to compensate for fewer battles
-     *
-     * @param {number} baseK - Base K-factor from calculateKFactor
-     * @param {number} poolSize - Number of players in the position pool
-     * @param {number} referenceSize - Reference pool size (from config)
-     * @returns {number} Adjusted K-factor
-     */
-    calculatePoolAdjustedKFactor(baseK, poolSize, referenceSize = null) {
-        // Use config reference size if not provided
-        const refSize = referenceSize || this.POOL_ADJUSTMENT.REFERENCE_SIZE;
-
-        // Validate inputs
-        if (poolSize <= 0) return baseK;
-        if (poolSize === 1) return baseK; // Single player, no adjustment needed
-
-        // Calculate adjustment factor: sqrt(referenceSize / poolSize)
-        // This gives more volatility to smaller pools
-        const adjustmentFactor = Math.sqrt(refSize / poolSize);
-
-        // Apply adjustment with reasonable bounds from config
-        const boundedFactor = Math.max(
-            this.POOL_ADJUSTMENT.MIN_FACTOR,
-            Math.min(this.POOL_ADJUSTMENT.MAX_FACTOR, adjustmentFactor)
-        );
-
-        return Math.round(baseK * boundedFactor);
-    }
-
-    /**
-     * Calculate the effective K-factor combining all adjustments:
-     * base K-factor (experience) × RD-based multiplier × pool adjustment
-     *
-     * Uses Glicko-2 RD for uncertainty scaling:
-     * high RD → higher K-factor (rating should change more when uncertain)
-     *
-     * @param {number} comparisons - Number of comparisons completed
-     * @param {number} rating - Current rating
-     * @param {number|null} poolSize - Number of players in position pool
-     * @param {number} rd - Player's Rating Deviation
-     * @returns {number} Fully adjusted K-factor
+     * @deprecated Use calculateFullGlicko2Update instead. Kept for getEnhancedPlayerStats.
      */
     calculateEffectiveKFactor(comparisons, rating, poolSize = null, rd = this.GLICKO2.INITIAL_RD) {
-        let k = this.calculateKFactor(comparisons, rating);
-
-        // RD-based uncertainty scaling:
-        // RD 350 (new) → multiplier ~2.5x, RD 30 (certain) → multiplier ~1.0x
-        const g2 = this.GLICKO2;
-        const normalizedRd = (rd - g2.MIN_RD) / (g2.MAX_RD - g2.MIN_RD);
-        const rdMultiplier = 1 + normalizedRd * 1.5;
-        k = k * rdMultiplier;
-
-        // Apply pool-size adjustment
-        if (poolSize && poolSize > 1) {
-            k = this.calculatePoolAdjustedKFactor(k, poolSize);
-        }
-
-        return Math.round(k);
+        return this.calculateKFactor(comparisons, rating);
     }
 
     // ==========================================
@@ -330,49 +285,14 @@ class EloService {
     }
 
     /**
-     * Calculate updated Glicko-2 RD and volatility after a single comparison.
-     *
-     * @param {number} rating - Player's current ELO rating
-     * @param {number} rd - Player's current RD
-     * @param {number} volatility - Player's current volatility (σ)
-     * @param {number} opponentRating - Opponent's ELO rating
-     * @param {number} opponentRd - Opponent's RD
-     * @param {number} score - Actual score (1=win, 0.5=draw, 0=loss)
-     * @returns {Object} { newRd, newVolatility }
+     * @deprecated Use calculateFullGlicko2Update instead.
+     * Kept for backward compatibility with processRanking batch mode.
      */
     calculateGlicko2Update(rating, rd, volatility, opponentRating, opponentRd, score) {
-        const g2 = this.GLICKO2;
-
-        // Step 1: Convert to Glicko-2 scale
-        const mu = this.toGlicko2Scale(rating);
-        const phi = this.rdToGlicko2Scale(rd);
-        const muJ = this.toGlicko2Scale(opponentRating);
-        const phiJ = this.rdToGlicko2Scale(opponentRd);
-
-        // Step 2: Compute variance (v) and delta
-        const gPhiJ = this.g(phiJ);
-        const eMuJ = this.E(mu, muJ, phiJ);
-
-        const v = 1 / (gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
-        const delta = v * gPhiJ * (score - eMuJ);
-
-        // Step 3: Calculate new volatility
-        let newSigma = this.calculateNewVolatility(volatility, phi, v, delta);
-        newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
-
-        // Step 4: Update RD (pre-rating period)
-        const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
-
-        // Step 5: Calculate new φ'
-        const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
-
-        // Convert back to RD scale
-        let newRd = this.rdFromGlicko2Scale(newPhi);
-        newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
-
+        const result = this.calculateFullGlicko2Update(rating, rd, volatility, opponentRating, opponentRd, score);
         return {
-            newRd: Math.round(newRd * 10) / 10,
-            newVolatility: Math.round(newSigma * 10000) / 10000
+            newRd: result.newRd,
+            newVolatility: result.newVolatility
         };
     }
 
@@ -408,26 +328,26 @@ class EloService {
     }
 
     /**
-     * Calculate rating changes for a position
+     * Calculate rating changes for a position using unified Glicko-2.
+     *
+     * Both rating AND RD/volatility are updated by the same Glicko-2 formula.
+     * No K-factor, no pool adjustment, no damping — Glicko-2 handles all of this
+     * through its φ' (new RD) and g(φ) (opponent uncertainty) mechanisms.
      *
      * @param {Object} winner - Winner player object
      * @param {Object} loser - Loser player object
      * @param {string} position - Position being compared
-     * @param {number} poolSize - Optional: Number of players in position pool (for fair K-factor adjustment)
+     * @param {number} poolSize - Optional: kept for backward compat in return value
      * @returns {Object} Rating change details
      */
     calculateRatingChange(winner, loser, position, poolSize = null) {
-        // Validate that winner and loser are different players
         if (winner.id === loser.id) {
             throw new Error('Cannot calculate rating change for same player');
         }
 
         const winnerRating = winner.ratings?.[position] || this.DEFAULT_RATING;
         const loserRating = loser.ratings?.[position] || this.DEFAULT_RATING;
-        const winnerComparisons = winner.comparisons?.[position] || 0;
-        const loserComparisons = loser.comparisons?.[position] || 0;
 
-        // Validate rating values
         if (winnerRating < 0 || loserRating < 0) {
             throw new Error('Invalid rating value: ratings cannot be negative');
         }
@@ -435,185 +355,115 @@ class EloService {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
-        // Use round-based comparison counts for expected score and K-factor calculations.
-        // Within a single round (where each player compares with every other player once),
-        // a player's effective state stays constant regardless of comparison order.
-        // This ensures players with identical results get identical ratings.
-        const winnerRoundComparisons = this.getRoundBaseComparisons(winnerComparisons, poolSize);
-        const loserRoundComparisons = this.getRoundBaseComparisons(loserComparisons, poolSize);
-
-        // Use damped ratings for expected score calculation to reduce order-dependence.
-        // Players with few comparisons have unreliable ratings; damping blends them
-        // toward the default, ensuring that sequential comparison order doesn't
-        // unfairly penalize players who happen to be compared earlier.
-        const dampedWinnerRating = this.getDampedRating(winnerRating, winnerRoundComparisons);
-        const dampedLoserRating = this.getDampedRating(loserRating, loserRoundComparisons);
-
-        // Use RD-weighted expected scores: opponent's RD uncertainty reduces
-        // the effective rating difference (Glicko-2 g(φ) function).
-        // When opponent has high RD → expected score closer to 0.5 (less certain).
         const winnerRd = winner.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
         const loserRd = loser.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
-
-        const winnerExpected = this.calculateExpectedScoreWithRD(dampedWinnerRating, dampedLoserRating, loserRd);
-        const loserExpected = this.calculateExpectedScoreWithRD(dampedLoserRating, dampedWinnerRating, winnerRd);
-
-        // Calculate base K-factors (experience level only)
-        const winnerBaseK = this.calculateKFactor(winnerRoundComparisons, winnerRating);
-        const loserBaseK = this.calculateKFactor(loserRoundComparisons, loserRating);
-
-        // Calculate effective K-factors with all adjustments
-        // RD-based scaling replaces the old uncertainty boost:
-        // high RD → higher K-factor (rating should change more)
-        const winnerK = this.calculateEffectiveKFactor(winnerRoundComparisons, winnerRating, poolSize, winnerRd);
-        const loserK = this.calculateEffectiveKFactor(loserRoundComparisons, loserRating, poolSize, loserRd);
-
-        // Use symmetric K-factor (average) for both players to ensure:
-        // 1. ELO conservation (total rating pool stays constant)
-        // 2. Fair, order-independent results (players with identical records get identical ratings)
-        const symmetricK = Math.round((winnerK + loserK) / 2);
-
-        const winnerChange = symmetricK * (1 - winnerExpected);
-        const loserChange = symmetricK * (0 - loserExpected);
-
-        // Calculate Glicko-2 RD and volatility updates
         const winnerVol = winner.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
         const loserVol = loser.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
 
-        const winnerGlicko = this.calculateGlicko2Update(
+        // Unified Glicko-2 update for both players
+        const winnerResult = this.calculateFullGlicko2Update(
             winnerRating, winnerRd, winnerVol,
-            loserRating, loserRd, 1
+            loserRating, loserRd, 1.0
         );
-        const loserGlicko = this.calculateGlicko2Update(
+        const loserResult = this.calculateFullGlicko2Update(
             loserRating, loserRd, loserVol,
-            winnerRating, winnerRd, 0
+            winnerRating, winnerRd, 0.0
         );
+
+        // Expected scores for reporting (using Glicko-2 E())
+        const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating, loserRd);
+        const loserExpected = this.calculateExpectedScore(loserRating, winnerRating, winnerRd);
 
         return {
             winner: {
                 oldRating: winnerRating,
-                newRating: winnerRating + winnerChange,
-                change: winnerChange,
-                kFactor: symmetricK,
-                baseKFactor: winnerBaseK,
+                newRating: winnerResult.newRating,
+                change: winnerResult.newRating - winnerRating,
+                kFactor: 0,  // No longer used; Glicko-2 controls update magnitude
+                baseKFactor: 0,
                 expected: winnerExpected,
-                newRd: winnerGlicko.newRd,
-                newVolatility: winnerGlicko.newVolatility
+                newRd: winnerResult.newRd,
+                newVolatility: winnerResult.newVolatility
             },
             loser: {
                 oldRating: loserRating,
-                newRating: loserRating + loserChange,
-                change: loserChange,
-                kFactor: symmetricK,
-                baseKFactor: loserBaseK,
+                newRating: loserResult.newRating,
+                change: loserResult.newRating - loserRating,
+                kFactor: 0,
+                baseKFactor: 0,
                 expected: loserExpected,
-                newRd: loserGlicko.newRd,
-                newVolatility: loserGlicko.newVolatility
+                newRd: loserResult.newRd,
+                newVolatility: loserResult.newVolatility
             },
             poolSize: poolSize || null,
-            poolAdjusted: poolSize && poolSize > 1
+            poolAdjusted: false
         };
     }
 
     /**
-     * Calculate rating changes for a Win-Win
-     * In a Win-Win, both players receive a score of 0.5
+     * Calculate rating changes for a Win-Win (draw)
+     * Both players receive a score of 0.5, updated via unified Glicko-2.
      *
      * @param {Object} player1 - First player object
      * @param {Object} player2 - Second player object
      * @param {string} position - Position being compared
-     * @param {number} poolSize - Optional: Number of players in position pool (for fair K-factor adjustment)
+     * @param {number} poolSize - Optional: kept for backward compat
      * @returns {Object} Rating change details
      */
     calculateDrawRatingChange(player1, player2, position, poolSize = null) {
-        // Validate that players are different
         if (player1.id === player2.id) {
             throw new Error('Cannot calculate rating change for same player');
         }
 
-        const player1Rating = player1.ratings?.[position] || this.DEFAULT_RATING;
-        const player2Rating = player2.ratings?.[position] || this.DEFAULT_RATING;
-        const player1Comparisons = player1.comparisons?.[position] || 0;
-        const player2Comparisons = player2.comparisons?.[position] || 0;
+        const p1Rating = player1.ratings?.[position] || this.DEFAULT_RATING;
+        const p2Rating = player2.ratings?.[position] || this.DEFAULT_RATING;
 
-        // Validate rating values
-        if (player1Rating < 0 || player2Rating < 0) {
+        if (p1Rating < 0 || p2Rating < 0) {
             throw new Error('Invalid rating value: ratings cannot be negative');
         }
-        if (!isFinite(player1Rating) || !isFinite(player2Rating)) {
+        if (!isFinite(p1Rating) || !isFinite(p2Rating)) {
             throw new Error('Invalid rating value: ratings must be finite numbers');
         }
 
-        // Use round-based comparison counts for expected score and K-factor calculations.
-        // Within a single round, a player's effective state stays constant regardless
-        // of comparison order, ensuring players with identical results get identical ratings.
-        const player1RoundComparisons = this.getRoundBaseComparisons(player1Comparisons, poolSize);
-        const player2RoundComparisons = this.getRoundBaseComparisons(player2Comparisons, poolSize);
-
-        // Use damped ratings for expected score calculation to reduce order-dependence
-        const dampedPlayer1Rating = this.getDampedRating(player1Rating, player1RoundComparisons);
-        const dampedPlayer2Rating = this.getDampedRating(player2Rating, player2RoundComparisons);
-
-        // Use RD-weighted expected scores
         const p1Rd = player1.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
         const p2Rd = player2.rd?.[position] ?? this.GLICKO2.INITIAL_RD;
-
-        const player1Expected = this.calculateExpectedScoreWithRD(dampedPlayer1Rating, dampedPlayer2Rating, p2Rd);
-        const player2Expected = this.calculateExpectedScoreWithRD(dampedPlayer2Rating, dampedPlayer1Rating, p1Rd);
-
-        // Calculate base K-factors (experience level only)
-        const player1BaseK = this.calculateKFactor(player1RoundComparisons, player1Rating);
-        const player2BaseK = this.calculateKFactor(player2RoundComparisons, player2Rating);
-
-        // Calculate effective K-factors with RD-based scaling
-        const player1K = this.calculateEffectiveKFactor(player1RoundComparisons, player1Rating, poolSize, p1Rd);
-        const player2K = this.calculateEffectiveKFactor(player2RoundComparisons, player2Rating, poolSize, p2Rd);
-
-        // Use symmetric K-factor (average) for both players to ensure:
-        // 1. ELO conservation (total rating pool stays constant)
-        // 2. Fair, order-independent results (players with identical records get identical ratings)
-        const symmetricK = Math.round((player1K + player2K) / 2);
-
-        // In a Win-Win, both players score 0.5
-        const player1Change = symmetricK * (0.5 - player1Expected);
-        const player2Change = symmetricK * (0.5 - player2Expected);
-
-        // Calculate Glicko-2 RD and volatility updates
         const p1Vol = player1.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
         const p2Vol = player2.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
 
-        const p1Glicko = this.calculateGlicko2Update(
-            player1Rating, p1Rd, p1Vol,
-            player2Rating, p2Rd, 0.5
+        // Unified Glicko-2 update with score=0.5 for both
+        const p1Result = this.calculateFullGlicko2Update(
+            p1Rating, p1Rd, p1Vol, p2Rating, p2Rd, 0.5
         );
-        const p2Glicko = this.calculateGlicko2Update(
-            player2Rating, p2Rd, p2Vol,
-            player1Rating, p1Rd, 0.5
+        const p2Result = this.calculateFullGlicko2Update(
+            p2Rating, p2Rd, p2Vol, p1Rating, p1Rd, 0.5
         );
+
+        const p1Expected = this.calculateExpectedScore(p1Rating, p2Rating, p2Rd);
+        const p2Expected = this.calculateExpectedScore(p2Rating, p1Rating, p1Rd);
 
         return {
             player1: {
-                oldRating: player1Rating,
-                newRating: player1Rating + player1Change,
-                change: player1Change,
-                kFactor: symmetricK,
-                baseKFactor: player1BaseK,
-                expected: player1Expected,
-                newRd: p1Glicko.newRd,
-                newVolatility: p1Glicko.newVolatility
+                oldRating: p1Rating,
+                newRating: p1Result.newRating,
+                change: p1Result.newRating - p1Rating,
+                kFactor: 0,
+                baseKFactor: 0,
+                expected: p1Expected,
+                newRd: p1Result.newRd,
+                newVolatility: p1Result.newVolatility
             },
             player2: {
-                oldRating: player2Rating,
-                newRating: player2Rating + player2Change,
-                change: player2Change,
-                kFactor: symmetricK,
-                baseKFactor: player2BaseK,
-                expected: player2Expected,
-                newRd: p2Glicko.newRd,
-                newVolatility: p2Glicko.newVolatility
+                oldRating: p2Rating,
+                newRating: p2Result.newRating,
+                change: p2Result.newRating - p2Rating,
+                kFactor: 0,
+                baseKFactor: 0,
+                expected: p2Expected,
+                newRd: p2Result.newRd,
+                newVolatility: p2Result.newVolatility
             },
             poolSize: poolSize || null,
-            poolAdjusted: poolSize && poolSize > 1,
+            poolAdjusted: false,
             isDraw: true
         };
     }
@@ -732,7 +582,7 @@ class EloService {
         }
 
         let bestPosition = null;
-        let bestRating = 0;
+        let bestRating = -Infinity;
 
         player.positions.forEach(pos => {
             const rating = player.ratings[pos] || this.DEFAULT_RATING;
