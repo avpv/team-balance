@@ -701,15 +701,12 @@ class TeamsPage extends BasePage {
             Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
             try {
-                // Generate multiple variants in parallel
-                const variantPromises = [];
-                for (let i = 0; i < VARIANT_COUNT; i++) {
-                    variantPromises.push(
-                        this.teamOptimizerService.optimize(composition, teamCount, players)
-                    );
-                }
-
-                const variants = await Promise.all(variantPromises);
+                // Generate multiple variants in a single optimization run.
+                // The optimizer runs all algorithms, collects unique solutions,
+                // refines each with local search, and returns the top-N.
+                const variants = await this.teamOptimizerService.optimize(
+                    composition, teamCount, players, { variantCount: VARIANT_COUNT }
+                );
 
                 // Sort variants by weighted balance (best first)
                 variants.sort((a, b) => {
@@ -737,7 +734,7 @@ class TeamsPage extends BasePage {
                     team_count: teamCount,
                     player_count: players.length,
                     balance_quality: weightedBalance,
-                    variant_count: VARIANT_COUNT
+                    variant_count: variants.length
                 });
 
                 toast.success(t('success.teamsCreated', { balance: weightedBalance }));
