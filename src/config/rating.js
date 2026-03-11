@@ -24,56 +24,7 @@ export const RATING_CONSTANTS = {
     RATING_DIVISOR: 400,
 
     /** Base for probability calculation (standard ELO) */
-    PROBABILITY_BASE: 10,
-
-    /**
-     * Reliability threshold for expected score damping.
-     * When a player has fewer comparisons than this threshold,
-     * their rating is blended toward DEFAULT for expected score calculation.
-     * This reduces order-dependence in sequential ELO processing.
-     *
-     * With threshold 5:
-     *   0 comparisons → uses DEFAULT rating (fully damped)
-     *   2 comparisons → uses 40% of rating deviation from DEFAULT
-     *   5+ comparisons → uses full current rating (no damping)
-     */
-    RELIABILITY_THRESHOLD: 5
-};
-
-/**
- * K-Factor Configuration
- * Controls rating volatility based on experience and skill level
- */
-export const K_FACTORS = {
-    /** Base K-factor for experienced players */
-    BASE: 36,
-
-    /** High K-factor for new players (< 20 comparisons) */
-    NOVICE: 48,
-
-    /** Low K-factor for masters (> 2000 rating, > 50 comparisons) */
-    MASTER: 20,
-
-    /** Low K-factor for experts (> 1800 rating, > 30 comparisons) */
-    EXPERT: 25,
-
-    /** Experience thresholds */
-    THRESHOLDS: {
-        /** Comparisons threshold for novice/experienced split */
-        NOVICE_COMPARISONS: 20,
-
-        /** Comparisons threshold for expert level */
-        EXPERT_COMPARISONS: 30,
-
-        /** Comparisons threshold for master level */
-        MASTER_COMPARISONS: 50,
-
-        /** Rating threshold for expert level */
-        EXPERT_RATING: 1800,
-
-        /** Rating threshold for master level */
-        MASTER_RATING: 2000
-    }
+    PROBABILITY_BASE: 10
 };
 
 /**
@@ -159,24 +110,6 @@ export const GLICKO2 = {
 };
 
 /**
- * Pool Adjustment Configuration
- * Adjusts K-factors based on position pool size for fairness
- */
-export const POOL_ADJUSTMENT = {
-    /** Reference pool size for baseline adjustments */
-    REFERENCE_SIZE: 15,
-
-    /** Minimum adjustment factor (prevents over-dampening) */
-    MIN_FACTOR: 0.5,
-
-    /** Maximum adjustment factor (prevents over-inflation) */
-    MAX_FACTOR: 2.0,
-
-    /** Enable/disable pool size adjustments */
-    ENABLED: true
-};
-
-/**
  * Balance Thresholds
  * Defines what constitutes balanced teams or matchups
  */
@@ -222,9 +155,7 @@ export const PERCENTILE_CONFIG = {
  */
 export default {
     RATING_CONSTANTS,
-    K_FACTORS,
     GLICKO2,
-    POOL_ADJUSTMENT,
     BALANCE_THRESHOLDS,
     CONFIDENCE_LEVELS,
     PERCENTILE_CONFIG

@@ -215,7 +215,6 @@ class TeamsPage extends BasePage {
                 };
             }
 
-            // Old format: single team result object (backward compat)
             return { teams: data, variants: [data], activeVariant: 0 };
         } catch (error) {
             return null;

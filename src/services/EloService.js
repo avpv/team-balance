@@ -6,45 +6,24 @@ import ratingConfig from '../config/rating.js';
  * EloService - Glicko-2 rating calculations
  * Pure business logic with no state management
  *
- * This service uses a unified Glicko-2 algorithm for all rating updates.
+ * Uses a unified Glicko-2 algorithm for all rating updates.
  * Rating, RD, and volatility are all updated by a single coherent formula.
  *
- * Previous hybrid ELO+Glicko-2 approach was replaced because:
- * - ELO formula for rating + Glicko-2 for RD/volatility caused rdt rdt divergence
- * - RD-based K-multiplier duplicated what Glicko-2 already does via newPhi
- * - Base-10 (ELO) and base-e (Glicko-2) expected scores were incompatible
- * - Pool adjustment was redundant with RD's natural adaptation
- *
- * Now: calculateFullGlicko2Update() handles everything in one coherent pass.
+ * Two modes:
+ * - calculateFullGlicko2Update(): single-opponent update (iterative)
+ * - calculateBatchGlicko2Update(): snapshot-based batch (order-independent)
  */
 class EloService {
     constructor(activityConfig) {
-        // Store activity config
         this.config = activityConfig;
 
-        // Import rating constants from centralized config
         this.DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
         this.RATING_DIVISOR = ratingConfig.RATING_CONSTANTS.RATING_DIVISOR;
         this.PROBABILITY_BASE = ratingConfig.RATING_CONSTANTS.PROBABILITY_BASE;
 
-        // K-factor thresholds (kept for getEnhancedPlayerStats backward compat)
-        this.K_FACTORS = ratingConfig.K_FACTORS;
-        this.BASE_K_FACTOR = ratingConfig.K_FACTORS.BASE;
-
-        // Pool adjustment settings (kept for backward compat, no longer used in rating calc)
-        this.POOL_ADJUSTMENT = ratingConfig.POOL_ADJUSTMENT;
-
-        // Glicko-2 settings
         this.GLICKO2 = ratingConfig.GLICKO2;
-
-        // Balance thresholds
         this.BALANCE_THRESHOLDS = ratingConfig.BALANCE_THRESHOLDS;
-
-        // Confidence levels
         this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
-
-        // Reliability threshold (kept for backward compat)
-        this.RELIABILITY_THRESHOLD = ratingConfig.RATING_CONSTANTS.RELIABILITY_THRESHOLD;
     }
 
     /**
@@ -136,26 +115,6 @@ class EloService {
             newRd: Math.round(newRd * 10) / 10,
             newVolatility: Math.round(newSigma * 10000) / 10000
         };
-    }
-
-    // === Legacy K-factor methods (kept for backward compatibility with UI stats) ===
-
-    /**
-     * @deprecated Use calculateFullGlicko2Update instead. Kept for getEnhancedPlayerStats.
-     */
-    calculateKFactor(comparisons, rating) {
-        const thresholds = this.K_FACTORS.THRESHOLDS;
-        if (comparisons < thresholds.NOVICE_COMPARISONS) return this.K_FACTORS.NOVICE;
-        if (rating > thresholds.MASTER_RATING && comparisons > thresholds.MASTER_COMPARISONS) return this.K_FACTORS.MASTER;
-        if (rating > thresholds.EXPERT_RATING && comparisons > thresholds.EXPERT_COMPARISONS) return this.K_FACTORS.EXPERT;
-        return this.BASE_K_FACTOR;
-    }
-
-    /**
-     * @deprecated Use calculateFullGlicko2Update instead. Kept for getEnhancedPlayerStats.
-     */
-    calculateEffectiveKFactor(comparisons, rating, poolSize = null, rd = this.GLICKO2.INITIAL_RD) {
-        return this.calculateKFactor(comparisons, rating);
     }
 
     /**
@@ -350,18 +309,6 @@ class EloService {
     }
 
     /**
-     * @deprecated Use calculateFullGlicko2Update instead.
-     * Kept for backward compatibility with processRanking batch mode.
-     */
-    calculateGlicko2Update(rating, rd, volatility, opponentRating, opponentRd, score) {
-        const result = this.calculateFullGlicko2Update(rating, rd, volatility, opponentRating, opponentRd, score);
-        return {
-            newRd: result.newRd,
-            newVolatility: result.newVolatility
-        };
-    }
-
-    /**
      * Get the confidence level label based on RD value.
      * Lower RD = higher confidence in the rating.
      *
@@ -395,17 +342,12 @@ class EloService {
     /**
      * Calculate rating changes for a position using unified Glicko-2.
      *
-     * Both rating AND RD/volatility are updated by the same Glicko-2 formula.
-     * No K-factor, no pool adjustment, no damping — Glicko-2 handles all of this
-     * through its φ' (new RD) and g(φ) (opponent uncertainty) mechanisms.
-     *
      * @param {Object} winner - Winner player object
      * @param {Object} loser - Loser player object
      * @param {string} position - Position being compared
-     * @param {number} poolSize - Optional: kept for backward compat in return value
      * @returns {Object} Rating change details
      */
-    calculateRatingChange(winner, loser, position, poolSize = null) {
+    calculateRatingChange(winner, loser, position) {
         if (winner.id === loser.id) {
             throw new Error('Cannot calculate rating change for same player');
         }
@@ -444,8 +386,6 @@ class EloService {
                 oldRating: winnerRating,
                 newRating: winnerResult.newRating,
                 change: winnerResult.newRating - winnerRating,
-                kFactor: 0,  // No longer used; Glicko-2 controls update magnitude
-                baseKFactor: 0,
                 expected: winnerExpected,
                 newRd: winnerResult.newRd,
                 newVolatility: winnerResult.newVolatility
@@ -454,14 +394,10 @@ class EloService {
                 oldRating: loserRating,
                 newRating: loserResult.newRating,
                 change: loserResult.newRating - loserRating,
-                kFactor: 0,
-                baseKFactor: 0,
                 expected: loserExpected,
                 newRd: loserResult.newRd,
                 newVolatility: loserResult.newVolatility
-            },
-            poolSize: poolSize || null,
-            poolAdjusted: false
+            }
         };
     }
 
@@ -472,10 +408,9 @@ class EloService {
      * @param {Object} player1 - First player object
      * @param {Object} player2 - Second player object
      * @param {string} position - Position being compared
-     * @param {number} poolSize - Optional: kept for backward compat
      * @returns {Object} Rating change details
      */
-    calculateDrawRatingChange(player1, player2, position, poolSize = null) {
+    calculateDrawRatingChange(player1, player2, position) {
         if (player1.id === player2.id) {
             throw new Error('Cannot calculate rating change for same player');
         }
@@ -511,8 +446,6 @@ class EloService {
                 oldRating: p1Rating,
                 newRating: p1Result.newRating,
                 change: p1Result.newRating - p1Rating,
-                kFactor: 0,
-                baseKFactor: 0,
                 expected: p1Expected,
                 newRd: p1Result.newRd,
                 newVolatility: p1Result.newVolatility
@@ -521,14 +454,10 @@ class EloService {
                 oldRating: p2Rating,
                 newRating: p2Result.newRating,
                 change: p2Result.newRating - p2Rating,
-                kFactor: 0,
-                baseKFactor: 0,
                 expected: p2Expected,
                 newRd: p2Result.newRd,
                 newVolatility: p2Result.newVolatility
             },
-            poolSize: poolSize || null,
-            poolAdjusted: false,
             isDraw: true
         };
     }
@@ -778,19 +707,8 @@ class EloService {
         const volatility = player.volatility?.[position] ?? this.GLICKO2.INITIAL_VOLATILITY;
         const poolSize = allPlayersInPosition.length;
 
-        // Calculate base K-factor
-        const baseK = this.calculateKFactor(comparisons, rating);
-
-        // Calculate effective K-factor with RD-based scaling + pool adjustment
-        const adjustedK = this.calculateEffectiveKFactor(comparisons, rating, poolSize, rd);
-
-        // Calculate percentile
         const percentileInfo = this.calculatePercentile(player, position, allPlayersInPosition);
-
-        // Calculate confidence
         const confidenceInfo = this.calculateConfidence(player, position, poolSize);
-
-        // Glicko-2 RD confidence
         const rdConfidence = this.getRdConfidenceLevel(rd);
         const ratingInterval = this.getRatingInterval(rating, rd);
 
@@ -803,8 +721,6 @@ class EloService {
             volatility,
             rdConfidence,
             ratingInterval,
-            baseKFactor: baseK,
-            adjustedKFactor: adjustedK,
             percentile: percentileInfo.percentile,
             rank: percentileInfo.rank,
             confidence: confidenceInfo.confidence,

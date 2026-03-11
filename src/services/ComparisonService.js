@@ -200,7 +200,6 @@ class ComparisonService {
                 oldRating: winnerOldRating,
                 newRating: updatedWinner.ratings[position],
                 change: updatedWinner.ratings[position] - winnerOldRating,
-                kFactor: 0, baseKFactor: 0,
                 expected: winnerExpected,
                 newRd: updatedWinner.rd?.[position],
                 newVolatility: updatedWinner.volatility?.[position]
@@ -209,13 +208,10 @@ class ComparisonService {
                 oldRating: loserOldRating,
                 newRating: updatedLoser.ratings[position],
                 change: updatedLoser.ratings[position] - loserOldRating,
-                kFactor: 0, baseKFactor: 0,
                 expected: loserExpected,
                 newRd: updatedLoser.rd?.[position],
                 newVolatility: updatedLoser.volatility?.[position]
-            },
-            poolSize: poolSize || null,
-            poolAdjusted: false
+            }
         };
 
         // Build result
@@ -282,7 +278,6 @@ class ComparisonService {
                 oldRating: p1OldRating,
                 newRating: updatedPlayer1.ratings[position],
                 change: updatedPlayer1.ratings[position] - p1OldRating,
-                kFactor: 0, baseKFactor: 0,
                 expected: p1Expected,
                 newRd: updatedPlayer1.rd?.[position],
                 newVolatility: updatedPlayer1.volatility?.[position]
@@ -291,13 +286,10 @@ class ComparisonService {
                 oldRating: p2OldRating,
                 newRating: updatedPlayer2.ratings[position],
                 change: updatedPlayer2.ratings[position] - p2OldRating,
-                kFactor: 0, baseKFactor: 0,
                 expected: p2Expected,
                 newRd: updatedPlayer2.rd?.[position],
                 newVolatility: updatedPlayer2.volatility?.[position]
             },
-            poolSize: poolSize || null,
-            poolAdjusted: false,
             isDraw: true
         };
 
