@@ -35,7 +35,7 @@ class AppInitializer {
             await i18n.init();
 
             // Step 0.1: Update navigation with translations
-            this.updateNavigationText();
+            this.app.updateNavigationText();
 
             // Step 0.2: Mount language selector
             this.mountLanguageSelector();
@@ -98,28 +98,6 @@ class AppInitializer {
         } catch (error) {
             this.app.showFatalError(error);
         }
-    }
-
-    /**
-     * Update navigation links with translated text
-     * @private
-     */
-    updateNavigationText() {
-        const navLinks = document.querySelectorAll('.nav-link[data-route]');
-
-        const translations = {
-            '/': t('nav.settings'),
-            '/compare/': t('nav.compare'),
-            '/rankings/': t('nav.rankings'),
-            '/teams/': t('nav.teams')
-        };
-
-        navLinks.forEach(link => {
-            const route = link.getAttribute('data-route');
-            if (translations[route]) {
-                link.textContent = translations[route];
-            }
-        });
     }
 
     /**
