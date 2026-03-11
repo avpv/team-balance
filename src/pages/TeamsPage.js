@@ -709,7 +709,18 @@ class TeamsPage extends BasePage {
                     );
                 }
 
-                const variants = await Promise.all(variantPromises);
+                const allVariants = await Promise.all(variantPromises);
+
+                // Deduplicate variants that produced identical team compositions
+                const seen = new Set();
+                const variants = allVariants.filter(variant => {
+                    const key = variant.teams.map(team =>
+                        team.map(p => p.name).sort().join(',')
+                    ).sort().join('|');
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
 
                 // Sort variants by weighted balance (best first)
                 variants.sort((a, b) => {
