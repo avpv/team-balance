@@ -734,7 +734,7 @@ class TeamsPage extends BasePage {
                     team_count: teamCount,
                     player_count: players.length,
                     balance_quality: weightedBalance,
-                    variant_count: VARIANT_COUNT
+                    variant_count: variants.length
                 });
 
                 toast.success(t('success.teamsCreated', { balance: weightedBalance }));
