@@ -37,6 +37,7 @@ import storage from './core/StorageAdapter.js';
 import { STORAGE_KEYS } from './utils/constants.js';
 import AppInitializer from './core/AppInitializer.js';
 import { trackClick } from './config/analytics.js';
+import { t } from './core/I18nManager.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -494,6 +495,28 @@ class Application {
                 `${data.winner.name} defeats ${data.loser.name} at ${posName}!`,
                 TOAST.MEDIUM_DURATION
             );
+        });
+
+        // Language change — re-render page without full reload
+        eventBus.on('i18n:language-changed', () => {
+            // Update navigation text with new translations
+            const navLinks = document.querySelectorAll('.nav-link[data-route]');
+            const translations = {
+                '/': t('nav.settings'),
+                '/compare/': t('nav.compare'),
+                '/rankings/': t('nav.rankings'),
+                '/teams/': t('nav.teams')
+            };
+            navLinks.forEach(link => {
+                const route = link.getAttribute(DATA_ATTRIBUTES.ROUTE);
+                if (translations[route]) {
+                    link.textContent = translations[route];
+                }
+            });
+
+            // Re-render current page with new translations
+            const currentPath = router.getCurrentPath();
+            router.navigate(currentPath, false);
         });
 
         // Route change events
