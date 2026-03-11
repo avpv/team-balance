@@ -173,6 +173,56 @@ class EloService {
         return Math.max(adaptive.MIN, Math.min(adaptive.MAX, scaled));
     }
 
+    /**
+     * Batch Glicko-2 update for a player given win/loss/draw counts.
+     *
+     * All opponents are assumed to start from the same snapshot state (rating, RD, vol),
+     * making the result purely a function of (wins, losses, draws) — order-independent.
+     *
+     * This is intentionally a "linear ranking wrapped in Glicko-2": since all opponents
+     * share the same snapshot, g(φ) and E() are constants, and the final rating is
+     * determined by (wins - losses). The Glicko-2 framework still provides correct
+     * RD narrowing and volatility adaptation based on result count.
+     *
+     * @param {number} wins - Number of wins
+     * @param {number} losses - Number of losses
+     * @param {number} draws - Number of draws
+     * @param {number} poolSize - Pool size (for adaptive initial RD)
+     * @returns {Object} { newRating, newRd, newVolatility } or null if no comparisons
+     */
+    calculateBatchGlicko2Update(wins, losses, draws, poolSize) {
+        const totalComparisons = wins + losses + draws;
+        if (totalComparisons === 0) return null;
+
+        const g2 = this.GLICKO2;
+        const snapshotRd = this.getInitialRD(poolSize);
+        const snapshotVol = g2.INITIAL_VOLATILITY;
+
+        const phi = this.rdToGlicko2Scale(snapshotRd);
+        const mu = this.toGlicko2Scale(this.DEFAULT_RATING);
+        const gPhiJ = this.g(phi);
+        const eMuJ = this.E(mu, mu, phi); // 0.5
+
+        const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
+        const delta = v * gPhiJ * ((wins - losses) / 2);
+
+        let newSigma = this.calculateNewVolatility(snapshotVol, phi, v, delta);
+        newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
+
+        const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
+        const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
+        const newMu = mu + newPhi * newPhi * gPhiJ * ((wins - losses) / 2);
+
+        let newRd = this.rdFromGlicko2Scale(newPhi);
+        newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
+
+        return {
+            newRating: Math.round(this.fromGlicko2Scale(newMu)),
+            newRd: Math.round(newRd * 10) / 10,
+            newVolatility: Math.round(newSigma * 10000) / 10000
+        };
+    }
+
     // ==========================================
     // Glicko-2 Rating Deviation & Volatility
     // ==========================================

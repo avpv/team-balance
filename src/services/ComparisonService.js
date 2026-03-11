@@ -452,7 +452,7 @@ class ComparisonService {
 
     /**
      * Batch recalculate all ratings for a position from scratch.
-     * Uses the same Glicko-2 batch formula as processRanking.
+     * Delegates to EloService.calculateBatchGlicko2Update() for the math.
      * Called after each step-by-step comparison to ensure order-independence:
      * regardless of comparison order, the resulting ratings are identical.
      *
@@ -464,36 +464,34 @@ class ComparisonService {
         if (players.length < 2) return;
 
         const poolSize = players.length;
-        const snapshotRating = this.eloService.DEFAULT_RATING;
-        const snapshotRd = this.eloService.getInitialRD(poolSize);
-        const snapshotVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
-        const g2 = this.eloService.GLICKO2;
-
-        // Glicko-2 batch constants (all start from same initial state)
-        const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
-        const mu = this.eloService.toGlicko2Scale(snapshotRating);
-        const gPhiJ = this.eloService.g(phi);
-        const eMuJ = this.eloService.E(mu, mu, phi); // 0.5
 
         // Build name→player map for win/loss reconstruction
         const nameToPlayer = new Map();
         for (const p of players) nameToPlayer.set(p.name, p);
+
+        // Pre-compute winsAgainst sets once (avoids re-creating per opponent lookup)
+        const winsAgainstSets = new Map();
+        for (const p of players) {
+            winsAgainstSets.set(p.name, new Set(p.winsAgainst?.[position] || []));
+        }
 
         const updates = [];
         for (const player of players) {
             const compared = player.comparedWith[position] || [];
             if (compared.length === 0) continue;
 
-            const winsAgainstSet = new Set(player.winsAgainst?.[position] || []);
+            const myWins = winsAgainstSets.get(player.name);
 
             // Reconstruct wins/losses/draws from metadata
             let wins = 0, losses = 0, draws = 0;
             for (const oppName of compared) {
-                if (winsAgainstSet.has(oppName)) {
+                if (myWins.has(oppName)) {
                     wins++;
                 } else {
-                    const opp = nameToPlayer.get(oppName);
-                    const oppWins = new Set(opp?.winsAgainst?.[position] || []);
+                    const oppWins = winsAgainstSets.get(oppName);
+                    // Guard against deleted/missing opponents: if opponent not in pool,
+                    // skip this comparison rather than counting it as a phantom draw.
+                    if (!oppWins) continue;
                     if (oppWins.has(player.name)) {
                         losses++;
                     } else {
@@ -502,32 +500,15 @@ class ComparisonService {
                 }
             }
 
-            const totalComparisons = wins + losses + draws;
-            if (totalComparisons === 0) continue;
-
-            // Glicko-2 multi-opponent batch update
-            const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
-            const delta = v * gPhiJ * ((wins - losses) / 2);
-
-            let newSigma = this.eloService.calculateNewVolatility(snapshotVol, phi, v, delta);
-            newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
-
-            const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
-            const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
-            const newMu = mu + newPhi * newPhi * gPhiJ * ((wins - losses) / 2);
-
-            const newRating = Math.round(this.eloService.fromGlicko2Scale(newMu));
-            let newRd = this.eloService.rdFromGlicko2Scale(newPhi);
-            newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
-            newRd = Math.round(newRd * 10) / 10;
-            newSigma = Math.round(newSigma * 10000) / 10000;
+            const result = this.eloService.calculateBatchGlicko2Update(wins, losses, draws, poolSize);
+            if (!result) continue;
 
             updates.push({
                 id: player.id,
                 updates: {
-                    ratings: { ...player.ratings, [position]: newRating },
-                    rd: { ...(player.rd || {}), [position]: newRd },
-                    volatility: { ...(player.volatility || {}), [position]: newSigma }
+                    ratings: { ...player.ratings, [position]: result.newRating },
+                    rd: { ...(player.rd || {}), [position]: result.newRd },
+                    volatility: { ...(player.volatility || {}), [position]: result.newVolatility }
                 }
             });
         }
@@ -695,15 +676,7 @@ class ComparisonService {
         const allIds = tiers.flat();
         if (allIds.length < 2) return {};
 
-        const snapshotRating = this.eloService.DEFAULT_RATING;
-        const snapshotRd = this.eloService.getInitialRD(allIds.length);
-
-        // Compute Glicko-2 batch constants (all start from same state)
-        const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
-        const mu = this.eloService.toGlicko2Scale(snapshotRating);
-        const gPhiJ = this.eloService.g(phi);
-        const eMuJ = this.eloService.E(mu, mu, phi); // 0.5
-
+        const poolSize = allIds.length;
         const winsLosses = new Map();
         for (const id of allIds) {
             winsLosses.set(id, { wins: 0, losses: 0, draws: 0 });
@@ -733,15 +706,10 @@ class ComparisonService {
 
         const ratings = {};
         for (const [id, res] of winsLosses) {
-            const totalComparisons = res.wins + res.losses + res.draws;
-            if (totalComparisons === 0) {
-                ratings[id] = snapshotRating;
-                continue;
-            }
-            const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
-            const newPhi = 1 / Math.sqrt(1 / (phi * phi) + 1 / v);
-            const newMu = mu + newPhi * newPhi * gPhiJ * ((res.wins - res.losses) / 2);
-            ratings[id] = Math.round(this.eloService.fromGlicko2Scale(newMu));
+            const result = this.eloService.calculateBatchGlicko2Update(
+                res.wins, res.losses, res.draws, poolSize
+            );
+            ratings[id] = result ? result.newRating : this.eloService.DEFAULT_RATING;
         }
         return ratings;
     }
@@ -777,12 +745,8 @@ class ComparisonService {
 
         // --- Snapshot-based batch Glicko-2 calculation ---
         // After reset all players have identical state, so expected scores = 0.5.
-        // Rating changes are purely determined by Glicko-2 batch update formula.
+        // Rating changes are determined by EloService.calculateBatchGlicko2Update().
         // This makes the result completely order-independent.
-
-        const snapshotRating = this.eloService.DEFAULT_RATING;
-        const snapshotRd = this.eloService.getInitialRD(allIds.length);
-        const snapshotVol = this.eloService.GLICKO2.INITIAL_VOLATILITY;
 
         // Count wins, losses, draws for each player
         const playerResults = new Map();
@@ -826,52 +790,23 @@ class ComparisonService {
             }
         }
 
-        // Compute Glicko-2 batch update constants (all opponents have same state)
-        const phi = this.eloService.rdToGlicko2Scale(snapshotRd);
-        const phiJ = phi;
-        const mu = this.eloService.toGlicko2Scale(snapshotRating);
-        const gPhiJ = this.eloService.g(phiJ);
-        const eMuJ = this.eloService.E(mu, mu, phiJ); // 0.5 since μ = μj
-        const g2 = this.eloService.GLICKO2;
-
         // Re-read players after reset for correct current state (preserves other positions)
         const freshPlayers = new Map();
         for (const id of allIds) {
             freshPlayers.set(id, this.playerRepository.getById(id));
         }
 
-        // Build batch updates
+        // Build batch updates using centralized Glicko-2 batch method
         const updates = [];
         for (const id of allIds) {
             const res = playerResults.get(id);
             const player = freshPlayers.get(id);
             const totalComparisons = res.wins + res.losses + res.draws;
 
-            // Glicko-2 multi-opponent batch update
-            // v = 1 / (n * g(φj)² * E * (1-E))
-            const v = 1 / (totalComparisons * gPhiJ * gPhiJ * eMuJ * (1 - eMuJ));
-            // Δ = v * g(φj) * Σ(sj - E)
-            // sj=1 for wins, sj=0 for losses, sj=0.5 for draws; E=0.5 for all
-            // Σ(sj - E) = wins*1 + draws*0.5 + losses*0 - totalComparisons*0.5
-            //            = (wins - losses) / 2
-            const delta = v * gPhiJ * ((res.wins - res.losses) / 2);
-
-            // New volatility
-            let newSigma = this.eloService.calculateNewVolatility(snapshotVol, phi, v, delta);
-            newSigma = Math.max(g2.MIN_VOLATILITY, Math.min(g2.MAX_VOLATILITY, newSigma));
-
-            // New RD: φ* = sqrt(φ² + σ'²), φ' = 1/sqrt(1/φ*² + 1/v)
-            const phiStar = Math.sqrt(phi * phi + newSigma * newSigma);
-            const newPhi = 1 / Math.sqrt(1 / (phiStar * phiStar) + 1 / v);
-
-            // New rating (Glicko-2 formula): μ' = μ + φ'² * g(φj) * Σ(sj - E)
-            const newMu = mu + newPhi * newPhi * gPhiJ * ((res.wins - res.losses) / 2);
-            const newRating = Math.round(this.eloService.fromGlicko2Scale(newMu));
-
-            let newRd = this.eloService.rdFromGlicko2Scale(newPhi);
-            newRd = Math.max(g2.MIN_RD, Math.min(g2.MAX_RD, newRd));
-            newRd = Math.round(newRd * 10) / 10;
-            newSigma = Math.round(newSigma * 10000) / 10000;
+            const glickoResult = this.eloService.calculateBatchGlicko2Update(
+                res.wins, res.losses, res.draws, allIds.length
+            );
+            if (!glickoResult) continue;
 
             // Build comparedWith and winsAgainst lists
             const comparedWithNames = [...res.opponentIds].map(oid => playerNameById.get(oid));
@@ -880,12 +815,12 @@ class ComparisonService {
             updates.push({
                 id,
                 updates: {
-                    ratings: { ...player.ratings, [position]: newRating },
+                    ratings: { ...player.ratings, [position]: glickoResult.newRating },
                     comparisons: { ...player.comparisons, [position]: totalComparisons },
                     comparedWith: { ...player.comparedWith, [position]: comparedWithNames },
                     winsAgainst: { ...(player.winsAgainst || {}), [position]: winsAgainstNames },
-                    rd: { ...(player.rd || {}), [position]: newRd },
-                    volatility: { ...(player.volatility || {}), [position]: newSigma }
+                    rd: { ...(player.rd || {}), [position]: glickoResult.newRd },
+                    volatility: { ...(player.volatility || {}), [position]: glickoResult.newVolatility }
                 }
             });
         }
