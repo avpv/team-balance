@@ -1621,7 +1621,6 @@
     border-color: var(--color-border-emphasis);
 }
 
-
 .balance-icon {
     flex-shrink: 0;
     display: flex;
@@ -1638,7 +1637,6 @@
     display: block;
     stroke: var(--color-text-secondary);
 }
-
 
 .balance-content {
     flex: 1;
