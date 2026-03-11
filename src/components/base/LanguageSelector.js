@@ -122,10 +122,7 @@ class LanguageSelector {
     async selectLanguage(langCode) {
         await i18n.setLanguage(langCode);
         this.closeDropdown();
-
-        // Reload the page to apply translations
-        // In a more advanced setup, you could re-render components
-        window.location.reload();
+        // i18n.setLanguage emits 'i18n:language-changed' — Application handles re-render
     }
 
     destroy() {

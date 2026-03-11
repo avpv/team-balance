@@ -42,12 +42,12 @@ class TeamsPage extends BasePage {
 
         // Load saved settings and teams from active session
         const savedSettings = this.loadSettings();
-        const savedTeams = this.loadTeams();
+        const savedData = this.loadTeams();
 
         this.state = {
-            teams: savedTeams,
-            variants: savedTeams ? [savedTeams] : [],
-            activeVariant: 0,
+            teams: savedData?.teams || null,
+            variants: savedData?.variants || [],
+            activeVariant: savedData?.activeVariant || 0,
             isOptimizing: false,
             showEloRatings: savedSettings.showEloRatings ?? true,
             showPositions: savedSettings.showPositions ?? true,
@@ -61,15 +61,15 @@ class TeamsPage extends BasePage {
         this.on('player:added', () => this.update());
         this.on('player:removed', () => {
             this.setState({ teams: null, variants: [], activeVariant: 0 });
-            this.saveTeams(null);
+            this.saveTeams([], 0);
         });
         this.on('session:activated', () => {
             const savedSettings = this.loadSettings();
-            const savedTeams = this.loadTeams();
+            const savedData = this.loadTeams();
             this.setState({
-                teams: savedTeams,
-                variants: savedTeams ? [savedTeams] : [],
-                activeVariant: 0,
+                teams: savedData?.teams || null,
+                variants: savedData?.variants || [],
+                activeVariant: savedData?.activeVariant || 0,
                 showEloRatings: savedSettings.showEloRatings ?? true,
                 showPositions: savedSettings.showPositions ?? true,
                 teamCount: savedSettings.teamCount ?? 2,
@@ -192,6 +192,7 @@ class TeamsPage extends BasePage {
 
     /**
      * Load generated teams from active session
+     * Returns { teams, variants, activeVariant } or null
      */
     loadTeams() {
         try {
@@ -200,23 +201,42 @@ class TeamsPage extends BasePage {
                 return null;
             }
 
-            return this.sessionRepository.getGeneratedTeams(this.activityKey, activeSessionId);
+            const data = this.sessionRepository.getGeneratedTeams(this.activityKey, activeSessionId);
+            if (!data) return null;
+
+            // New format: { variants, activeVariant }
+            if (Array.isArray(data.variants)) {
+                if (data.variants.length === 0) return null;
+                const activeVariant = data.activeVariant || 0;
+                return {
+                    teams: data.variants[activeVariant] || data.variants[0],
+                    variants: data.variants,
+                    activeVariant
+                };
+            }
+
+            // Old format: single team result object (backward compat)
+            return { teams: data, variants: [data], activeVariant: 0 };
         } catch (error) {
             return null;
         }
     }
 
     /**
-     * Save generated teams to active session
+     * Save generated teams to active session (all variants)
      */
-    saveTeams(teams) {
+    saveTeams(variants, activeVariant) {
         try {
             const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
             if (!activeSessionId) {
                 return;
             }
 
-            this.sessionRepository.updateGeneratedTeams(this.activityKey, activeSessionId, teams);
+            const data = variants && variants.length > 0
+                ? { variants, activeVariant: activeVariant || 0 }
+                : null;
+
+            this.sessionRepository.updateGeneratedTeams(this.activityKey, activeSessionId, data);
         } catch (error) {
             // Error saving teams
         }
@@ -646,7 +666,7 @@ class TeamsPage extends BasePage {
                             teams: selectedVariant,
                             activeVariant: index
                         });
-                        this.saveTeams(selectedVariant);
+                        this.saveTeams(this.state.variants, index);
                     }
                 });
             });
@@ -725,8 +745,8 @@ class TeamsPage extends BasePage {
                     isOptimizing: false
                 });
 
-                // Save best teams to active session
-                this.saveTeams(bestResult);
+                // Save all variants to active session
+                this.saveTeams(variants, 0);
 
                 // Track successful team generation
                 trackEvent('teams_generated', {

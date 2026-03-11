@@ -37,6 +37,7 @@ import storage from './core/StorageAdapter.js';
 import { STORAGE_KEYS } from './utils/constants.js';
 import AppInitializer from './core/AppInitializer.js';
 import { trackClick } from './config/analytics.js';
+import { t } from './core/I18nManager.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -496,6 +497,12 @@ class Application {
             );
         });
 
+        // Language change — re-render page without full reload
+        eventBus.on('i18n:language-changed', () => {
+            this.updateNavigationText();
+            router.navigate(router.getCurrentPath(), false);
+        });
+
         // Route change events
         eventBus.on('route:changed', () => {
             this.updateNavigation();
@@ -584,6 +591,26 @@ class Application {
                 </div>
             `;
         }
+    }
+
+    /**
+     * Update navigation links with translated text
+     * Called on init and on language change
+     */
+    updateNavigationText() {
+        const navLinks = document.querySelectorAll('.nav-link[data-route]');
+        const translations = {
+            '/': t('nav.settings'),
+            '/compare/': t('nav.compare'),
+            '/rankings/': t('nav.rankings'),
+            '/teams/': t('nav.teams')
+        };
+        navLinks.forEach(link => {
+            const route = link.getAttribute(DATA_ATTRIBUTES.ROUTE);
+            if (translations[route]) {
+                link.textContent = translations[route];
+            }
+        });
     }
 
     /**
