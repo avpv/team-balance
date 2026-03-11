@@ -64,22 +64,6 @@ class TeamsPage extends BasePage {
             this.saveTeams(null);
         });
         this.on('session:activated', () => {
-            // When session changes, reload settings and teams
-            const savedSettings = this.loadSettings();
-            const savedTeams = this.loadTeams();
-            this.setState({
-                teams: savedTeams,
-                variants: savedTeams ? [savedTeams] : [],
-                activeVariant: 0,
-                showEloRatings: savedSettings.showEloRatings ?? true,
-                showPositions: savedSettings.showPositions ?? true,
-                teamCount: savedSettings.teamCount ?? 2,
-                composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
-                positionWeights: savedSettings.positionWeights ?? this.getInitialWeights()
-            });
-        });
-        this.on('state:changed', () => {
-            // When state changes (e.g., session switch within same activity), reload data
             const savedSettings = this.loadSettings();
             const savedTeams = this.loadTeams();
             this.setState({
@@ -613,10 +597,8 @@ class TeamsPage extends BasePage {
             });
         }
 
-        // Don't call updatePlayersPerTeam() here - it causes infinite loop
-        // by saving settings which triggers state:changed which triggers onUpdate()
-        // which calls attachEventListeners() again. Settings are already loaded
-        // from loadSettings() in the state:changed listener.
+        // Don't call updatePlayersPerTeam() here - settings are already loaded
+        // from the constructor / session:activated handler.
 
         // Optimize button
         const optimizeBtn = this.$('#optimizeBtn');
