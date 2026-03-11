@@ -204,8 +204,9 @@ class TeamsPage extends BasePage {
             const data = this.sessionRepository.getGeneratedTeams(this.activityKey, activeSessionId);
             if (!data) return null;
 
-            // New format: { current, variants, activeVariant }
-            if (data.variants && Array.isArray(data.variants)) {
+            // New format: { variants, activeVariant }
+            if (Array.isArray(data.variants)) {
+                if (data.variants.length === 0) return null;
                 const activeVariant = data.activeVariant || 0;
                 return {
                     teams: data.variants[activeVariant] || data.variants[0],
@@ -231,10 +232,9 @@ class TeamsPage extends BasePage {
                 return;
             }
 
-            const data = {
-                variants,
-                activeVariant: activeVariant || 0
-            };
+            const data = variants && variants.length > 0
+                ? { variants, activeVariant: activeVariant || 0 }
+                : null;
 
             this.sessionRepository.updateGeneratedTeams(this.activityKey, activeSessionId, data);
         } catch (error) {
