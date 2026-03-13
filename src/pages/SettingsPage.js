@@ -785,7 +785,16 @@ class SettingsPage extends BasePage {
                         <button type="button" class="btn btn-sm btn-secondary" data-format="json">JSON</button>
                     </div>
                     <p class="form-help-text mt-2 mb-2">${t('settings.modals.exportPlayers.roundTripHint')}</p>
-                    <pre class="export-preview"><code>${this.escape(csvContent)}</code></pre>
+                    <div class="export-preview-section">
+                        <div class="example-header">
+                            <strong>${t('teams.export.preview')}</strong>
+                            <button type="button" class="btn btn-sm copy-button copy-btn" id="exportPlayersCopyBtn">
+                                ${getIcon('copy', { size: 14 })}
+                                ${t('common.copy')}
+                            </button>
+                        </div>
+                        <pre class="export-preview-content"><code>${this.escape(csvContent)}</code></pre>
+                    </div>
                 </div>
             `,
             showCancel: true,
@@ -822,7 +831,7 @@ class SettingsPage extends BasePage {
         const container = exportModal.container;
         if (container) {
             const formatButtons = container.querySelectorAll('[data-format]');
-            const previewEl = container.querySelector('.export-preview code');
+            const previewEl = container.querySelector('.export-preview-content code');
 
             formatButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -841,6 +850,25 @@ class SettingsPage extends BasePage {
                     }
                 });
             });
+
+            // Copy button
+            const copyBtn = container.querySelector('#exportPlayersCopyBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(getContent());
+                        const originalHTML = copyBtn.innerHTML;
+                        copyBtn.innerHTML = `${getIcon('check', { size: 14 })} ${t('teams.export.copiedSuccess')}`;
+                        copyBtn.classList.add('copied');
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        // Silent fail
+                    }
+                });
+            }
         }
     }
 
