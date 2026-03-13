@@ -334,35 +334,31 @@ export default {
             copiedSuccess: '已复制到剪贴板！',
             exportSuccess: '队伍已导出！',
             exportAs: '导出为{{format}}',
-            preview: '预览'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: '发送到API',
-            url: 'URL',
-            urlHint: '输入发送队伍数据的URL',
-            sendData: '发送',
-            sending: '发送中...',
-            sendingTo: '正在向{{url}}发送数据...',
-            sendSuccess: '数据发送成功！',
-            sentTo: '队伍数据已发送到{{url}}。',
-            sendFailed: '数据发送失败',
-            networkError: '网络错误。请检查：\n\u2022 URL是否正确\n\u2022 服务器是否启用了CORS\n\u2022 是否有网络连接',
-            dataPreview: '要发送的数据',
-            bearerHint: '输入您的OAuth/Bearer令牌',
-            apiKeyNameHint: '请求头名称或查询参数',
-            apiKeyValue: '密钥值',
-            apiKeyValueHint: '您的API密钥',
-            apiKeyAsQuery: '作为查询参数而非请求头添加',
-            username: '用户名',
-            password: '密码',
-            customHeadersHint: '每行一个，格式：Header-Name: 值',
-            notePostMethod: '数据将通过HTTP POST方法发送',
-            noteJsonBody: '请求正文将包含队伍数据的JSON',
-            noteCorsRequired: '目标服务器必须启用CORS'
+            preview: '预览',
+            api: {
+                title: '发送到API',
+                url: 'URL',
+                urlHint: '输入发送队伍数据的URL',
+                sendData: '发送',
+                sending: '发送中...',
+                sendingTo: '正在向{{url}}发送数据...',
+                sendSuccess: '数据发送成功！',
+                sentTo: '队伍数据已发送到{{url}}。',
+                sendFailed: '数据发送失败',
+                networkError: '网络错误。请检查：\n\u2022 URL是否正确\n\u2022 服务器是否启用了CORS\n\u2022 是否有网络连接',
+                dataPreview: '要发送的数据',
+                bearerHint: '输入您的OAuth/Bearer令牌',
+                apiKeyNameHint: '请求头名称或查询参数',
+                apiKeyValue: '密钥值',
+                apiKeyValueHint: '您的API密钥',
+                apiKeyAsQuery: '作为查询参数而非请求头添加',
+                username: '用户名',
+                password: '密码',
+                customHeadersHint: '每行一个，格式：Header-Name: 值',
+                notePostMethod: '数据将通过HTTP POST方法发送',
+                noteJsonBody: '请求正文将包含队伍数据的JSON',
+                noteCorsRequired: '目标服务器必须启用CORS'
+            }
         }
     },
 

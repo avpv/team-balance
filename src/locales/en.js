@@ -334,35 +334,31 @@ export default {
             copiedSuccess: 'Copied to clipboard!',
             exportSuccess: 'Teams exported!',
             exportAs: 'Export as {{format}}',
-            preview: 'Preview'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: 'Send to API',
-            url: 'URL',
-            urlHint: 'Enter the URL to send team data to',
-            sendData: 'Send',
-            sending: 'Sending...',
-            sendingTo: 'Sending data to {{url}}...',
-            sendSuccess: 'Data sent successfully!',
-            sentTo: 'Team data was sent to {{url}}.',
-            sendFailed: 'Failed to send data',
-            networkError: 'Network error. Please check:\n\u2022 The URL is correct\n\u2022 CORS is enabled on the server\n\u2022 You have internet connection',
-            dataPreview: 'Data to send',
-            bearerHint: 'Enter your OAuth/Bearer token',
-            apiKeyNameHint: 'Header name or query parameter',
-            apiKeyValue: 'Key Value',
-            apiKeyValueHint: 'Your API key',
-            apiKeyAsQuery: 'Add as query parameter instead of header',
-            username: 'Username',
-            password: 'Password',
-            customHeadersHint: 'One per line in format: Header-Name: value',
-            notePostMethod: 'Data will be sent via HTTP POST method',
-            noteJsonBody: 'Request body will contain JSON with team data',
-            noteCorsRequired: 'CORS must be enabled on the target server'
+            preview: 'Preview',
+            api: {
+                title: 'Send to API',
+                url: 'URL',
+                urlHint: 'Enter the URL to send team data to',
+                sendData: 'Send',
+                sending: 'Sending...',
+                sendingTo: 'Sending data to {{url}}...',
+                sendSuccess: 'Data sent successfully!',
+                sentTo: 'Team data was sent to {{url}}.',
+                sendFailed: 'Failed to send data',
+                networkError: 'Network error. Please check:\n\u2022 The URL is correct\n\u2022 CORS is enabled on the server\n\u2022 You have internet connection',
+                dataPreview: 'Data to send',
+                bearerHint: 'Enter your OAuth/Bearer token',
+                apiKeyNameHint: 'Header name or query parameter',
+                apiKeyValue: 'Key Value',
+                apiKeyValueHint: 'Your API key',
+                apiKeyAsQuery: 'Add as query parameter instead of header',
+                username: 'Username',
+                password: 'Password',
+                customHeadersHint: 'One per line in format: Header-Name: value',
+                notePostMethod: 'Data will be sent via HTTP POST method',
+                noteJsonBody: 'Request body will contain JSON with team data',
+                noteCorsRequired: 'CORS must be enabled on the target server'
+            }
         }
     },
 

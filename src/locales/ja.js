@@ -334,35 +334,31 @@ export default {
             copiedSuccess: 'クリップボードにコピーしました！',
             exportSuccess: 'チームをエクスポートしました！',
             exportAs: '{{format}}でエクスポート',
-            preview: 'プレビュー'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: 'APIに送信',
-            url: 'URL',
-            urlHint: 'チームデータの送信先URLを入力してください',
-            sendData: '送信',
-            sending: '送信中...',
-            sendingTo: '{{url}}にデータを送信中...',
-            sendSuccess: 'データが正常に送信されました！',
-            sentTo: 'チームデータが{{url}}に送信されました。',
-            sendFailed: 'データの送信に失敗しました',
-            networkError: 'ネットワークエラー。確認してください：\n\u2022 URLが正しいこと\n\u2022 サーバーでCORSが有効であること\n\u2022 インターネット接続があること',
-            dataPreview: '送信するデータ',
-            bearerHint: 'OAuth/Bearerトークンを入力してください',
-            apiKeyNameHint: 'ヘッダー名またはクエリパラメータ',
-            apiKeyValue: 'キーの値',
-            apiKeyValueHint: 'APIキー',
-            apiKeyAsQuery: 'ヘッダーの代わりにクエリパラメータとして追加',
-            username: 'ユーザー名',
-            password: 'パスワード',
-            customHeadersHint: '1行に1つ、形式：Header-Name: 値',
-            notePostMethod: 'データはHTTP POSTメソッドで送信されます',
-            noteJsonBody: 'リクエストボディにはチームデータのJSONが含まれます',
-            noteCorsRequired: 'ターゲットサーバーでCORSが有効である必要があります'
+            preview: 'プレビュー',
+            api: {
+                title: 'APIに送信',
+                url: 'URL',
+                urlHint: 'チームデータの送信先URLを入力してください',
+                sendData: '送信',
+                sending: '送信中...',
+                sendingTo: '{{url}}にデータを送信中...',
+                sendSuccess: 'データが正常に送信されました！',
+                sentTo: 'チームデータが{{url}}に送信されました。',
+                sendFailed: 'データの送信に失敗しました',
+                networkError: 'ネットワークエラー。確認してください：\n\u2022 URLが正しいこと\n\u2022 サーバーでCORSが有効であること\n\u2022 インターネット接続があること',
+                dataPreview: '送信するデータ',
+                bearerHint: 'OAuth/Bearerトークンを入力してください',
+                apiKeyNameHint: 'ヘッダー名またはクエリパラメータ',
+                apiKeyValue: 'キーの値',
+                apiKeyValueHint: 'APIキー',
+                apiKeyAsQuery: 'ヘッダーの代わりにクエリパラメータとして追加',
+                username: 'ユーザー名',
+                password: 'パスワード',
+                customHeadersHint: '1行に1つ、形式：Header-Name: 値',
+                notePostMethod: 'データはHTTP POSTメソッドで送信されます',
+                noteJsonBody: 'リクエストボディにはチームデータのJSONが含まれます',
+                noteCorsRequired: 'ターゲットサーバーでCORSが有効である必要があります'
+            }
         }
     },
 

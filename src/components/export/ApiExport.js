@@ -27,7 +27,7 @@ export default class ApiExport extends Component {
                     <div class="auth-fields">
                         <label for="apiBearerToken">
                             <strong>Bearer Token</strong>
-                            <span class="hint">${t('export.api.bearerHint')}</span>
+                            <span class="hint">${t('teams.export.api.bearerHint')}</span>
                         </label>
                         <input
                             type="password"
@@ -43,7 +43,7 @@ export default class ApiExport extends Component {
                     <div class="auth-fields">
                         <label for="apiExportKeyName">
                             <strong>${t('import.authApiKey')}</strong>
-                            <span class="hint">${t('export.api.apiKeyNameHint')}</span>
+                            <span class="hint">${t('teams.export.api.apiKeyNameHint')}</span>
                         </label>
                         <input
                             type="text"
@@ -53,8 +53,8 @@ export default class ApiExport extends Component {
                         />
 
                         <label for="apiExportKeyValue" style="margin-top: 12px;">
-                            <strong>${t('export.api.apiKeyValue')}</strong>
-                            <span class="hint">${t('export.api.apiKeyValueHint')}</span>
+                            <strong>${t('teams.export.api.apiKeyValue')}</strong>
+                            <span class="hint">${t('teams.export.api.apiKeyValueHint')}</span>
                         </label>
                         <input
                             type="password"
@@ -69,7 +69,7 @@ export default class ApiExport extends Component {
                                 id="apiExportKeyInQuery"
                                 style="width: auto;"
                             />
-                            <span>${t('export.api.apiKeyAsQuery')}</span>
+                            <span>${t('teams.export.api.apiKeyAsQuery')}</span>
                         </label>
                     </div>
                 `;
@@ -78,7 +78,7 @@ export default class ApiExport extends Component {
                 return `
                     <div class="auth-fields">
                         <label for="apiExportUsername">
-                            <strong>${t('export.api.username')}</strong>
+                            <strong>${t('teams.export.api.username')}</strong>
                         </label>
                         <input
                             type="text"
@@ -89,7 +89,7 @@ export default class ApiExport extends Component {
                         />
 
                         <label for="apiExportPassword" style="margin-top: 12px;">
-                            <strong>${t('export.api.password')}</strong>
+                            <strong>${t('teams.export.api.password')}</strong>
                         </label>
                         <input
                             type="password"
@@ -106,7 +106,7 @@ export default class ApiExport extends Component {
                     <div class="auth-fields">
                         <label for="apiExportCustomHeaders">
                             <strong>${t('import.authCustomHeaders')}</strong>
-                            <span class="hint">${t('export.api.customHeadersHint')}</span>
+                            <span class="hint">${t('teams.export.api.customHeadersHint')}</span>
                         </label>
                         <textarea
                             id="apiExportCustomHeaders"
@@ -131,15 +131,15 @@ export default class ApiExport extends Component {
                         ${t('import.back')}
                     </button>
                     <div class="header-content">
-                        <h2>${t('export.api.title')}</h2>
+                        <h2>${t('teams.export.api.title')}</h2>
                     </div>
                 </div>
 
                 <div class="export-method-content">
                     <div class="input-section">
                         <label for="apiExportUrlInput">
-                            <strong>${t('export.api.url')}</strong>
-                            <span class="hint">${t('export.api.urlHint')}</span>
+                            <strong>${t('teams.export.api.url')}</strong>
+                            <span class="hint">${t('teams.export.api.urlHint')}</span>
                         </label>
                         <div class="url-input-group">
                             <input
@@ -154,7 +154,7 @@ export default class ApiExport extends Component {
                                 data-action="send"
                                 ${this.isLoading ? 'disabled' : ''}
                             >
-                                ${this.isLoading ? t('export.api.sending') : t('export.api.sendData')}
+                                ${this.isLoading ? t('teams.export.api.sending') : t('teams.export.api.sendData')}
                             </button>
                         </div>
                     </div>
@@ -176,7 +176,7 @@ export default class ApiExport extends Component {
 
                     <div class="export-preview-section">
                         <div class="example-header">
-                            <strong>${t('export.api.dataPreview')}</strong>
+                            <strong>${t('teams.export.api.dataPreview')}</strong>
                         </div>
                         <pre class="export-preview-content">${this.escapeHtml(this.content)}</pre>
                     </div>
@@ -184,9 +184,9 @@ export default class ApiExport extends Component {
                     <div class="info-box">
                         <h4>${getIcon('info', { size: 18 })} ${t('import.notes')}</h4>
                         <ul>
-                            <li>${t('export.api.notePostMethod')}</li>
-                            <li>${t('export.api.noteJsonBody')}</li>
-                            <li>${t('export.api.noteCorsRequired')}</li>
+                            <li>${t('teams.export.api.notePostMethod')}</li>
+                            <li>${t('teams.export.api.noteJsonBody')}</li>
+                            <li>${t('teams.export.api.noteCorsRequired')}</li>
                         </ul>
                     </div>
 
@@ -341,7 +341,7 @@ export default class ApiExport extends Component {
         this.updateResult(`
             <div class="preview-loading">
                 <div class="spinner"></div>
-                <p>${t('export.api.sendingTo', { url: url })}</p>
+                <p>${t('teams.export.api.sendingTo', { url: url })}</p>
             </div>
         `);
 
@@ -352,17 +352,32 @@ export default class ApiExport extends Component {
                 body: this.content
             });
 
+            let responseBody = '';
+            try {
+                responseBody = await response.text();
+            } catch (_) {
+                // ignore body read errors
+            }
+
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const errorDetail = responseBody
+                    ? `HTTP ${response.status}: ${response.statusText}\n${responseBody}`
+                    : `HTTP ${response.status}: ${response.statusText}`;
+                throw new Error(errorDetail);
             }
 
             trackClick('apiExportSendBtn', 'teams', 'export_api_send');
 
+            const responseHtml = responseBody
+                ? `<pre class="export-preview-content" style="margin-top: 8px; max-height: 150px;">${this.escapeHtml(responseBody)}</pre>`
+                : '';
+
             this.updateResult(`
                 <div class="preview-success">
-                    <strong>\u2713 ${t('export.api.sendSuccess')}</strong>
-                    <p>${t('export.api.sentTo', { url: url })}</p>
+                    <strong>\u2713 ${t('teams.export.api.sendSuccess')}</strong>
+                    <p>${t('teams.export.api.sentTo', { url: url })}</p>
                 </div>
+                ${responseHtml}
             `);
 
             if (this.onExportComplete) {
@@ -372,13 +387,13 @@ export default class ApiExport extends Component {
         } catch (error) {
             let errorMessage = error.message;
             if (error.message.includes('Failed to fetch')) {
-                errorMessage = t('export.api.networkError');
+                errorMessage = t('teams.export.api.networkError');
             }
 
             this.updateResult(`
                 <div class="preview-error">
-                    <strong>${t('export.api.sendFailed')}</strong>
-                    <p style="white-space: pre-line;">${errorMessage}</p>
+                    <strong>${t('teams.export.api.sendFailed')}</strong>
+                    <p style="white-space: pre-line;">${this.escapeHtml(errorMessage)}</p>
                 </div>
             `);
         } finally {
@@ -394,7 +409,7 @@ export default class ApiExport extends Component {
         const sendButton = this.element.querySelector('[data-action="send"]');
         if (sendButton) {
             sendButton.disabled = this.isLoading;
-            sendButton.textContent = this.isLoading ? t('export.api.sending') : t('export.api.sendData');
+            sendButton.textContent = this.isLoading ? t('teams.export.api.sending') : t('teams.export.api.sendData');
         }
     }
 

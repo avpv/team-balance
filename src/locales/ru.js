@@ -334,35 +334,31 @@ export default {
             copiedSuccess: 'Скопировано в буфер обмена!',
             exportSuccess: 'Команды экспортированы!',
             exportAs: 'Экспорт как {{format}}',
-            preview: 'Предпросмотр'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: 'Отправить в API',
-            url: 'URL',
-            urlHint: 'Введите URL для отправки данных команд',
-            sendData: 'Отправить',
-            sending: 'Отправка...',
-            sendingTo: 'Отправка данных на {{url}}...',
-            sendSuccess: 'Данные успешно отправлены!',
-            sentTo: 'Данные команд отправлены на {{url}}.',
-            sendFailed: 'Не удалось отправить данные',
-            networkError: 'Ошибка сети. Проверьте:\n\u2022 URL указан правильно\n\u2022 На сервере включён CORS\n\u2022 Есть подключение к интернету',
-            dataPreview: 'Данные для отправки',
-            bearerHint: 'Введите ваш OAuth/Bearer токен',
-            apiKeyNameHint: 'Имя заголовка или параметра запроса',
-            apiKeyValue: 'Значение ключа',
-            apiKeyValueHint: 'Ваш API ключ',
-            apiKeyAsQuery: 'Добавить как параметр запроса вместо заголовка',
-            username: 'Имя пользователя',
-            password: 'Пароль',
-            customHeadersHint: 'По одному на строку в формате: Header-Name: value',
-            notePostMethod: 'Данные будут отправлены методом HTTP POST',
-            noteJsonBody: 'Тело запроса будет содержать JSON с данными команд',
-            noteCorsRequired: 'На целевом сервере должен быть включён CORS'
+            preview: 'Предпросмотр',
+            api: {
+                title: 'Отправить в API',
+                url: 'URL',
+                urlHint: 'Введите URL для отправки данных команд',
+                sendData: 'Отправить',
+                sending: 'Отправка...',
+                sendingTo: 'Отправка данных на {{url}}...',
+                sendSuccess: 'Данные успешно отправлены!',
+                sentTo: 'Данные команд отправлены на {{url}}.',
+                sendFailed: 'Не удалось отправить данные',
+                networkError: 'Ошибка сети. Проверьте:\n\u2022 URL указан правильно\n\u2022 На сервере включён CORS\n\u2022 Есть подключение к интернету',
+                dataPreview: 'Данные для отправки',
+                bearerHint: 'Введите ваш OAuth/Bearer токен',
+                apiKeyNameHint: 'Имя заголовка или параметра запроса',
+                apiKeyValue: 'Значение ключа',
+                apiKeyValueHint: 'Ваш API ключ',
+                apiKeyAsQuery: 'Добавить как параметр запроса вместо заголовка',
+                username: 'Имя пользователя',
+                password: 'Пароль',
+                customHeadersHint: 'По одному на строку в формате: Header-Name: value',
+                notePostMethod: 'Данные будут отправлены методом HTTP POST',
+                noteJsonBody: 'Тело запроса будет содержать JSON с данными команд',
+                noteCorsRequired: 'На целевом сервере должен быть включён CORS'
+            }
         }
     },
 

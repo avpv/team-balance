@@ -334,35 +334,31 @@ export default {
             copiedSuccess: '¡Copiado al portapapeles!',
             exportSuccess: '¡Equipos exportados!',
             exportAs: 'Exportar como {{format}}',
-            preview: 'Vista previa'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: 'Enviar a API',
-            url: 'URL',
-            urlHint: 'Ingrese la URL para enviar los datos del equipo',
-            sendData: 'Enviar',
-            sending: 'Enviando...',
-            sendingTo: 'Enviando datos a {{url}}...',
-            sendSuccess: '¡Datos enviados exitosamente!',
-            sentTo: 'Los datos del equipo fueron enviados a {{url}}.',
-            sendFailed: 'Error al enviar datos',
-            networkError: 'Error de red. Verifique:\n\u2022 La URL es correcta\n\u2022 CORS está habilitado en el servidor\n\u2022 Tiene conexión a internet',
-            dataPreview: 'Datos a enviar',
-            bearerHint: 'Ingrese su token OAuth/Bearer',
-            apiKeyNameHint: 'Nombre del encabezado o parámetro de consulta',
-            apiKeyValue: 'Valor de la clave',
-            apiKeyValueHint: 'Su clave API',
-            apiKeyAsQuery: 'Agregar como parámetro de consulta en lugar de encabezado',
-            username: 'Usuario',
-            password: 'Contraseña',
-            customHeadersHint: 'Uno por línea en formato: Header-Name: valor',
-            notePostMethod: 'Los datos se enviarán mediante el método HTTP POST',
-            noteJsonBody: 'El cuerpo de la solicitud contendrá JSON con datos del equipo',
-            noteCorsRequired: 'CORS debe estar habilitado en el servidor destino'
+            preview: 'Vista previa',
+            api: {
+                title: 'Enviar a API',
+                url: 'URL',
+                urlHint: 'Ingrese la URL para enviar los datos del equipo',
+                sendData: 'Enviar',
+                sending: 'Enviando...',
+                sendingTo: 'Enviando datos a {{url}}...',
+                sendSuccess: '¡Datos enviados exitosamente!',
+                sentTo: 'Los datos del equipo fueron enviados a {{url}}.',
+                sendFailed: 'Error al enviar datos',
+                networkError: 'Error de red. Verifique:\n\u2022 La URL es correcta\n\u2022 CORS está habilitado en el servidor\n\u2022 Tiene conexión a internet',
+                dataPreview: 'Datos a enviar',
+                bearerHint: 'Ingrese su token OAuth/Bearer',
+                apiKeyNameHint: 'Nombre del encabezado o parámetro de consulta',
+                apiKeyValue: 'Valor de la clave',
+                apiKeyValueHint: 'Su clave API',
+                apiKeyAsQuery: 'Agregar como parámetro de consulta en lugar de encabezado',
+                username: 'Usuario',
+                password: 'Contraseña',
+                customHeadersHint: 'Uno por línea en formato: Header-Name: valor',
+                notePostMethod: 'Los datos se enviarán mediante el método HTTP POST',
+                noteJsonBody: 'El cuerpo de la solicitud contendrá JSON con datos del equipo',
+                noteCorsRequired: 'CORS debe estar habilitado en el servidor destino'
+            }
         }
     },
 

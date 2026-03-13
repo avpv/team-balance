@@ -334,35 +334,31 @@ export default {
             copiedSuccess: 'In die Zwischenablage kopiert!',
             exportSuccess: 'Teams exportiert!',
             exportAs: 'Exportieren als {{format}}',
-            preview: 'Vorschau'
-        }
-    },
-
-    // Export API
-    export: {
-        api: {
-            title: 'An API senden',
-            url: 'URL',
-            urlHint: 'Geben Sie die URL ein, an die die Teamdaten gesendet werden sollen',
-            sendData: 'Senden',
-            sending: 'Wird gesendet...',
-            sendingTo: 'Daten werden an {{url}} gesendet...',
-            sendSuccess: 'Daten erfolgreich gesendet!',
-            sentTo: 'Teamdaten wurden an {{url}} gesendet.',
-            sendFailed: 'Daten konnten nicht gesendet werden',
-            networkError: 'Netzwerkfehler. Bitte prüfen Sie:\n\u2022 Die URL ist korrekt\n\u2022 CORS ist auf dem Server aktiviert\n\u2022 Sie haben eine Internetverbindung',
-            dataPreview: 'Zu sendende Daten',
-            bearerHint: 'Geben Sie Ihr OAuth/Bearer-Token ein',
-            apiKeyNameHint: 'Header-Name oder Abfrageparameter',
-            apiKeyValue: 'Schlüsselwert',
-            apiKeyValueHint: 'Ihr API-Schlüssel',
-            apiKeyAsQuery: 'Als Abfrageparameter statt Header hinzufügen',
-            username: 'Benutzername',
-            password: 'Passwort',
-            customHeadersHint: 'Einer pro Zeile im Format: Header-Name: Wert',
-            notePostMethod: 'Daten werden per HTTP POST gesendet',
-            noteJsonBody: 'Der Anfragekörper enthält JSON mit Teamdaten',
-            noteCorsRequired: 'CORS muss auf dem Zielserver aktiviert sein'
+            preview: 'Vorschau',
+            api: {
+                title: 'An API senden',
+                url: 'URL',
+                urlHint: 'Geben Sie die URL ein, an die die Teamdaten gesendet werden sollen',
+                sendData: 'Senden',
+                sending: 'Wird gesendet...',
+                sendingTo: 'Daten werden an {{url}} gesendet...',
+                sendSuccess: 'Daten erfolgreich gesendet!',
+                sentTo: 'Teamdaten wurden an {{url}} gesendet.',
+                sendFailed: 'Daten konnten nicht gesendet werden',
+                networkError: 'Netzwerkfehler. Bitte prüfen Sie:\n\u2022 Die URL ist korrekt\n\u2022 CORS ist auf dem Server aktiviert\n\u2022 Sie haben eine Internetverbindung',
+                dataPreview: 'Zu sendende Daten',
+                bearerHint: 'Geben Sie Ihr OAuth/Bearer-Token ein',
+                apiKeyNameHint: 'Header-Name oder Abfrageparameter',
+                apiKeyValue: 'Schlüsselwert',
+                apiKeyValueHint: 'Ihr API-Schlüssel',
+                apiKeyAsQuery: 'Als Abfrageparameter statt Header hinzufügen',
+                username: 'Benutzername',
+                password: 'Passwort',
+                customHeadersHint: 'Einer pro Zeile im Format: Header-Name: Wert',
+                notePostMethod: 'Daten werden per HTTP POST gesendet',
+                noteJsonBody: 'Der Anfragekörper enthält JSON mit Teamdaten',
+                noteCorsRequired: 'CORS muss auf dem Zielserver aktiviert sein'
+            }
         }
     },
 
