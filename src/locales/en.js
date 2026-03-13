@@ -422,7 +422,8 @@ export default {
         fetchSuccess: 'Data fetched successfully!',
         fetchedItems: 'Fetched {{count}} item(s) from the URL.',
         fetchFailed: 'Failed to fetch data',
-        fileReadError: 'Error reading file'
+        fileReadError: 'Error reading file',
+        availablePositions: 'Available Positions'
     },
 
     // Error Messages

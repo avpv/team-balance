@@ -609,6 +609,7 @@ class SettingsPage extends BasePage {
         const positionKeys = Object.keys(positions);
 
         this.importWizard = new ImportWizard(positionKeys, {
+            positionNames: positions,
             onStepChange: (step, isContentStep) => {
                 // Show Import button only after format is selected
                 if (this.importModal) {

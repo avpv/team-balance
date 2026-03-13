@@ -6,11 +6,12 @@ import { t } from '../../core/I18nManager.js';
  * Text/Paste import component - allows users to paste or type player data
  */
 export default class TextImport extends Component {
-    constructor(onDataChange, onBack, positions = []) {
+    constructor(onDataChange, onBack, positions = [], positionNames = {}) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
         this.positions = positions;
+        this.positionNames = positionNames;
         this.delimiter = ','; // Default delimiter
     }
 
@@ -47,6 +48,27 @@ Alice Johnson${actualDelim}${pos[0]}`;
 Mike Johnson
 Tom Williams
 Chris Brown`;
+    }
+
+    /**
+     * Render position reference block
+     */
+    renderPositionReference() {
+        const entries = Object.entries(this.positionNames);
+        if (entries.length === 0) return '';
+
+        return `
+            <div class="position-reference">
+                <h3>${t('import.availablePositions')}</h3>
+                <div class="position-reference-list">
+                    ${entries.map(([key, name]) => `
+                        <span class="position-reference-item">
+                            <code>${key}</code> — ${name}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
     }
 
     render() {
@@ -86,6 +108,8 @@ Chris Brown`;
                             rows="10"
                         ></textarea>
                     </div>
+
+                    ${this.renderPositionReference()}
 
                     <div class="examples-section">
                         <h3>${t('import.examples')}</h3>

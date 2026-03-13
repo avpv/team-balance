@@ -14,6 +14,7 @@ export default class ImportWizard extends Component {
     constructor(positions = [], options = {}) {
         super();
         this.positions = positions;
+        this.positionNames = options.positionNames || {};
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
         this.currentDelimiter = ','; // Default delimiter
@@ -104,7 +105,8 @@ export default class ImportWizard extends Component {
                 component = new TextImport(
                     (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
-                    this.positions
+                    this.positions,
+                    this.positionNames
                 );
                 break;
 
@@ -113,7 +115,8 @@ export default class ImportWizard extends Component {
                     'csv',
                     (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
-                    this.positions
+                    this.positions,
+                    this.positionNames
                 );
                 break;
 
@@ -122,7 +125,8 @@ export default class ImportWizard extends Component {
                     'json',
                     (data) => this.handleDataChange(data),
                     () => this.handleBack(),
-                    this.positions
+                    this.positions,
+                    this.positionNames
                 );
                 break;
 
@@ -130,7 +134,8 @@ export default class ImportWizard extends Component {
                 component = new ApiImport(
                     (data) => this.handleDataChange(data),
                     () => this.handleBack(),
-                    this.positions
+                    this.positions,
+                    this.positionNames
                 );
                 break;
 

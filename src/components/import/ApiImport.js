@@ -6,11 +6,12 @@ import { t } from '../../core/I18nManager.js';
  * API import component - allows users to fetch player data from a URL
  */
 export default class ApiImport extends Component {
-    constructor(onDataChange, onBack, positions = []) {
+    constructor(onDataChange, onBack, positions = [], positionNames = {}) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
         this.positions = positions;
+        this.positionNames = positionNames;
         this.isLoading = false;
         this.authType = 'none'; // none, bearer, apikey, basic, custom
     }
@@ -143,6 +144,27 @@ export default class ApiImport extends Component {
         }
     }
 
+    /**
+     * Render position reference block
+     */
+    renderPositionReference() {
+        const entries = Object.entries(this.positionNames);
+        if (entries.length === 0) return '';
+
+        return `
+            <div class="position-reference">
+                <h3>${t('import.availablePositions')}</h3>
+                <div class="position-reference-list">
+                    ${entries.map(([key, name]) => `
+                        <span class="position-reference-item">
+                            <code>${key}</code> — ${name}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     render() {
         return `
             <div class="import-method-container">
@@ -194,6 +216,8 @@ export default class ApiImport extends Component {
                         </select>
                         ${this.renderAuthFields()}
                     </div>
+
+                    ${this.renderPositionReference()}
 
                     <div class="examples-section">
                         <h3>${t('import.expectedJsonFormat')}</h3>

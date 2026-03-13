@@ -422,7 +422,8 @@ export default {
         fetchSuccess: 'Данные успешно получены!',
         fetchedItems: 'Получено {{count}} элемент(ов) из URL.',
         fetchFailed: 'Не удалось получить данные',
-        fileReadError: 'Ошибка чтения файла'
+        fileReadError: 'Ошибка чтения файла',
+        availablePositions: 'Доступные позиции'
     },
 
     // Error Messages

@@ -422,7 +422,8 @@ export default {
         fetchSuccess: 'データの取得に成功しました！',
         fetchedItems: 'URLから{{count}}件のアイテムを取得しました。',
         fetchFailed: 'データの取得に失敗しました',
-        fileReadError: 'ファイルの読み取りエラー'
+        fileReadError: 'ファイルの読み取りエラー',
+        availablePositions: '利用可能なポジション'
     },
 
     // Error Messages

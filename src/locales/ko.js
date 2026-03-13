@@ -422,7 +422,8 @@ export default {
         fetchSuccess: '데이터를 성공적으로 가져왔습니다!',
         fetchedItems: 'URL에서 {{count}}개 항목을 가져왔습니다.',
         fetchFailed: '데이터 가져오기 실패',
-        fileReadError: '파일 읽기 오류'
+        fileReadError: '파일 읽기 오류',
+        availablePositions: '사용 가능한 포지션'
     },
 
     // Error Messages
