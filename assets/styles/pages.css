@@ -1610,7 +1610,7 @@
     gap: var(--spacing-4);
     padding: var(--spacing-5);
     background: var(--color-surface-raised);
-    border: 1px solid;
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-6);
     transition: var(--transition-default);
