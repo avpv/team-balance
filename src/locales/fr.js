@@ -84,6 +84,10 @@ export default {
             importPlayers: 'Importer des Joueurs',
             importBtn: 'Importer',
             importHelp: 'Téléchargez un fichier CSV ou JSON avec les noms et positions de vos joueurs',
+            importExportPlayers: 'Import / Export Players',
+            exportPlayersBtn: 'Export',
+            exportPlayersHelp: 'Export current players as CSV or JSON file',
+            importExportHelp: 'Import players from a file or export current players for backup',
             addIndividual: 'Ajouter des Joueurs Individuellement',
             playerName: 'Nom du Joueur',
             playerNamePlaceholder: 'ex., Jean Dupont',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: 'Importer des Joueurs',
                 confirmBtn: 'Importer'
+            },
+            exportPlayers: {
+                title: 'Export Players',
+                roundTripHint: 'Exported files are compatible with Import — you can re-import them later.'
             },
             removePlayer: {
                 confirmMessage: 'Supprimer {{name}} ?'
@@ -390,6 +398,7 @@ export default {
         delimiter: 'Délimiteur',
         preview: 'Aperçu',
         foundPlayers: '{{count}} joueur(s) trouvé(s)',
+        invalidPositions: 'Invalid positions: {{positions}}. Valid: {{valid}}',
         noData: 'Veuillez fournir des données à importer',
         noPlayersFound: 'Aucun joueur trouvé',
         importSuccess: '{{imported}} joueur(s) importé(s)',

@@ -32,6 +32,7 @@ class TeamsPage extends BasePage {
         this.sessionService = props.services?.resolve('sessionService');
         this.sessionRepository = props.services?.resolve('sessionRepository');
         this.eventBus = props.services?.resolve('eventBus');
+        this.importExportService = props.services?.resolve('importExportService');
         this.sidebar = null;
 
         // Initialize position weights from config
@@ -757,11 +758,19 @@ class TeamsPage extends BasePage {
         const showElo = this.state.showEloRatings;
         const showPositions = this.state.showPositions;
 
+        const exportOptions = {
+            showElo,
+            showPositions,
+            calculateTeamRating: (team) => this.calculateWeightedTeamRating(team),
+            activityKey: this.activityKey,
+            positionWeights: { ...this.state.positionWeights }
+        };
+
         // Create export wizard
         this.exportWizard = new ExportWizard({
-            generateTextExport: () => this.generateTextExport(teams, showElo, showPositions),
-            generateCsvExport: () => this.generateCsvExport(teams, showElo, showPositions),
-            generateJsonExport: () => this.generateJsonExport(teams, showElo, showPositions),
+            generateTextExport: () => this.importExportService.generateTextExport(teams, exportOptions),
+            generateCsvExport: () => this.importExportService.generateCsvExport(teams, exportOptions),
+            generateJsonExport: () => this.importExportService.generateJsonExport(teams, exportOptions),
             onExportComplete: (format, action) => {
                 trackEvent(action === 'copy' ? 'teams_copied_to_clipboard' : 'teams_exported', {
                     event_category: 'teams',
@@ -815,108 +824,6 @@ class TeamsPage extends BasePage {
         if (container) {
             this.exportWizard.mount(container);
         }
-    }
-
-    /**
-     * Generate plain text export
-     */
-    generateTextExport(teams, showElo, showPositions) {
-        const lines = [];
-
-        teams.forEach((team, teamIndex) => {
-            const teamRating = this.calculateWeightedTeamRating(team);
-            lines.push(`TEAM ${teamIndex + 1}${showElo ? ` (${teamRating} ELO)` : ''}`);
-            lines.push('-'.repeat(30));
-
-            team.forEach(player => {
-                const position = player.assignedPosition;
-                const posName = this.playerService.positions[position];
-                const rating = Math.round(player.positionRating);
-
-                let playerLine = `  • ${player.name}`;
-                if (showPositions) {
-                    playerLine += ` - ${posName}`;
-                }
-                if (showElo) {
-                    playerLine += ` (${rating})`;
-                }
-                lines.push(playerLine);
-            });
-
-            lines.push('');
-        });
-
-        return lines.join('\n');
-    }
-
-    /**
-     * Generate CSV export
-     */
-    generateCsvExport(teams, showElo, showPositions) {
-        const lines = [];
-        const header = ['Team', 'Player'];
-        if (showPositions) header.push('Position');
-        if (showElo) header.push('ELO Rating');
-
-        lines.push(header.join(','));
-
-        teams.forEach((team, teamIndex) => {
-            team.forEach(player => {
-                const position = player.assignedPosition;
-                const posName = this.playerService.positions[position];
-                const rating = Math.round(player.positionRating);
-
-                const row = [
-                    `Team ${teamIndex + 1}`,
-                    `"${player.name.replace(/"/g, '""')}"`
-                ];
-
-                if (showPositions) {
-                    row.push(posName);
-                }
-
-                if (showElo) {
-                    row.push(rating);
-                }
-
-                lines.push(row.join(','));
-            });
-        });
-
-        return lines.join('\n');
-    }
-
-    /**
-     * Generate JSON export
-     */
-    generateJsonExport(teams, showElo, showPositions) {
-        const exportData = {
-            teams: teams.map((team, teamIndex) => ({
-                name: `Team ${teamIndex + 1}`,
-                totalRating: showElo ? this.calculateWeightedTeamRating(team) : undefined,
-                players: team.map(player => {
-                    const position = player.assignedPosition;
-                    const posName = this.playerService.positions[position];
-                    const rating = Math.round(player.positionRating);
-
-                    const playerData = {
-                        name: player.name
-                    };
-
-                    if (showPositions) {
-                        playerData.position = posName;
-                    }
-
-                    if (showElo) {
-                        playerData.rating = rating;
-                    }
-
-                    return playerData;
-                })
-            }))
-        };
-
-        return JSON.stringify(exportData, null, 2);
     }
 
 }

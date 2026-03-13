@@ -14,6 +14,7 @@ class AddPlayerForm extends BaseComponent {
         super(container);
         this.playerService = props.playerService;
         this.onImportClick = props.onImportClick;
+        this.onExportPlayersClick = props.onExportPlayersClick;
         this.onResetAllClick = props.onResetAllClick;
         this.onClearAllClick = props.onClearAllClick;
     }
@@ -39,21 +40,32 @@ class AddPlayerForm extends BaseComponent {
                     id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}"
                     role="region"
                     aria-hidden="${!isOpen}">
-                    <!-- Import Players Section -->
+                    <!-- Import / Export Players Section -->
                     <div class="player-section import-section">
-                        <h4 class="section-title">${t('settings.addPlayers.importPlayers')}</h4>
+                        <h4 class="section-title">${t('settings.addPlayers.importExportPlayers')}</h4>
                         <div class="section-content">
-                            <button
-                                type="button"
-                                class="btn btn-primary"
-                                id="${ELEMENT_IDS.IMPORT_BTN}"
-                                ${!currentActivity ? 'disabled' : ''}
-                                aria-label="${t('settings.addPlayers.importHelp')}">
-                                ${getIcon('arrow-down', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
-                                ${t('settings.addPlayers.importBtn')}
-                            </button>
+                            <div class="form-section-actions">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    id="${ELEMENT_IDS.IMPORT_BTN}"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-label="${t('settings.addPlayers.importHelp')}">
+                                    ${getIcon('arrow-down', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
+                                    ${t('settings.addPlayers.importBtn')}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="exportPlayersBtn"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-label="${t('settings.addPlayers.exportPlayersHelp')}">
+                                    ${getIcon('arrow-up', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
+                                    ${t('settings.addPlayers.exportPlayersBtn')}
+                                </button>
+                            </div>
                             <p class="form-help-text mt-2">
-                                ${t('settings.addPlayers.importHelp')}
+                                ${t('settings.addPlayers.importExportHelp')}
                             </p>
                         </div>
                     </div>
@@ -192,6 +204,15 @@ class AddPlayerForm extends BaseComponent {
             importBtn.addEventListener('click', () => {
                 trackClick('importBtn', 'settings', 'import_players');
                 this.onImportClick();
+            });
+        }
+
+        // Export Players button
+        const exportPlayersBtn = this.container.querySelector('#exportPlayersBtn');
+        if (exportPlayersBtn && this.onExportPlayersClick) {
+            exportPlayersBtn.addEventListener('click', () => {
+                trackClick('exportPlayersBtn', 'settings', 'export_players');
+                this.onExportPlayersClick();
             });
         }
 

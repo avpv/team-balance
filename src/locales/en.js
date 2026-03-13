@@ -82,8 +82,12 @@ export default {
         addPlayers: {
             title: 'Add Players',
             importPlayers: 'Import Players',
+            importExportPlayers: 'Import / Export Players',
             importBtn: 'Import',
+            exportPlayersBtn: 'Export',
             importHelp: 'Upload a CSV or JSON file with your players\' names and positions',
+            exportPlayersHelp: 'Export current players as CSV or JSON file',
+            importExportHelp: 'Import players from a file or export current players for backup',
             addIndividual: 'Add Individual Players',
             playerName: 'Player Name',
             playerNamePlaceholder: 'e.g., John Smith',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: 'Import Players',
                 confirmBtn: 'Import'
+            },
+            exportPlayers: {
+                title: 'Export Players',
+                roundTripHint: 'Exported files are compatible with Import — you can re-import them later.'
             },
             removePlayer: {
                 confirmMessage: 'Remove {{name}}?'
@@ -390,6 +398,7 @@ export default {
         delimiter: 'Delimiter',
         preview: 'Preview',
         foundPlayers: 'Found {{count}} player(s)',
+        invalidPositions: 'Invalid positions: {{positions}}. Valid: {{valid}}',
         noData: 'Please provide data to import',
         noPlayersFound: 'No players found',
         importSuccess: 'Imported {{imported}} player(s)',

@@ -84,6 +84,10 @@ export default {
             importPlayers: 'プレイヤーをインポート',
             importBtn: 'インポート',
             importHelp: 'プレイヤーの名前とポジションを含むCSVまたはJSONファイルをアップロード',
+            importExportPlayers: 'Import / Export Players',
+            exportPlayersBtn: 'Export',
+            exportPlayersHelp: 'Export current players as CSV or JSON file',
+            importExportHelp: 'Import players from a file or export current players for backup',
             addIndividual: '個別にプレイヤーを追加',
             playerName: 'プレイヤー名',
             playerNamePlaceholder: '例：山田太郎',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: 'プレイヤーをインポート',
                 confirmBtn: 'インポート'
+            },
+            exportPlayers: {
+                title: 'Export Players',
+                roundTripHint: 'Exported files are compatible with Import — you can re-import them later.'
             },
             removePlayer: {
                 confirmMessage: '{{name}}を削除しますか？'
@@ -390,6 +398,7 @@ export default {
         delimiter: '区切り文字',
         preview: 'プレビュー',
         foundPlayers: '{{count}}人のプレイヤーが見つかりました',
+        invalidPositions: 'Invalid positions: {{positions}}. Valid: {{valid}}',
         noData: 'インポートするデータを提供してください',
         noPlayersFound: 'プレイヤーが見つかりません',
         importSuccess: '{{imported}}人のプレイヤーをインポートしました',
