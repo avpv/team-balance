@@ -2,7 +2,6 @@ import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
 import { renderPositionReference } from './renderPositionReference.js';
-import { createPositionConfig } from './PositionConfig.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
@@ -12,8 +11,8 @@ export default class TextImport extends Component {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
-        this.positionConfig = createPositionConfig(positionConfig);
-        this.positions = this.positionConfig.keys;
+        this.positionConfig = positionConfig;
+        this.positions = positionConfig.keys;
         this.delimiter = ','; // Default delimiter
     }
 

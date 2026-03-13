@@ -2,7 +2,6 @@ import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
 import { renderPositionReference } from './renderPositionReference.js';
-import { createPositionConfig } from './PositionConfig.js';
 
 /**
  * File import component - handles CSV and JSON file uploads
@@ -13,8 +12,8 @@ export default class FileImport extends Component {
         this.fileType = fileType; // 'csv' or 'json'
         this.onDataChange = onDataChange;
         this.onBack = onBack;
-        this.positionConfig = createPositionConfig(positionConfig);
-        this.positions = this.positionConfig.keys;
+        this.positionConfig = positionConfig;
+        this.positions = positionConfig.keys;
         this.selectedFile = null;
         this.delimiter = ','; // Default delimiter for CSV
     }
