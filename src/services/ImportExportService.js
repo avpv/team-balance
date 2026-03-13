@@ -90,12 +90,18 @@ class ImportExportService {
 
             // Handle teams export format: {teams: [{players: [...]}]}
             if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.teams)) {
+                const seen = new Set();
                 const players = [];
                 for (const team of parsed.teams) {
                     if (!Array.isArray(team.players)) continue;
                     for (const p of team.players) {
+                        if (!p.name || typeof p.name !== 'string' || !p.name.trim()) continue;
+                        const name = p.name.trim();
+                        // Deduplicate: same player may appear in multiple teams
+                        if (seen.has(name)) continue;
+                        seen.add(name);
                         players.push({
-                            name: p.name,
+                            name,
                             positions: p.positionCode ? [p.positionCode]
                                 : p.positions ? (Array.isArray(p.positions) ? p.positions : [p.positions])
                                 : [],
@@ -107,11 +113,15 @@ class ImportExportService {
             }
 
             if (!Array.isArray(parsed)) parsed = [parsed];
-            return parsed.map(item => ({
-                name: item.name,
-                positions: Array.isArray(item.positions) ? item.positions : [item.positions],
-                warnings: []
-            }));
+            return parsed
+                .filter(item => item.name && typeof item.name === 'string' && item.name.trim())
+                .map(item => ({
+                    name: item.name.trim(),
+                    positions: Array.isArray(item.positions) ? item.positions
+                        : item.positions ? [item.positions]
+                        : [],
+                    warnings: []
+                }));
         } catch (e) {
             throw new Error(t('errors.invalidJson'));
         }
@@ -125,9 +135,9 @@ class ImportExportService {
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
         if (lines.length < 1) throw new Error(t('errors.noDataToImport'));
 
-        // Check if first line is a header
-        const firstLine = lines[0].toLowerCase();
-        const hasHeader = firstLine.includes('name') || firstLine.includes('position');
+        // Check if first line is a header by matching whole field values
+        const firstFields = parseCSVLine(lines[0], delimiter).map(f => f.trim().toLowerCase());
+        const hasHeader = firstFields.some(f => f === 'name' || f === 'positions' || f === 'position');
 
         const dataLines = hasHeader ? lines.slice(1) : lines;
         const players = [];
