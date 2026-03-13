@@ -3,6 +3,7 @@ import ImportDataSourcePicker from './ImportDataSourcePicker.js';
 import TextImport from './TextImport.js';
 import FileImport from './FileImport.js';
 import ApiImport from './ApiImport.js';
+import { getPositionKeys } from './renderPositionReference.js';
 
 /**
  * Import Wizard - Orchestrates the multi-step import process
@@ -11,11 +12,13 @@ import ApiImport from './ApiImport.js';
  * Step 3: Preview and confirmation (handled by parent)
  */
 export default class ImportWizard extends Component {
-    constructor(positions = [], options = {}) {
+    constructor({ positionConfig = {}, onStepChange } = {}) {
         super();
-        this.positions = positions;
-        this.positionNames = options.positionNames || {};
-        this.positionOrder = options.positionOrder || [];
+        this.positionConfig = {
+            names: positionConfig.names || {},
+            order: positionConfig.order || []
+        };
+        this.positions = getPositionKeys(this.positionConfig);
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
         this.currentDelimiter = ','; // Default delimiter
@@ -23,7 +26,7 @@ export default class ImportWizard extends Component {
         this.onDataChangeCallback = null;
 
         // Callback when step changes (for modal to show/hide Import button)
-        this.onStepChange = options.onStepChange;
+        this.onStepChange = onStepChange;
     }
 
     /**
@@ -106,9 +109,7 @@ export default class ImportWizard extends Component {
                 component = new TextImport({
                     onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
                     onBack: () => this.handleBack(),
-                    positions: this.positions,
-                    positionNames: this.positionNames,
-                    positionOrder: this.positionOrder
+                    positionConfig: this.positionConfig
                 });
                 break;
 
@@ -117,9 +118,7 @@ export default class ImportWizard extends Component {
                     fileType: 'csv',
                     onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
                     onBack: () => this.handleBack(),
-                    positions: this.positions,
-                    positionNames: this.positionNames,
-                    positionOrder: this.positionOrder
+                    positionConfig: this.positionConfig
                 });
                 break;
 
@@ -128,9 +127,7 @@ export default class ImportWizard extends Component {
                     fileType: 'json',
                     onDataChange: (data) => this.handleDataChange(data),
                     onBack: () => this.handleBack(),
-                    positions: this.positions,
-                    positionNames: this.positionNames,
-                    positionOrder: this.positionOrder
+                    positionConfig: this.positionConfig
                 });
                 break;
 
@@ -138,9 +135,7 @@ export default class ImportWizard extends Component {
                 component = new ApiImport({
                     onDataChange: (data) => this.handleDataChange(data),
                     onBack: () => this.handleBack(),
-                    positions: this.positions,
-                    positionNames: this.positionNames,
-                    positionOrder: this.positionOrder
+                    positionConfig: this.positionConfig
                 });
                 break;
 
