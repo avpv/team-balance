@@ -43,9 +43,9 @@ class ImportExportService {
     parseImportData(data, delimiter = ',') {
         if (!data || !data.trim()) return [];
 
-        // Return cached result if input hasn't changed
+        // Return cached result if input hasn't changed (deep copy to prevent mutation)
         if (this._cachedParseInput === data && this._cachedParseDelimiter === delimiter && this._cachedParseResult) {
-            return this._cachedParseResult;
+            return this._cachedParseResult.map(p => ({ ...p, positions: [...p.positions], warnings: [...p.warnings] }));
         }
 
         const trimmed = data.trim();
@@ -221,6 +221,14 @@ class ImportExportService {
         return unique;
     }
 
+    /**
+     * Get position display name with fallback to the raw code
+     * @private
+     */
+    _posName(positionCode) {
+        return this.positions[positionCode] || positionCode || '?';
+    }
+
     // ===== EXPORT: Players =====
 
     /**
@@ -270,7 +278,7 @@ class ImportExportService {
 
             team.forEach(player => {
                 const position = player.assignedPosition;
-                const posName = this.positions[position];
+                const posName = this._posName(position);
                 const rating = Math.round(player.positionRating);
 
                 let playerLine = `  \u2022 ${player.name}`;
@@ -304,7 +312,7 @@ class ImportExportService {
         teams.forEach((team, teamIndex) => {
             team.forEach(player => {
                 const position = player.assignedPosition;
-                const posName = this.positions[position];
+                const posName = this._posName(position);
                 const rating = Math.round(player.positionRating);
 
                 const row = [
@@ -350,7 +358,7 @@ class ImportExportService {
                 totalRating: showElo && calculateTeamRating ? calculateTeamRating(team) : undefined,
                 players: team.map(player => {
                     const position = player.assignedPosition;
-                    const posName = this.positions[position];
+                    const posName = this._posName(position);
                     const rating = Math.round(player.positionRating);
 
                     const playerData = { name: player.name };

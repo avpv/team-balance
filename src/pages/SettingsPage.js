@@ -691,7 +691,7 @@ class SettingsPage extends BasePage {
                     ` : ''}
                     <div class="preview-list">
                         ${players.map(p => `
-                            <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
+                            <div class="preview-item">• ${this.escape(p.name)} - ${this.escape(p.positions.join(', '))}</div>
                         `).join('')}
                     </div>
                 </div>
