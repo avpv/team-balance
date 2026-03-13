@@ -7,7 +7,7 @@ import { renderPositionReference } from './renderPositionReference.js';
  * File import component - handles CSV and JSON file uploads
  */
 export default class FileImport extends Component {
-    constructor(fileType, onDataChange, onBack, positions = [], positionNames = {}, positionOrder = []) {
+    constructor({ fileType, onDataChange, onBack, positions = [], positionNames = {}, positionOrder = [] }) {
         super();
         this.fileType = fileType; // 'csv' or 'json'
         this.onDataChange = onDataChange;

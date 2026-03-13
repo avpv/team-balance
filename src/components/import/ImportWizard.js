@@ -103,45 +103,45 @@ export default class ImportWizard extends Component {
                 break;
 
             case 'text':
-                component = new TextImport(
-                    (data, delimiter) => this.handleDataChange(data, delimiter),
-                    () => this.handleBack(),
-                    this.positions,
-                    this.positionNames,
-                    this.positionOrder
-                );
+                component = new TextImport({
+                    onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
+                    onBack: () => this.handleBack(),
+                    positions: this.positions,
+                    positionNames: this.positionNames,
+                    positionOrder: this.positionOrder
+                });
                 break;
 
             case 'csv':
-                component = new FileImport(
-                    'csv',
-                    (data, delimiter) => this.handleDataChange(data, delimiter),
-                    () => this.handleBack(),
-                    this.positions,
-                    this.positionNames,
-                    this.positionOrder
-                );
+                component = new FileImport({
+                    fileType: 'csv',
+                    onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
+                    onBack: () => this.handleBack(),
+                    positions: this.positions,
+                    positionNames: this.positionNames,
+                    positionOrder: this.positionOrder
+                });
                 break;
 
             case 'json':
-                component = new FileImport(
-                    'json',
-                    (data) => this.handleDataChange(data),
-                    () => this.handleBack(),
-                    this.positions,
-                    this.positionNames,
-                    this.positionOrder
-                );
+                component = new FileImport({
+                    fileType: 'json',
+                    onDataChange: (data) => this.handleDataChange(data),
+                    onBack: () => this.handleBack(),
+                    positions: this.positions,
+                    positionNames: this.positionNames,
+                    positionOrder: this.positionOrder
+                });
                 break;
 
             case 'api':
-                component = new ApiImport(
-                    (data) => this.handleDataChange(data),
-                    () => this.handleBack(),
-                    this.positions,
-                    this.positionNames,
-                    this.positionOrder
-                );
+                component = new ApiImport({
+                    onDataChange: (data) => this.handleDataChange(data),
+                    onBack: () => this.handleBack(),
+                    positions: this.positions,
+                    positionNames: this.positionNames,
+                    positionOrder: this.positionOrder
+                });
                 break;
 
             default:

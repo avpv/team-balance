@@ -7,7 +7,7 @@ import { renderPositionReference } from './renderPositionReference.js';
  * API import component - allows users to fetch player data from a URL
  */
 export default class ApiImport extends Component {
-    constructor(onDataChange, onBack, positions = [], positionNames = {}, positionOrder = []) {
+    constructor({ onDataChange, onBack, positions = [], positionNames = {}, positionOrder = [] }) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;

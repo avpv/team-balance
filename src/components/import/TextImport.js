@@ -7,7 +7,7 @@ import { renderPositionReference } from './renderPositionReference.js';
  * Text/Paste import component - allows users to paste or type player data
  */
 export default class TextImport extends Component {
-    constructor(onDataChange, onBack, positions = [], positionNames = {}, positionOrder = []) {
+    constructor({ onDataChange, onBack, positions = [], positionNames = {}, positionOrder = [] }) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
