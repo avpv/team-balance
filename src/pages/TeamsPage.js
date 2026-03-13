@@ -32,7 +32,7 @@ class TeamsPage extends BasePage {
         this.sessionService = props.services?.resolve('sessionService');
         this.sessionRepository = props.services?.resolve('sessionRepository');
         this.eventBus = props.services?.resolve('eventBus');
-        this.importExportService = props.services?.resolve('importExportService');
+        this.importExportService = props.services?.tryResolve('importExportService');
         this.sidebar = null;
 
         // Initialize position weights from config
@@ -752,7 +752,7 @@ class TeamsPage extends BasePage {
     }
 
     handleExport() {
-        if (!this.state.teams) return;
+        if (!this.state.teams || !this.importExportService) return;
 
         const { teams } = this.state.teams;
         const showElo = this.state.showEloRatings;

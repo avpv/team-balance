@@ -33,7 +33,7 @@ class SettingsPage extends BasePage {
         this.playerService = props.services?.resolve('playerService');
         this.sessionService = props.services?.resolve('sessionService');
         this.eventBus = props.services?.resolve('eventBus');
-        this.importExportService = props.services?.resolve('importExportService');
+        this.importExportService = props.services?.tryResolve('importExportService');
 
         this.sidebar = null;
         this.activitySelector = null;
@@ -668,7 +668,7 @@ class SettingsPage extends BasePage {
 
 
     previewImportData(data, delimiter = ',') {
-        if (!this.importWizard) return;
+        if (!this.importWizard || !this.importExportService) return;
 
         try {
             const players = this.importExportService.parseImportData(data, delimiter);
@@ -709,7 +709,7 @@ class SettingsPage extends BasePage {
     }
 
     async handleImportConfirm() {
-        if (!this.importWizard) {
+        if (!this.importWizard || !this.importExportService) {
             toast.error(t('import.importFailed'));
             return false;
         }
@@ -758,6 +758,7 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Export Players =====
     showExportPlayersModal() {
+        if (!this.importExportService) return;
         const players = this.playerService.getAll();
         if (!players || players.length === 0) {
             toast.error(t('import.noPlayersFound'));

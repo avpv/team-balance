@@ -240,6 +240,20 @@ class ServiceRegistry {
     }
 
     /**
+     * Try to resolve a service, returning null if not found
+     * Use this for optional services that shouldn't crash the caller if missing
+     *
+     * @param {string} name - Service name
+     * @returns {*|null} Service instance or null if not found
+     */
+    tryResolve(name) {
+        if (!this.services.has(name)) {
+            return null;
+        }
+        return this.resolve(name);
+    }
+
+    /**
      * Resolve a service
      * Creates instance if needed and resolves dependencies
      *
