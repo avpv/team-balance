@@ -1,7 +1,8 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
-import { renderPositionReference, getPositionKeys } from './renderPositionReference.js';
+import { renderPositionReference } from './renderPositionReference.js';
+import { createPositionConfig } from './PositionConfig.js';
 
 /**
  * API import component - allows users to fetch player data from a URL
@@ -11,8 +12,8 @@ export default class ApiImport extends Component {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
-        this.positionConfig = { names: positionConfig.names || {}, order: positionConfig.order || [] };
-        this.positions = getPositionKeys(this.positionConfig);
+        this.positionConfig = createPositionConfig(positionConfig);
+        this.positions = this.positionConfig.keys;
         this.isLoading = false;
         this.authType = 'none'; // none, bearer, apikey, basic, custom
     }

@@ -3,7 +3,7 @@ import ImportDataSourcePicker from './ImportDataSourcePicker.js';
 import TextImport from './TextImport.js';
 import FileImport from './FileImport.js';
 import ApiImport from './ApiImport.js';
-import { getPositionKeys } from './renderPositionReference.js';
+import { createPositionConfig } from './PositionConfig.js';
 
 /**
  * Import Wizard - Orchestrates the multi-step import process
@@ -14,11 +14,8 @@ import { getPositionKeys } from './renderPositionReference.js';
 export default class ImportWizard extends Component {
     constructor({ positionConfig = {}, onStepChange } = {}) {
         super();
-        this.positionConfig = {
-            names: positionConfig.names || {},
-            order: positionConfig.order || []
-        };
-        this.positions = getPositionKeys(this.positionConfig);
+        this.positionConfig = createPositionConfig(positionConfig);
+        this.positions = this.positionConfig.keys;
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
         this.currentDelimiter = ','; // Default delimiter
