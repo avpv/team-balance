@@ -61,12 +61,12 @@ class ImportExportService {
         // Validate positions and add warnings
         result = this._validateImportPositions(result);
 
-        // Cache
+        // Cache the original, always return a copy
         this._cachedParseInput = data;
         this._cachedParseDelimiter = delimiter;
         this._cachedParseResult = result;
 
-        return result;
+        return result.map(p => ({ ...p, positions: [...p.positions], warnings: [...p.warnings] }));
     }
 
     /**
