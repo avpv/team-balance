@@ -1,17 +1,19 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
+import { renderPositionReference } from './renderPositionReference.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
  */
 export default class TextImport extends Component {
-    constructor(onDataChange, onBack, positions = [], positionNames = {}) {
+    constructor(onDataChange, onBack, positions = [], positionNames = {}, positionOrder = []) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
         this.positions = positions;
         this.positionNames = positionNames;
+        this.positionOrder = positionOrder;
         this.delimiter = ','; // Default delimiter
     }
 
@@ -48,27 +50,6 @@ Alice Johnson${actualDelim}${pos[0]}`;
 Mike Johnson
 Tom Williams
 Chris Brown`;
-    }
-
-    /**
-     * Render position reference block
-     */
-    renderPositionReference() {
-        const entries = Object.entries(this.positionNames);
-        if (entries.length === 0) return '';
-
-        return `
-            <div class="position-reference">
-                <h3>${t('import.availablePositions')}</h3>
-                <div class="position-reference-list">
-                    ${entries.map(([key, name]) => `
-                        <span class="position-reference-item">
-                            <code>${key}</code> — ${name}
-                        </span>
-                    `).join('')}
-                </div>
-            </div>
-        `;
     }
 
     render() {
@@ -109,7 +90,7 @@ Chris Brown`;
                         ></textarea>
                     </div>
 
-                    ${this.renderPositionReference()}
+                    ${renderPositionReference(this.positionNames, this.positionOrder)}
 
                     <div class="examples-section">
                         <h3>${t('import.examples')}</h3>

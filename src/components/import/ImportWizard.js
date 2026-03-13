@@ -15,6 +15,7 @@ export default class ImportWizard extends Component {
         super();
         this.positions = positions;
         this.positionNames = options.positionNames || {};
+        this.positionOrder = options.positionOrder || [];
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
         this.currentDelimiter = ','; // Default delimiter
@@ -106,7 +107,8 @@ export default class ImportWizard extends Component {
                     (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
                     this.positions,
-                    this.positionNames
+                    this.positionNames,
+                    this.positionOrder
                 );
                 break;
 
@@ -116,7 +118,8 @@ export default class ImportWizard extends Component {
                     (data, delimiter) => this.handleDataChange(data, delimiter),
                     () => this.handleBack(),
                     this.positions,
-                    this.positionNames
+                    this.positionNames,
+                    this.positionOrder
                 );
                 break;
 
@@ -126,7 +129,8 @@ export default class ImportWizard extends Component {
                     (data) => this.handleDataChange(data),
                     () => this.handleBack(),
                     this.positions,
-                    this.positionNames
+                    this.positionNames,
+                    this.positionOrder
                 );
                 break;
 
@@ -135,7 +139,8 @@ export default class ImportWizard extends Component {
                     (data) => this.handleDataChange(data),
                     () => this.handleBack(),
                     this.positions,
-                    this.positionNames
+                    this.positionNames,
+                    this.positionOrder
                 );
                 break;
 

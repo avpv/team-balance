@@ -1,18 +1,20 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
+import { renderPositionReference } from './renderPositionReference.js';
 
 /**
  * File import component - handles CSV and JSON file uploads
  */
 export default class FileImport extends Component {
-    constructor(fileType, onDataChange, onBack, positions = [], positionNames = {}) {
+    constructor(fileType, onDataChange, onBack, positions = [], positionNames = {}, positionOrder = []) {
         super();
         this.fileType = fileType; // 'csv' or 'json'
         this.onDataChange = onDataChange;
         this.onBack = onBack;
         this.positions = positions;
         this.positionNames = positionNames;
+        this.positionOrder = positionOrder;
         this.selectedFile = null;
         this.delimiter = ','; // Default delimiter for CSV
     }
@@ -65,27 +67,6 @@ Alice Johnson${actualDelim}${pos[0]}`;
   {"name": "John Smith", "positions": ["${pos[0]}", "${pos[1] || pos[0]}"]},
   {"name": "Alice Johnson", "positions": ["${pos[0]}"]}
 ]`;
-    }
-
-    /**
-     * Render position reference block
-     */
-    renderPositionReference() {
-        const entries = Object.entries(this.positionNames);
-        if (entries.length === 0) return '';
-
-        return `
-            <div class="position-reference">
-                <h3>${t('import.availablePositions')}</h3>
-                <div class="position-reference-list">
-                    ${entries.map(([key, name]) => `
-                        <span class="position-reference-item">
-                            <code>${key}</code> — ${name}
-                        </span>
-                    `).join('')}
-                </div>
-            </div>
-        `;
     }
 
     render() {
@@ -142,7 +123,7 @@ Alice Johnson${actualDelim}${pos[0]}`;
                         </div>
                     </div>
 
-                    ${this.renderPositionReference()}
+                    ${renderPositionReference(this.positionNames, this.positionOrder)}
 
                     <div class="examples-section">
                         <h3>${t('import.expectedFormat')}</h3>

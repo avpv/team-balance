@@ -610,6 +610,7 @@ class SettingsPage extends BasePage {
 
         this.importWizard = new ImportWizard(positionKeys, {
             positionNames: positions,
+            positionOrder: this.activityConfig?.positionOrder || [],
             onStepChange: (step, isContentStep) => {
                 // Show Import button only after format is selected
                 if (this.importModal) {
