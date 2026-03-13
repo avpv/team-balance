@@ -35,7 +35,18 @@ export default {
         warning: 'Warnung',
         dangerZone: 'Gefahrenbereich',
         yes: 'Ja',
-        no: 'Nein'
+        no: 'Nein',
+        auth: {
+            bearerHint: 'Geben Sie Ihr OAuth/Bearer-Token ein',
+            keyNameHint: 'Header-Name oder Abfrageparameter',
+            keyValue: 'Schlüsselwert',
+            keyValueHint: 'Ihr API-Schlüssel',
+            keyAsQuery: 'Als Abfrageparameter statt Header hinzufügen',
+            username: 'Benutzername',
+            password: 'Passwort',
+            customHeadersHint: 'Einer pro Zeile im Format: Header-Name: Wert',
+            networkError: 'Netzwerkfehler. Bitte prüfen Sie:\n\u2022 Die URL ist korrekt\n\u2022 CORS ist auf dem Server aktiviert\n\u2022 Sie haben eine Internetverbindung'
+        }
     },
 
     // Navigation
@@ -345,16 +356,7 @@ export default {
                 sendSuccess: 'Daten erfolgreich gesendet!',
                 sentTo: 'Teamdaten wurden an {{url}} gesendet.',
                 sendFailed: 'Daten konnten nicht gesendet werden',
-                networkError: 'Netzwerkfehler. Bitte prüfen Sie:\n\u2022 Die URL ist korrekt\n\u2022 CORS ist auf dem Server aktiviert\n\u2022 Sie haben eine Internetverbindung',
                 dataPreview: 'Zu sendende Daten',
-                bearerHint: 'Geben Sie Ihr OAuth/Bearer-Token ein',
-                apiKeyNameHint: 'Header-Name oder Abfrageparameter',
-                apiKeyValue: 'Schlüsselwert',
-                apiKeyValueHint: 'Ihr API-Schlüssel',
-                apiKeyAsQuery: 'Als Abfrageparameter statt Header hinzufügen',
-                username: 'Benutzername',
-                password: 'Passwort',
-                customHeadersHint: 'Einer pro Zeile im Format: Header-Name: Wert',
                 notePostMethod: 'Daten werden per HTTP POST gesendet',
                 noteJsonBody: 'Der Anfragekörper enthält JSON mit Teamdaten',
                 noteCorsRequired: 'CORS muss auf dem Zielserver aktiviert sein'

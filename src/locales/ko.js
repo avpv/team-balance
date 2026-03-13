@@ -35,7 +35,18 @@ export default {
         warning: '경고',
         dangerZone: '위험 영역',
         yes: '예',
-        no: '아니오'
+        no: '아니오',
+        auth: {
+            bearerHint: 'OAuth/Bearer 토큰을 입력하세요',
+            keyNameHint: '헤더 이름 또는 쿼리 매개변수',
+            keyValue: '키 값',
+            keyValueHint: 'API 키',
+            keyAsQuery: '헤더 대신 쿼리 매개변수로 추가',
+            username: '사용자 이름',
+            password: '비밀번호',
+            customHeadersHint: '한 줄에 하나씩 형식: Header-Name: 값',
+            networkError: '네트워크 오류. 확인하세요:\n\u2022 URL이 올바른지\n\u2022 서버에서 CORS가 활성화되어 있는지\n\u2022 인터넷 연결이 있는지'
+        }
     },
 
     // Navigation
@@ -345,16 +356,7 @@ export default {
                 sendSuccess: '데이터가 성공적으로 전송되었습니다!',
                 sentTo: '팀 데이터가 {{url}}로 전송되었습니다.',
                 sendFailed: '데이터 전송 실패',
-                networkError: '네트워크 오류. 확인하세요:\n\u2022 URL이 올바른지\n\u2022 서버에서 CORS가 활성화되어 있는지\n\u2022 인터넷 연결이 있는지',
                 dataPreview: '전송할 데이터',
-                bearerHint: 'OAuth/Bearer 토큰을 입력하세요',
-                apiKeyNameHint: '헤더 이름 또는 쿼리 매개변수',
-                apiKeyValue: '키 값',
-                apiKeyValueHint: 'API 키',
-                apiKeyAsQuery: '헤더 대신 쿼리 매개변수로 추가',
-                username: '사용자 이름',
-                password: '비밀번호',
-                customHeadersHint: '한 줄에 하나씩 형식: Header-Name: 값',
                 notePostMethod: '데이터는 HTTP POST 방식으로 전송됩니다',
                 noteJsonBody: '요청 본문에 팀 데이터가 포함된 JSON이 포함됩니다',
                 noteCorsRequired: '대상 서버에서 CORS가 활성화되어야 합니다'

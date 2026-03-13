@@ -185,7 +185,7 @@ export default class ApiExport extends Component {
         } catch (error) {
             let errorMessage = error.message;
             if (error.message.includes('Failed to fetch')) {
-                errorMessage = t('teams.export.api.networkError');
+                errorMessage = t('common.auth.networkError');
             }
 
             this.updateResult(`

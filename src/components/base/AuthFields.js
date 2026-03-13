@@ -4,26 +4,30 @@ import { t } from '../../core/I18nManager.js';
  * Shared authentication fields logic used by both ApiImport and ApiExport.
  * Provides rendering, header building, and URL param logic for auth types:
  * none, bearer, apikey, basic, custom.
+ *
+ * @param idPrefix - When non-empty, a hyphen separator is added automatically
+ *   (e.g. idPrefix='export' → id='export-bearerToken')
  */
+
+function prefixId(prefix, name) {
+    return prefix ? `${prefix}-${name}` : name;
+}
 
 /**
  * Render authentication input fields based on auth type
- * @param {string} authType - Current auth type
- * @param {string} idPrefix - Prefix for element IDs to avoid collisions
- * @returns {string} HTML string
  */
 export function renderAuthFields(authType, idPrefix = '') {
     switch (authType) {
         case 'bearer':
             return `
                 <div class="auth-fields">
-                    <label for="${idPrefix}bearerToken">
+                    <label for="${prefixId(idPrefix, 'bearerToken')}">
                         <strong>${t('import.authBearer')}</strong>
-                        <span class="hint">${t('teams.export.api.bearerHint')}</span>
+                        <span class="hint">${t('common.auth.bearerHint')}</span>
                     </label>
                     <input
                         type="password"
-                        id="${idPrefix}bearerToken"
+                        id="${prefixId(idPrefix, 'bearerToken')}"
                         class="auth-input"
                         placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                     />
@@ -33,24 +37,24 @@ export function renderAuthFields(authType, idPrefix = '') {
         case 'apikey':
             return `
                 <div class="auth-fields">
-                    <label for="${idPrefix}apiKeyName">
+                    <label for="${prefixId(idPrefix, 'apiKeyName')}">
                         <strong>${t('import.authApiKey')}</strong>
-                        <span class="hint">${t('teams.export.api.apiKeyNameHint')}</span>
+                        <span class="hint">${t('common.auth.keyNameHint')}</span>
                     </label>
                     <input
                         type="text"
-                        id="${idPrefix}apiKeyName"
+                        id="${prefixId(idPrefix, 'apiKeyName')}"
                         class="auth-input"
                         placeholder="X-API-Key"
                     />
 
-                    <label for="${idPrefix}apiKeyValue" style="margin-top: 12px;">
-                        <strong>${t('teams.export.api.apiKeyValue')}</strong>
-                        <span class="hint">${t('teams.export.api.apiKeyValueHint')}</span>
+                    <label for="${prefixId(idPrefix, 'apiKeyValue')}" style="margin-top: 12px;">
+                        <strong>${t('common.auth.keyValue')}</strong>
+                        <span class="hint">${t('common.auth.keyValueHint')}</span>
                     </label>
                     <input
                         type="password"
-                        id="${idPrefix}apiKeyValue"
+                        id="${prefixId(idPrefix, 'apiKeyValue')}"
                         class="auth-input"
                         placeholder="your-api-key-here"
                     />
@@ -58,10 +62,10 @@ export function renderAuthFields(authType, idPrefix = '') {
                     <label style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
                         <input
                             type="checkbox"
-                            id="${idPrefix}apiKeyInQuery"
+                            id="${prefixId(idPrefix, 'apiKeyInQuery')}"
                             style="width: auto;"
                         />
-                        <span>${t('teams.export.api.apiKeyAsQuery')}</span>
+                        <span>${t('common.auth.keyAsQuery')}</span>
                     </label>
                 </div>
             `;
@@ -69,23 +73,23 @@ export function renderAuthFields(authType, idPrefix = '') {
         case 'basic':
             return `
                 <div class="auth-fields">
-                    <label for="${idPrefix}basicUsername">
-                        <strong>${t('teams.export.api.username')}</strong>
+                    <label for="${prefixId(idPrefix, 'basicUsername')}">
+                        <strong>${t('common.auth.username')}</strong>
                     </label>
                     <input
                         type="text"
-                        id="${idPrefix}basicUsername"
+                        id="${prefixId(idPrefix, 'basicUsername')}"
                         class="auth-input"
                         placeholder="username"
                         autocomplete="username"
                     />
 
-                    <label for="${idPrefix}basicPassword" style="margin-top: 12px;">
-                        <strong>${t('teams.export.api.password')}</strong>
+                    <label for="${prefixId(idPrefix, 'basicPassword')}" style="margin-top: 12px;">
+                        <strong>${t('common.auth.password')}</strong>
                     </label>
                     <input
                         type="password"
-                        id="${idPrefix}basicPassword"
+                        id="${prefixId(idPrefix, 'basicPassword')}"
                         class="auth-input"
                         placeholder="password"
                         autocomplete="current-password"
@@ -96,12 +100,12 @@ export function renderAuthFields(authType, idPrefix = '') {
         case 'custom':
             return `
                 <div class="auth-fields">
-                    <label for="${idPrefix}customHeaders">
+                    <label for="${prefixId(idPrefix, 'customHeaders')}">
                         <strong>${t('import.authCustomHeaders')}</strong>
-                        <span class="hint">${t('teams.export.api.customHeadersHint')}</span>
+                        <span class="hint">${t('common.auth.customHeadersHint')}</span>
                     </label>
                     <textarea
-                        id="${idPrefix}customHeaders"
+                        id="${prefixId(idPrefix, 'customHeaders')}"
                         class="auth-input"
                         rows="4"
                         placeholder="Authorization: Bearer token123&#10;X-Custom-Header: value&#10;X-API-Key: key123"
@@ -115,36 +119,7 @@ export function renderAuthFields(authType, idPrefix = '') {
 }
 
 /**
- * Render the auth type selector dropdown
- * @param {string} authType - Current auth type
- * @param {string} selectId - ID for the select element
- * @returns {string} HTML string
- */
-export function renderAuthSelector(authType, selectId = 'authTypeSelect') {
-    return `
-        <div class="auth-section">
-            <label for="${selectId}">
-                <strong>${t('import.authentication')}</strong>
-                <span class="hint">${t('import.authHint')}</span>
-            </label>
-            <select id="${selectId}" class="auth-type-select">
-                <option value="none" ${authType === 'none' ? 'selected' : ''}>${t('import.authNone')}</option>
-                <option value="bearer" ${authType === 'bearer' ? 'selected' : ''}>${t('import.authBearer')}</option>
-                <option value="apikey" ${authType === 'apikey' ? 'selected' : ''}>${t('import.authApiKey')}</option>
-                <option value="basic" ${authType === 'basic' ? 'selected' : ''}>${t('import.authBasic')}</option>
-                <option value="custom" ${authType === 'custom' ? 'selected' : ''}>${t('import.authCustomHeaders')}</option>
-            </select>
-            ${renderAuthFields(authType, selectId.replace('authTypeSelect', '').replace('AuthType', ''))}
-        </div>
-    `;
-}
-
-/**
  * Build authentication headers from DOM elements
- * @param {string} authType - Current auth type
- * @param {Element} container - Parent element to query selectors from
- * @param {string} idPrefix - Prefix for element IDs
- * @returns {Object} Headers object
  */
 export function buildAuthHeaders(authType, container, idPrefix = '') {
     const headers = {
@@ -153,7 +128,7 @@ export function buildAuthHeaders(authType, container, idPrefix = '') {
 
     switch (authType) {
         case 'bearer': {
-            const token = container.querySelector(`#${idPrefix}bearerToken`)?.value.trim();
+            const token = container.querySelector(`#${prefixId(idPrefix, 'bearerToken')}`)?.value.trim();
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
@@ -161,8 +136,8 @@ export function buildAuthHeaders(authType, container, idPrefix = '') {
         }
 
         case 'apikey': {
-            const keyName = container.querySelector(`#${idPrefix}apiKeyName`)?.value.trim();
-            const keyValue = container.querySelector(`#${idPrefix}apiKeyValue`)?.value.trim();
+            const keyName = container.querySelector(`#${prefixId(idPrefix, 'apiKeyName')}`)?.value.trim();
+            const keyValue = container.querySelector(`#${prefixId(idPrefix, 'apiKeyValue')}`)?.value.trim();
             if (keyName && keyValue) {
                 headers[keyName] = keyValue;
             }
@@ -170,8 +145,8 @@ export function buildAuthHeaders(authType, container, idPrefix = '') {
         }
 
         case 'basic': {
-            const username = container.querySelector(`#${idPrefix}basicUsername`)?.value.trim();
-            const password = container.querySelector(`#${idPrefix}basicPassword`)?.value.trim();
+            const username = container.querySelector(`#${prefixId(idPrefix, 'basicUsername')}`)?.value.trim();
+            const password = container.querySelector(`#${prefixId(idPrefix, 'basicPassword')}`)?.value.trim();
             if (username && password) {
                 const credentials = btoa(`${username}:${password}`);
                 headers['Authorization'] = `Basic ${credentials}`;
@@ -180,7 +155,7 @@ export function buildAuthHeaders(authType, container, idPrefix = '') {
         }
 
         case 'custom': {
-            const customHeadersText = container.querySelector(`#${idPrefix}customHeaders`)?.value.trim();
+            const customHeadersText = container.querySelector(`#${prefixId(idPrefix, 'customHeaders')}`)?.value.trim();
             if (customHeadersText) {
                 const lines = customHeadersText.split('\n');
                 lines.forEach(line => {
@@ -203,18 +178,13 @@ export function buildAuthHeaders(authType, container, idPrefix = '') {
 
 /**
  * Build URL with query parameters for API key auth if needed
- * @param {string} baseUrl - The base URL
- * @param {string} authType - Current auth type
- * @param {Element} container - Parent element to query selectors from
- * @param {string} idPrefix - Prefix for element IDs
- * @returns {string} URL with params appended if applicable
  */
 export function buildUrlWithParams(baseUrl, authType, container, idPrefix = '') {
     if (authType === 'apikey') {
-        const isQueryParam = container.querySelector(`#${idPrefix}apiKeyInQuery`)?.checked;
+        const isQueryParam = container.querySelector(`#${prefixId(idPrefix, 'apiKeyInQuery')}`)?.checked;
         if (isQueryParam) {
-            const keyName = container.querySelector(`#${idPrefix}apiKeyName`)?.value.trim();
-            const keyValue = container.querySelector(`#${idPrefix}apiKeyValue`)?.value.trim();
+            const keyName = container.querySelector(`#${prefixId(idPrefix, 'apiKeyName')}`)?.value.trim();
+            const keyValue = container.querySelector(`#${prefixId(idPrefix, 'apiKeyValue')}`)?.value.trim();
             if (keyName && keyValue) {
                 const url = new URL(baseUrl);
                 url.searchParams.set(keyName, keyValue);
@@ -227,9 +197,6 @@ export function buildUrlWithParams(baseUrl, authType, container, idPrefix = '') 
 
 /**
  * Handle auth type change — re-renders auth fields in the DOM
- * @param {Element} container - Parent element
- * @param {string} selectId - ID of the auth type select
- * @param {string} idPrefix - Prefix for element IDs
  * @returns {string} New auth type value
  */
 export function handleAuthTypeChange(container, selectId, idPrefix = '') {

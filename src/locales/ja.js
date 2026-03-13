@@ -35,7 +35,18 @@ export default {
         warning: '警告',
         dangerZone: '危険ゾーン',
         yes: 'はい',
-        no: 'いいえ'
+        no: 'いいえ',
+        auth: {
+            bearerHint: 'OAuth/Bearerトークンを入力してください',
+            keyNameHint: 'ヘッダー名またはクエリパラメータ',
+            keyValue: 'キーの値',
+            keyValueHint: 'APIキー',
+            keyAsQuery: 'ヘッダーの代わりにクエリパラメータとして追加',
+            username: 'ユーザー名',
+            password: 'パスワード',
+            customHeadersHint: '1行に1つ、形式：Header-Name: 値',
+            networkError: 'ネットワークエラー。確認してください：\n\u2022 URLが正しいこと\n\u2022 サーバーでCORSが有効であること\n\u2022 インターネット接続があること'
+        }
     },
 
     // Navigation
@@ -345,16 +356,7 @@ export default {
                 sendSuccess: 'データが正常に送信されました！',
                 sentTo: 'チームデータが{{url}}に送信されました。',
                 sendFailed: 'データの送信に失敗しました',
-                networkError: 'ネットワークエラー。確認してください：\n\u2022 URLが正しいこと\n\u2022 サーバーでCORSが有効であること\n\u2022 インターネット接続があること',
                 dataPreview: '送信するデータ',
-                bearerHint: 'OAuth/Bearerトークンを入力してください',
-                apiKeyNameHint: 'ヘッダー名またはクエリパラメータ',
-                apiKeyValue: 'キーの値',
-                apiKeyValueHint: 'APIキー',
-                apiKeyAsQuery: 'ヘッダーの代わりにクエリパラメータとして追加',
-                username: 'ユーザー名',
-                password: 'パスワード',
-                customHeadersHint: '1行に1つ、形式：Header-Name: 値',
                 notePostMethod: 'データはHTTP POSTメソッドで送信されます',
                 noteJsonBody: 'リクエストボディにはチームデータのJSONが含まれます',
                 noteCorsRequired: 'ターゲットサーバーでCORSが有効である必要があります'

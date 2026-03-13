@@ -35,7 +35,18 @@ export default {
         warning: 'Attention',
         dangerZone: 'Zone de danger',
         yes: 'Oui',
-        no: 'Non'
+        no: 'Non',
+        auth: {
+            bearerHint: 'Entrez votre token OAuth/Bearer',
+            keyNameHint: "Nom de l'en-tête ou paramètre de requête",
+            keyValue: 'Valeur de la clé',
+            keyValueHint: 'Votre clé API',
+            keyAsQuery: "Ajouter comme paramètre de requête au lieu d'en-tête",
+            username: "Nom d'utilisateur",
+            password: 'Mot de passe',
+            customHeadersHint: 'Un par ligne au format : Header-Name: valeur',
+            networkError: 'Erreur réseau. Vérifiez :\n\u2022 L\'URL est correcte\n\u2022 CORS est activé sur le serveur\n\u2022 Vous avez une connexion internet'
+        }
     },
 
     // Navigation
@@ -345,16 +356,7 @@ export default {
                 sendSuccess: 'Données envoyées avec succès !',
                 sentTo: "Les données d'équipe ont été envoyées à {{url}}.",
                 sendFailed: "Échec de l'envoi des données",
-                networkError: 'Erreur réseau. Vérifiez :\n\u2022 L\'URL est correcte\n\u2022 CORS est activé sur le serveur\n\u2022 Vous avez une connexion internet',
                 dataPreview: 'Données à envoyer',
-                bearerHint: 'Entrez votre token OAuth/Bearer',
-                apiKeyNameHint: "Nom de l'en-tête ou paramètre de requête",
-                apiKeyValue: 'Valeur de la clé',
-                apiKeyValueHint: 'Votre clé API',
-                apiKeyAsQuery: "Ajouter comme paramètre de requête au lieu d'en-tête",
-                username: "Nom d'utilisateur",
-                password: 'Mot de passe',
-                customHeadersHint: 'Un par ligne au format : Header-Name: valeur',
                 notePostMethod: 'Les données seront envoyées via la méthode HTTP POST',
                 noteJsonBody: "Le corps de la requête contiendra du JSON avec les données d'équipe",
                 noteCorsRequired: 'CORS doit être activé sur le serveur cible'

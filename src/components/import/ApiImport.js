@@ -233,7 +233,7 @@ export default class ApiImport extends Component {
         } catch (error) {
             let errorMessage = error.message;
             if (error.message.includes('Failed to fetch')) {
-                errorMessage = 'Network error. Please check:\n• The URL is correct\n• CORS is enabled on the server\n• You have internet connection';
+                errorMessage = t('common.auth.networkError');
             }
 
             this.updatePreview(`

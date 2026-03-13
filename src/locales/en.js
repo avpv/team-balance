@@ -35,7 +35,18 @@ export default {
         warning: 'Warning',
         dangerZone: 'Danger Zone',
         yes: 'Yes',
-        no: 'No'
+        no: 'No',
+        auth: {
+            bearerHint: 'Enter your OAuth/Bearer token',
+            keyNameHint: 'Header name or query parameter',
+            keyValue: 'Key Value',
+            keyValueHint: 'Your API key',
+            keyAsQuery: 'Add as query parameter instead of header',
+            username: 'Username',
+            password: 'Password',
+            customHeadersHint: 'One per line in format: Header-Name: value',
+            networkError: 'Network error. Please check:\n\u2022 The URL is correct\n\u2022 CORS is enabled on the server\n\u2022 You have internet connection'
+        }
     },
 
     // Navigation
@@ -345,16 +356,7 @@ export default {
                 sendSuccess: 'Data sent successfully!',
                 sentTo: 'Team data was sent to {{url}}.',
                 sendFailed: 'Failed to send data',
-                networkError: 'Network error. Please check:\n\u2022 The URL is correct\n\u2022 CORS is enabled on the server\n\u2022 You have internet connection',
                 dataPreview: 'Data to send',
-                bearerHint: 'Enter your OAuth/Bearer token',
-                apiKeyNameHint: 'Header name or query parameter',
-                apiKeyValue: 'Key Value',
-                apiKeyValueHint: 'Your API key',
-                apiKeyAsQuery: 'Add as query parameter instead of header',
-                username: 'Username',
-                password: 'Password',
-                customHeadersHint: 'One per line in format: Header-Name: value',
                 notePostMethod: 'Data will be sent via HTTP POST method',
                 noteJsonBody: 'Request body will contain JSON with team data',
                 noteCorsRequired: 'CORS must be enabled on the target server'
