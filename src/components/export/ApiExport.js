@@ -2,10 +2,18 @@ import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { trackClick } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
+import {
+    renderAuthFields,
+    buildAuthHeaders,
+    buildUrlWithParams,
+    handleAuthTypeChange
+} from '../base/AuthFields.js';
+
+const ID_PREFIX = 'apiExport';
+const AUTH_SELECT_ID = 'apiExportAuthType';
 
 /**
  * API export component - allows users to POST team data to an external URL
- * Mirrors ApiImport component interface for consistency
  */
 export default class ApiExport extends Component {
     constructor({ content, onBack, onExportComplete }) {
@@ -14,112 +22,7 @@ export default class ApiExport extends Component {
         this.onBack = onBack;
         this.onExportComplete = onExportComplete;
         this.isLoading = false;
-        this.authType = 'none'; // none, bearer, apikey, basic, custom
-    }
-
-    /**
-     * Render authentication fields based on selected type
-     */
-    renderAuthFields() {
-        switch (this.authType) {
-            case 'bearer':
-                return `
-                    <div class="auth-fields">
-                        <label for="apiBearerToken">
-                            <strong>Bearer Token</strong>
-                            <span class="hint">${t('teams.export.api.bearerHint')}</span>
-                        </label>
-                        <input
-                            type="password"
-                            id="apiBearerToken"
-                            class="auth-input"
-                            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                        />
-                    </div>
-                `;
-
-            case 'apikey':
-                return `
-                    <div class="auth-fields">
-                        <label for="apiExportKeyName">
-                            <strong>${t('import.authApiKey')}</strong>
-                            <span class="hint">${t('teams.export.api.apiKeyNameHint')}</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="apiExportKeyName"
-                            class="auth-input"
-                            placeholder="X-API-Key"
-                        />
-
-                        <label for="apiExportKeyValue" style="margin-top: 12px;">
-                            <strong>${t('teams.export.api.apiKeyValue')}</strong>
-                            <span class="hint">${t('teams.export.api.apiKeyValueHint')}</span>
-                        </label>
-                        <input
-                            type="password"
-                            id="apiExportKeyValue"
-                            class="auth-input"
-                            placeholder="your-api-key-here"
-                        />
-
-                        <label style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
-                            <input
-                                type="checkbox"
-                                id="apiExportKeyInQuery"
-                                style="width: auto;"
-                            />
-                            <span>${t('teams.export.api.apiKeyAsQuery')}</span>
-                        </label>
-                    </div>
-                `;
-
-            case 'basic':
-                return `
-                    <div class="auth-fields">
-                        <label for="apiExportUsername">
-                            <strong>${t('teams.export.api.username')}</strong>
-                        </label>
-                        <input
-                            type="text"
-                            id="apiExportUsername"
-                            class="auth-input"
-                            placeholder="username"
-                            autocomplete="username"
-                        />
-
-                        <label for="apiExportPassword" style="margin-top: 12px;">
-                            <strong>${t('teams.export.api.password')}</strong>
-                        </label>
-                        <input
-                            type="password"
-                            id="apiExportPassword"
-                            class="auth-input"
-                            placeholder="password"
-                            autocomplete="current-password"
-                        />
-                    </div>
-                `;
-
-            case 'custom':
-                return `
-                    <div class="auth-fields">
-                        <label for="apiExportCustomHeaders">
-                            <strong>${t('import.authCustomHeaders')}</strong>
-                            <span class="hint">${t('teams.export.api.customHeadersHint')}</span>
-                        </label>
-                        <textarea
-                            id="apiExportCustomHeaders"
-                            class="auth-input"
-                            rows="4"
-                            placeholder="Authorization: Bearer token123&#10;X-Custom-Header: value&#10;X-API-Key: key123"
-                        ></textarea>
-                    </div>
-                `;
-
-            default:
-                return '';
-        }
+        this.authType = 'none';
     }
 
     render() {
@@ -160,18 +63,18 @@ export default class ApiExport extends Component {
                     </div>
 
                     <div class="auth-section">
-                        <label for="apiExportAuthType">
+                        <label for="${AUTH_SELECT_ID}">
                             <strong>${t('import.authentication')}</strong>
                             <span class="hint">${t('import.authHint')}</span>
                         </label>
-                        <select id="apiExportAuthType" class="auth-type-select">
+                        <select id="${AUTH_SELECT_ID}" class="auth-type-select">
                             <option value="none" ${this.authType === 'none' ? 'selected' : ''}>${t('import.authNone')}</option>
                             <option value="bearer" ${this.authType === 'bearer' ? 'selected' : ''}>${t('import.authBearer')}</option>
                             <option value="apikey" ${this.authType === 'apikey' ? 'selected' : ''}>${t('import.authApiKey')}</option>
                             <option value="basic" ${this.authType === 'basic' ? 'selected' : ''}>${t('import.authBasic')}</option>
                             <option value="custom" ${this.authType === 'custom' ? 'selected' : ''}>${t('import.authCustomHeaders')}</option>
                         </select>
-                        ${this.renderAuthFields()}
+                        ${renderAuthFields(this.authType, ID_PREFIX)}
                     </div>
 
                     <div class="export-preview-section">
@@ -196,117 +99,12 @@ export default class ApiExport extends Component {
         `;
     }
 
-    /**
-     * Escape HTML for safe display
-     */
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-    /**
-     * Build authentication headers based on selected type
-     */
-    buildAuthHeaders() {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        switch (this.authType) {
-            case 'bearer': {
-                const token = this.element.querySelector('#apiBearerToken')?.value.trim();
-                if (token) {
-                    headers['Authorization'] = `Bearer ${token}`;
-                }
-                break;
-            }
-
-            case 'apikey': {
-                const keyName = this.element.querySelector('#apiExportKeyName')?.value.trim();
-                const keyValue = this.element.querySelector('#apiExportKeyValue')?.value.trim();
-                if (keyName && keyValue) {
-                    headers[keyName] = keyValue;
-                }
-                break;
-            }
-
-            case 'basic': {
-                const username = this.element.querySelector('#apiExportUsername')?.value.trim();
-                const password = this.element.querySelector('#apiExportPassword')?.value.trim();
-                if (username && password) {
-                    const credentials = btoa(`${username}:${password}`);
-                    headers['Authorization'] = `Basic ${credentials}`;
-                }
-                break;
-            }
-
-            case 'custom': {
-                const customHeadersText = this.element.querySelector('#apiExportCustomHeaders')?.value.trim();
-                if (customHeadersText) {
-                    const lines = customHeadersText.split('\n');
-                    lines.forEach(line => {
-                        const colonIndex = line.indexOf(':');
-                        if (colonIndex > 0) {
-                            const headerName = line.substring(0, colonIndex).trim();
-                            const headerValue = line.substring(colonIndex + 1).trim();
-                            if (headerName && headerValue) {
-                                headers[headerName] = headerValue;
-                            }
-                        }
-                    });
-                }
-                break;
-            }
-        }
-
-        return headers;
-    }
-
-    /**
-     * Build URL with query parameters for API key if needed
-     */
-    buildUrlWithParams(baseUrl) {
-        if (this.authType === 'apikey') {
-            const isQueryParam = this.element.querySelector('#apiExportKeyInQuery')?.checked;
-            if (isQueryParam) {
-                const keyName = this.element.querySelector('#apiExportKeyName')?.value.trim();
-                const keyValue = this.element.querySelector('#apiExportKeyValue')?.value.trim();
-                if (keyName && keyValue) {
-                    const url = new URL(baseUrl);
-                    url.searchParams.set(keyName, keyValue);
-                    return url.toString();
-                }
-            }
-        }
-        return baseUrl;
-    }
-
-    /**
-     * Handle auth type change
-     */
-    handleAuthTypeChange() {
-        const select = this.element.querySelector('#apiExportAuthType');
-        this.authType = select.value;
-
-        const authSection = this.element.querySelector('.auth-section');
-        if (authSection) {
-            const existingFields = authSection.querySelector('.auth-fields');
-            const newFieldsHTML = this.renderAuthFields();
-
-            if (existingFields) {
-                existingFields.remove();
-            }
-
-            if (newFieldsHTML) {
-                authSection.insertAdjacentHTML('beforeend', newFieldsHTML);
-            }
-        }
-    }
-
-    /**
-     * Send data to URL via POST
-     */
     async sendData() {
         const urlInput = this.element.querySelector('#apiExportUrlInput');
         const url = urlInput.value.trim();
@@ -335,8 +133,8 @@ export default class ApiExport extends Component {
         this.isLoading = true;
         this.updateSendButton();
 
-        const finalUrl = this.buildUrlWithParams(url);
-        const headers = this.buildAuthHeaders();
+        const finalUrl = buildUrlWithParams(url, this.authType, this.element, ID_PREFIX);
+        const headers = buildAuthHeaders(this.authType, this.element, ID_PREFIX);
 
         this.updateResult(`
             <div class="preview-loading">
@@ -402,9 +200,6 @@ export default class ApiExport extends Component {
         }
     }
 
-    /**
-     * Update send button state
-     */
     updateSendButton() {
         const sendButton = this.element.querySelector('[data-action="send"]');
         if (sendButton) {
@@ -413,9 +208,6 @@ export default class ApiExport extends Component {
         }
     }
 
-    /**
-     * Update result area
-     */
     updateResult(html) {
         const container = this.element.querySelector('#apiExportResult');
         if (container) {
@@ -445,9 +237,11 @@ export default class ApiExport extends Component {
             });
         }
 
-        const authTypeSelect = this.element.querySelector('#apiExportAuthType');
+        const authTypeSelect = this.element.querySelector(`#${AUTH_SELECT_ID}`);
         if (authTypeSelect) {
-            authTypeSelect.addEventListener('change', () => this.handleAuthTypeChange());
+            authTypeSelect.addEventListener('change', () => {
+                this.authType = handleAuthTypeChange(this.element, AUTH_SELECT_ID, ID_PREFIX);
+            });
         }
     }
 
