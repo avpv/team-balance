@@ -35,7 +35,18 @@ export default {
         warning: 'Предупреждение',
         dangerZone: 'Опасная зона',
         yes: 'Да',
-        no: 'Нет'
+        no: 'Нет',
+        auth: {
+            bearerHint: 'Введите ваш OAuth/Bearer токен',
+            keyNameHint: 'Имя заголовка или параметра запроса',
+            keyValue: 'Значение ключа',
+            keyValueHint: 'Ваш API ключ',
+            keyAsQuery: 'Добавить как параметр запроса вместо заголовка',
+            username: 'Имя пользователя',
+            password: 'Пароль',
+            customHeadersHint: 'По одному на строку в формате: Header-Name: value',
+            networkError: 'Ошибка сети. Проверьте:\n\u2022 URL указан правильно\n\u2022 На сервере включён CORS\n\u2022 Есть подключение к интернету'
+        }
     },
 
     // Navigation
@@ -327,12 +338,29 @@ export default {
             formatText: 'Текст',
             formatCsv: 'CSV',
             formatJson: 'JSON',
+            formatApi: 'API',
+            formatApiDesc: 'Отправить команды на внешний API через POST',
             copyBtn: 'Копировать',
             downloadBtn: 'Скачать',
             copiedSuccess: 'Скопировано в буфер обмена!',
             exportSuccess: 'Команды экспортированы!',
             exportAs: 'Экспорт как {{format}}',
-            preview: 'Предпросмотр'
+            preview: 'Предпросмотр',
+            api: {
+                title: 'Отправить в API',
+                url: 'URL',
+                urlHint: 'Введите URL для отправки данных команд',
+                sendData: 'Отправить',
+                sending: 'Отправка...',
+                sendingTo: 'Отправка данных на {{url}}...',
+                sendSuccess: 'Данные успешно отправлены!',
+                sentTo: 'Данные команд отправлены на {{url}}.',
+                sendFailed: 'Не удалось отправить данные',
+                dataPreview: 'Данные для отправки',
+                notePostMethod: 'Данные будут отправлены методом HTTP POST',
+                noteJsonBody: 'Тело запроса будет содержать JSON с данными команд',
+                noteCorsRequired: 'На целевом сервере должен быть включён CORS'
+            }
         }
     },
 

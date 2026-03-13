@@ -1,6 +1,7 @@
 import Component from '../base/Component.js';
 import ExportFormatPicker from './ExportFormatPicker.js';
 import ExportContent from './ExportContent.js';
+import ApiExport from './ApiExport.js';
 import { t } from '../../core/I18nManager.js';
 
 /**
@@ -106,6 +107,15 @@ export default class ExportWizard extends Component {
             component = new ExportFormatPicker(
                 (formatId) => this.handleFormatSelect(formatId)
             );
+        } else if (this.currentStep === 'api') {
+            // Show API export view (POST to external URL)
+            const content = this.getExportContent('json');
+
+            component = new ApiExport({
+                content: content,
+                onBack: () => this.handleBack(),
+                onExportComplete: this.onExportComplete
+            });
         } else {
             // Show export content view
             const content = this.getExportContent(this.currentStep);
@@ -127,7 +137,8 @@ export default class ExportWizard extends Component {
 
         // Notify about step change
         if (this.onStepChange) {
-            this.onStepChange(this.currentStep, this.currentStep !== 'picker');
+            const showDownload = this.currentStep !== 'picker' && this.currentStep !== 'api';
+            this.onStepChange(this.currentStep, showDownload);
         }
     }
 

@@ -35,7 +35,18 @@ export default {
         warning: '警告',
         dangerZone: '危険ゾーン',
         yes: 'はい',
-        no: 'いいえ'
+        no: 'いいえ',
+        auth: {
+            bearerHint: 'OAuth/Bearerトークンを入力してください',
+            keyNameHint: 'ヘッダー名またはクエリパラメータ',
+            keyValue: 'キーの値',
+            keyValueHint: 'APIキー',
+            keyAsQuery: 'ヘッダーの代わりにクエリパラメータとして追加',
+            username: 'ユーザー名',
+            password: 'パスワード',
+            customHeadersHint: '1行に1つ、形式：Header-Name: 値',
+            networkError: 'ネットワークエラー。確認してください：\n\u2022 URLが正しいこと\n\u2022 サーバーでCORSが有効であること\n\u2022 インターネット接続があること'
+        }
     },
 
     // Navigation
@@ -327,12 +338,29 @@ export default {
             formatText: 'プレーンテキスト',
             formatCsv: 'CSV',
             formatJson: 'JSON',
+            formatApi: 'API',
+            formatApiDesc: 'POST経由で外部APIにチームを送信',
             copyBtn: 'コピー',
             downloadBtn: 'ダウンロード',
             copiedSuccess: 'クリップボードにコピーしました！',
             exportSuccess: 'チームをエクスポートしました！',
             exportAs: '{{format}}でエクスポート',
-            preview: 'プレビュー'
+            preview: 'プレビュー',
+            api: {
+                title: 'APIに送信',
+                url: 'URL',
+                urlHint: 'チームデータの送信先URLを入力してください',
+                sendData: '送信',
+                sending: '送信中...',
+                sendingTo: '{{url}}にデータを送信中...',
+                sendSuccess: 'データが正常に送信されました！',
+                sentTo: 'チームデータが{{url}}に送信されました。',
+                sendFailed: 'データの送信に失敗しました',
+                dataPreview: '送信するデータ',
+                notePostMethod: 'データはHTTP POSTメソッドで送信されます',
+                noteJsonBody: 'リクエストボディにはチームデータのJSONが含まれます',
+                noteCorsRequired: 'ターゲットサーバーでCORSが有効である必要があります'
+            }
         }
     },
 

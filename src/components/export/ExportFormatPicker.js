@@ -38,6 +38,13 @@ export default class ExportFormatPicker extends Component {
                 description: t('import.fileUploadDesc'),
                 icon: 'code',
                 iconColor: 'var(--color-brand-secondary)'
+            },
+            {
+                id: 'api',
+                title: t('teams.export.formatApi'),
+                description: t('teams.export.formatApiDesc'),
+                icon: 'globe',
+                iconColor: 'var(--color-warning-text)'
             }
         ];
     }
