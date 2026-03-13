@@ -35,6 +35,7 @@ import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
 import TransitivityService from '../services/TransitivityService.js';
 import SessionService from '../services/SessionService.js';
+import ImportExportService from '../services/ImportExportService.js';
 
 /**
  * Core service configuration (no activity required)
@@ -269,6 +270,24 @@ export function createCoreServiceConfig(activityConfig = null) {
             factory: (deps) => new TeamOptimizerService(
                 activityConfig,
                 deps.eloService
+            )
+        },
+
+        /**
+         * Import/Export Service - Centralized import/export logic
+         * Singleton: One instance
+         * Dependencies: playerService
+         *
+         * Purpose: Parse import data, generate export data, validate positions,
+         * cache parsed results, provide round-trip compatible formats
+         */
+        importExportService: {
+            implementation: ImportExportService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['playerService'],
+            factory: (deps) => new ImportExportService(
+                activityConfig,
+                deps.playerService
             )
         }
     };

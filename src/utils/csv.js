@@ -65,7 +65,7 @@ export function parseCSVLine(line, delimiter = ',') {
     }
 
     values.push(current);
-    return values.map(v => v.replace(/^"|"$/g, ''));
+    return values;
 }
 
 /**

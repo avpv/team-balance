@@ -82,8 +82,12 @@ export default {
         addPlayers: {
             title: 'Добавить игроков',
             importPlayers: 'Импорт игроков',
+            importExportPlayers: 'Импорт / Экспорт игроков',
             importBtn: 'Импорт',
+            exportPlayersBtn: 'Экспорт',
             importHelp: 'Загрузите CSV или JSON файл с именами и позициями игроков',
+            exportPlayersHelp: 'Экспортировать текущих игроков в CSV или JSON файл',
+            importExportHelp: 'Импортируйте игроков из файла или экспортируйте для резервного копирования',
             addIndividual: 'Добавить игроков вручную',
             playerName: 'Имя игрока',
             playerNamePlaceholder: 'напр., Иван Иванов',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: 'Импорт игроков',
                 confirmBtn: 'Импортировать'
+            },
+            exportPlayers: {
+                title: 'Экспорт игроков',
+                roundTripHint: 'Экспортированные файлы совместимы с Импортом — вы можете повторно импортировать их позже.'
             },
             removePlayer: {
                 confirmMessage: 'Удалить {{name}}?'
@@ -390,6 +398,7 @@ export default {
         delimiter: 'Разделитель',
         preview: 'Предпросмотр',
         foundPlayers: 'Найдено {{count}} игрок(ов)',
+        invalidPositions: 'Недопустимые позиции: {{positions}}. Допустимые: {{valid}}',
         noData: 'Пожалуйста, предоставьте данные для импорта',
         noPlayersFound: 'Игроки не найдены',
         importSuccess: 'Импортировано {{imported}} игрок(ов)',

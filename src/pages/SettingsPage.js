@@ -33,6 +33,7 @@ class SettingsPage extends BasePage {
         this.playerService = props.services?.resolve('playerService');
         this.sessionService = props.services?.resolve('sessionService');
         this.eventBus = props.services?.resolve('eventBus');
+        this.importExportService = props.services?.resolve('importExportService');
 
         this.sidebar = null;
         this.activitySelector = null;
@@ -170,6 +171,7 @@ class SettingsPage extends BasePage {
             this.addPlayerForm = new AddPlayerForm(addPlayerFormContainer, {
                 playerService: this.playerService,
                 onImportClick: () => this.showImportModal(),
+                onExportPlayersClick: () => this.showExportPlayersModal(),
                 onResetAllClick: () => this.showResetAllModal(),
                 onClearAllClick: () => this.showClearAllModal()
             });
@@ -615,6 +617,10 @@ class SettingsPage extends BasePage {
                 if (this.importModal) {
                     this.importModal.setConfirmVisible(isContentStep);
                 }
+                // Clear parse cache when switching source types
+                if (!isContentStep && this.importExportService) {
+                    this.importExportService.clearParseCache();
+                }
             }
         });
 
@@ -636,6 +642,9 @@ class SettingsPage extends BasePage {
                 if (this.importWizard) {
                     this.importWizard.unmount();
                     this.importWizard = null;
+                }
+                if (this.importExportService) {
+                    this.importExportService.clearParseCache();
                 }
                 if (this.importModal) {
                     this.importModal.destroy();
@@ -662,19 +671,27 @@ class SettingsPage extends BasePage {
         if (!this.importWizard) return;
 
         try {
-            const players = this.parseImportData(data, delimiter);
+            const players = this.importExportService.parseImportData(data, delimiter);
 
             if (players.length === 0) {
                 this.importWizard.updatePreview('');
                 return;
             }
 
+            // Collect deduplicated warnings from position validation
+            const allWarnings = this.importExportService.getUniqueWarnings(players);
+
             const previewHTML = `
                 <div class="preview-success">
                     <strong>${t('import.foundPlayers', { count: players.length })}</strong>
+                    ${allWarnings.length > 0 ? `
+                        <div class="preview-warnings">
+                            ${allWarnings.map(w => `<div class="preview-warning">${this.escape(w)}</div>`).join('')}
+                        </div>
+                    ` : ''}
                     <div class="preview-list">
                         ${players.map(p => `
-                            <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
+                            <div class="preview-item">• ${this.escape(p.name)} - ${this.escape(p.positions.join(', '))}</div>
                         `).join('')}
                     </div>
                 </div>
@@ -689,92 +706,6 @@ class SettingsPage extends BasePage {
             `;
             this.importWizard.updatePreview(errorHTML);
         }
-    }
-
-    parseImportData(data, delimiter = ',') {
-        if (!data || !data.trim()) return [];
-        data = data.trim();
-
-        // Try JSON
-        if (data.startsWith('[') || data.startsWith('{')) {
-            try {
-                let parsed = JSON.parse(data);
-                if (!Array.isArray(parsed)) parsed = [parsed];
-                return parsed.map(item => ({
-                    name: item.name,
-                    positions: Array.isArray(item.positions) ? item.positions : [item.positions]
-                }));
-            } catch (e) {
-                throw new Error(t('errors.invalidJson'));
-            }
-        }
-
-        // Try CSV - using the provided delimiter
-        const lines = data.split('\n').map(l => l.trim()).filter(l => l);
-        if (lines.length < 1) throw new Error(t('errors.noDataToImport'));
-
-        // Check if first line is a header (contains "name" or "positions")
-        const firstLine = lines[0].toLowerCase();
-        const hasHeader = firstLine.includes('name') || firstLine.includes('position');
-
-        const dataLines = hasHeader ? lines.slice(1) : lines;
-        const players = [];
-
-        // Escape special regex characters in delimiter
-        const delimiterEscaped = delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        for (const line of dataLines) {
-            // Split by delimiter, handling quotes
-            const parts = this.parseCSVLineSimple(line, delimiter);
-
-            if (parts.length < 1 || !parts[0].trim()) {
-                continue; // Skip empty lines
-            }
-
-            let positions;
-            if (parts.length < 2 || !parts[1] || !parts[1].trim()) {
-                // No positions provided - assign all available positions
-                positions = Object.keys(this.playerService.positions);
-            } else {
-                // Parse provided positions
-                positions = parts[1].split(',').map(p => p.trim()).filter(p => p);
-            }
-
-            players.push({
-                name: parts[0].trim(),
-                positions: positions
-            });
-        }
-
-        return players;
-    }
-
-    /**
-     * Simple CSV line parser that handles basic quotes
-     */
-    parseCSVLineSimple(line, delimiter) {
-        const parts = [];
-        let current = '';
-        let inQuotes = false;
-
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === delimiter && !inQuotes) {
-                parts.push(current.trim());
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-
-        if (current) {
-            parts.push(current.trim());
-        }
-
-        return parts.map(p => p.replace(/^"|"$/g, ''));
     }
 
     async handleImportConfirm() {
@@ -793,8 +724,8 @@ class SettingsPage extends BasePage {
                 return false;
             }
 
-            // Use cached delimiter value
-            const players = this.parseImportData(data, delimiter);
+            // Uses cached result from preview (no double-parsing)
+            const players = this.importExportService.parseImportData(data, delimiter);
             if (players.length === 0) {
                 toast.error(t('import.noPlayersFound'));
                 return false;
@@ -807,9 +738,11 @@ class SettingsPage extends BasePage {
                     imported++;
                 } catch (error) {
                     skipped++;
-                    // Player skipped due to error
                 }
             });
+
+            // Clear parse cache after import
+            this.importExportService.clearParseCache();
 
             if (skipped > 0) {
                 toast.success(t('import.importSuccessWithSkipped', { imported, skipped }));
@@ -820,6 +753,94 @@ class SettingsPage extends BasePage {
         } catch (error) {
             toast.error(t('import.importFailed') + ': ' + error.message);
             return false;
+        }
+    }
+
+    // ===== MODAL: Export Players =====
+    showExportPlayersModal() {
+        const players = this.playerService.getAll();
+        if (!players || players.length === 0) {
+            toast.error(t('import.noPlayersFound'));
+            return;
+        }
+
+        const csvContent = this.importExportService.exportPlayersCsv(players);
+        const jsonContent = this.importExportService.exportPlayersJson(players);
+
+        // Default to CSV
+        let currentFormat = 'csv';
+
+        const getContent = () => currentFormat === 'csv' ? csvContent : jsonContent;
+        const getFilename = () => {
+            const date = new Date().toISOString().split('T')[0];
+            return `players-${date}.${currentFormat}`;
+        };
+
+        const exportModal = new Modal({
+            title: t('settings.modals.exportPlayers.title'),
+            content: `
+                <div class="export-players-modal">
+                    <div class="export-format-toggle">
+                        <button type="button" class="btn btn-sm btn-primary" data-format="csv">CSV</button>
+                        <button type="button" class="btn btn-sm btn-secondary" data-format="json">JSON</button>
+                    </div>
+                    <p class="form-help-text mt-2 mb-2">${t('settings.modals.exportPlayers.roundTripHint')}</p>
+                    <pre class="export-preview"><code>${this.escape(csvContent)}</code></pre>
+                </div>
+            `,
+            showCancel: true,
+            showConfirm: true,
+            confirmText: t('common.download'),
+            confirmIcon: 'download',
+            cancelText: t('common.close'),
+            size: 'medium',
+            onConfirm: () => {
+                const content = getContent();
+                const filename = getFilename();
+                const mimeType = currentFormat === 'csv' ? 'text/csv' : 'application/json';
+                const blob = new Blob([content], { type: `${mimeType};charset=utf-8;` });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                toast.success(t('success.exportComplete'));
+                return false; // Don't close modal
+            },
+            onClose: () => {
+                exportModal.destroy();
+            }
+        });
+
+        exportModal.mount();
+        exportModal.open();
+
+        // Format toggle buttons
+        const container = exportModal.container;
+        if (container) {
+            const formatButtons = container.querySelectorAll('[data-format]');
+            const previewEl = container.querySelector('.export-preview code');
+
+            formatButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentFormat = btn.dataset.format;
+
+                    // Update button styles
+                    formatButtons.forEach(b => {
+                        b.className = b.dataset.format === currentFormat
+                            ? 'btn btn-sm btn-primary'
+                            : 'btn btn-sm btn-secondary';
+                    });
+
+                    // Update preview
+                    if (previewEl) {
+                        previewEl.textContent = getContent();
+                    }
+                });
+            });
         }
     }
 

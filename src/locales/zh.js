@@ -84,6 +84,10 @@ export default {
             importPlayers: '导入球员',
             importBtn: '导入',
             importHelp: '上传包含球员姓名和位置的CSV或JSON文件',
+            importExportPlayers: 'Import / Export Players',
+            exportPlayersBtn: 'Export',
+            exportPlayersHelp: 'Export current players as CSV or JSON file',
+            importExportHelp: 'Import players from a file or export current players for backup',
             addIndividual: '单独添加球员',
             playerName: '球员姓名',
             playerNamePlaceholder: '例如：张三',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: '导入球员',
                 confirmBtn: '导入'
+            },
+            exportPlayers: {
+                title: 'Export Players',
+                roundTripHint: 'Exported files are compatible with Import — you can re-import them later.'
             },
             removePlayer: {
                 confirmMessage: '移除{{name}}？'
@@ -390,6 +398,7 @@ export default {
         delimiter: '分隔符',
         preview: '预览',
         foundPlayers: '找到{{count}}名球员',
+        invalidPositions: 'Invalid positions: {{positions}}. Valid: {{valid}}',
         noData: '请提供要导入的数据',
         noPlayersFound: '未找到球员',
         importSuccess: '已导入{{imported}}名球员',

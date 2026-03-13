@@ -84,6 +84,10 @@ export default {
             importPlayers: '선수 가져오기',
             importBtn: '가져오기',
             importHelp: '선수 이름과 포지션이 포함된 CSV 또는 JSON 파일을 업로드하세요',
+            importExportPlayers: 'Import / Export Players',
+            exportPlayersBtn: 'Export',
+            exportPlayersHelp: 'Export current players as CSV or JSON file',
+            importExportHelp: 'Import players from a file or export current players for backup',
             addIndividual: '개별 선수 추가',
             playerName: '선수 이름',
             playerNamePlaceholder: '예: 홍길동',
@@ -152,6 +156,10 @@ export default {
             importPlayers: {
                 title: '선수 가져오기',
                 confirmBtn: '가져오기'
+            },
+            exportPlayers: {
+                title: 'Export Players',
+                roundTripHint: 'Exported files are compatible with Import — you can re-import them later.'
             },
             removePlayer: {
                 confirmMessage: '{{name}}을(를) 제거하시겠습니까?'
@@ -390,6 +398,7 @@ export default {
         delimiter: '구분자',
         preview: '미리보기',
         foundPlayers: '{{count}}명의 선수 발견',
+        invalidPositions: 'Invalid positions: {{positions}}. Valid: {{valid}}',
         noData: '가져올 데이터를 제공해 주세요',
         noPlayersFound: '선수를 찾을 수 없습니다',
         importSuccess: '{{imported}}명의 선수를 가져왔습니다',
