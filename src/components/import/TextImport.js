@@ -1,16 +1,18 @@
 import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { t } from '../../core/I18nManager.js';
+import { renderPositionReference } from './renderPositionReference.js';
 
 /**
  * Text/Paste import component - allows users to paste or type player data
  */
 export default class TextImport extends Component {
-    constructor(onDataChange, onBack, positions = []) {
+    constructor({ onDataChange, onBack, positionConfig = {} }) {
         super();
         this.onDataChange = onDataChange;
         this.onBack = onBack;
-        this.positions = positions;
+        this.positionConfig = positionConfig;
+        this.positions = positionConfig.keys;
         this.delimiter = ','; // Default delimiter
     }
 
@@ -86,6 +88,8 @@ Chris Brown`;
                             rows="10"
                         ></textarea>
                     </div>
+
+                    ${renderPositionReference(this.positionConfig)}
 
                     <div class="examples-section">
                         <h3>${t('import.examples')}</h3>

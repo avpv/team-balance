@@ -3,6 +3,7 @@ import ImportDataSourcePicker from './ImportDataSourcePicker.js';
 import TextImport from './TextImport.js';
 import FileImport from './FileImport.js';
 import ApiImport from './ApiImport.js';
+import { createPositionConfig } from './PositionConfig.js';
 
 /**
  * Import Wizard - Orchestrates the multi-step import process
@@ -11,9 +12,10 @@ import ApiImport from './ApiImport.js';
  * Step 3: Preview and confirmation (handled by parent)
  */
 export default class ImportWizard extends Component {
-    constructor(positions = [], options = {}) {
+    constructor({ positionConfig = {}, onStepChange } = {}) {
         super();
-        this.positions = positions;
+        this.positionConfig = createPositionConfig(positionConfig);
+        this.positions = this.positionConfig.keys;
         this.currentStep = 'picker'; // 'picker', 'text', 'csv', 'json', 'api'
         this.currentData = '';
         this.currentDelimiter = ','; // Default delimiter
@@ -21,7 +23,7 @@ export default class ImportWizard extends Component {
         this.onDataChangeCallback = null;
 
         // Callback when step changes (for modal to show/hide Import button)
-        this.onStepChange = options.onStepChange;
+        this.onStepChange = onStepChange;
     }
 
     /**
@@ -101,37 +103,37 @@ export default class ImportWizard extends Component {
                 break;
 
             case 'text':
-                component = new TextImport(
-                    (data, delimiter) => this.handleDataChange(data, delimiter),
-                    () => this.handleBack(),
-                    this.positions
-                );
+                component = new TextImport({
+                    onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
+                    onBack: () => this.handleBack(),
+                    positionConfig: this.positionConfig
+                });
                 break;
 
             case 'csv':
-                component = new FileImport(
-                    'csv',
-                    (data, delimiter) => this.handleDataChange(data, delimiter),
-                    () => this.handleBack(),
-                    this.positions
-                );
+                component = new FileImport({
+                    fileType: 'csv',
+                    onDataChange: (data, delimiter) => this.handleDataChange(data, delimiter),
+                    onBack: () => this.handleBack(),
+                    positionConfig: this.positionConfig
+                });
                 break;
 
             case 'json':
-                component = new FileImport(
-                    'json',
-                    (data) => this.handleDataChange(data),
-                    () => this.handleBack(),
-                    this.positions
-                );
+                component = new FileImport({
+                    fileType: 'json',
+                    onDataChange: (data) => this.handleDataChange(data),
+                    onBack: () => this.handleBack(),
+                    positionConfig: this.positionConfig
+                });
                 break;
 
             case 'api':
-                component = new ApiImport(
-                    (data) => this.handleDataChange(data),
-                    () => this.handleBack(),
-                    this.positions
-                );
+                component = new ApiImport({
+                    onDataChange: (data) => this.handleDataChange(data),
+                    onBack: () => this.handleBack(),
+                    positionConfig: this.positionConfig
+                });
                 break;
 
             default:

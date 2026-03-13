@@ -422,7 +422,8 @@ export default {
         fetchSuccess: 'Daten erfolgreich abgerufen!',
         fetchedItems: '{{count}} Element(e) von der URL abgerufen.',
         fetchFailed: 'Daten konnten nicht abgerufen werden',
-        fileReadError: 'Fehler beim Lesen der Datei'
+        fileReadError: 'Fehler beim Lesen der Datei',
+        availablePositions: 'Verfügbare Positionen'
     },
 
     // Error Messages

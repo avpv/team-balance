@@ -422,7 +422,8 @@ export default {
         fetchSuccess: '数据获取成功！',
         fetchedItems: '从URL获取了{{count}}个项目。',
         fetchFailed: '数据获取失败',
-        fileReadError: '文件读取错误'
+        fileReadError: '文件读取错误',
+        availablePositions: '可用位置'
     },
 
     // Error Messages

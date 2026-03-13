@@ -605,10 +605,11 @@ class SettingsPage extends BasePage {
         }
 
         // Create the import wizard with current positions
-        const positions = this.playerService.positions;
-        const positionKeys = Object.keys(positions);
-
-        this.importWizard = new ImportWizard(positionKeys, {
+        this.importWizard = new ImportWizard({
+            positionConfig: {
+                names: this.playerService.positions,
+                order: this.activityConfig?.positionOrder || []
+            },
             onStepChange: (step, isContentStep) => {
                 // Show Import button only after format is selected
                 if (this.importModal) {
