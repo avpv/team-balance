@@ -2,6 +2,7 @@ import Component from '../base/Component.js';
 import { getIcon } from '../base/Icons.js';
 import { trackClick } from '../../config/analytics.js';
 import { t } from '../../core/I18nManager.js';
+import { copyWithFeedback } from '../../utils/clipboard.js';
 
 /**
  * Export Content component - displays export preview with Download and Copy buttons
@@ -48,15 +49,12 @@ export default class ExportContent extends Component {
      */
     async handleCopy() {
         trackClick('exportCopyBtn', 'teams', `export_copy_${this.format}`);
-        try {
-            await navigator.clipboard.writeText(this.content);
-            this.showButtonSuccess('copy');
-
-            if (this.onExportComplete) {
+        const button = this.element.querySelector('.copy-btn');
+        if (button) {
+            const copied = await copyWithFeedback(button, this.content);
+            if (copied && this.onExportComplete) {
                 this.onExportComplete(this.format, 'copy');
             }
-        } catch (err) {
-            // Silent fail
         }
     }
 

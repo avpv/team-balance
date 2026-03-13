@@ -12,6 +12,7 @@ import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
 import { STORAGE_KEYS, SESSION_KEYS } from '../utils/constants.js';
 import { t } from '../core/I18nManager.js';
+import { copyWithFeedback } from '../utils/clipboard.js';
 
 // Components
 import ActivitySelector from '../components/settings/ActivitySelector.js';
@@ -854,20 +855,7 @@ class SettingsPage extends BasePage {
             // Copy button
             const copyBtn = container.querySelector('#exportPlayersCopyBtn');
             if (copyBtn) {
-                copyBtn.addEventListener('click', async () => {
-                    try {
-                        await navigator.clipboard.writeText(getContent());
-                        const originalHTML = copyBtn.innerHTML;
-                        copyBtn.innerHTML = `${getIcon('check', { size: 14 })} ${t('teams.export.copiedSuccess')}`;
-                        copyBtn.classList.add('copied');
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalHTML;
-                            copyBtn.classList.remove('copied');
-                        }, 2000);
-                    } catch (err) {
-                        // Silent fail
-                    }
-                });
+                copyBtn.addEventListener('click', () => copyWithFeedback(copyBtn, getContent()));
             }
         }
     }
