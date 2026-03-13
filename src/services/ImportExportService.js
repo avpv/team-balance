@@ -11,7 +11,7 @@
  * - Provide round-trip compatible formats
  */
 
-import { parseCSVLine } from '../utils/csv.js';
+import { parseCSVLine, escapeCSVValue } from '../utils/csv.js';
 import { t } from '../core/I18nManager.js';
 
 class ImportExportService {
@@ -70,7 +70,7 @@ class ImportExportService {
     }
 
     /**
-     * Clear the parse cache (call when wizard is reset or closed)
+     * Clear the parse cache (call when wizard step changes or modal closes)
      */
     clearParseCache() {
         this._cachedParseResult = null;
@@ -79,12 +79,33 @@ class ImportExportService {
     }
 
     /**
-     * Parse JSON import data
+     * Parse JSON import data.
+     * Supports both player format [{name, positions}] and
+     * teams export format {teams: [{players: [{name, positionCode}]}]}
      * @private
      */
     _parseJsonImport(data) {
         try {
             let parsed = JSON.parse(data);
+
+            // Handle teams export format: {teams: [{players: [...]}]}
+            if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.teams)) {
+                const players = [];
+                for (const team of parsed.teams) {
+                    if (!Array.isArray(team.players)) continue;
+                    for (const p of team.players) {
+                        players.push({
+                            name: p.name,
+                            positions: p.positionCode ? [p.positionCode]
+                                : p.positions ? (Array.isArray(p.positions) ? p.positions : [p.positions])
+                                : [],
+                            warnings: []
+                        });
+                    }
+                }
+                return players;
+            }
+
             if (!Array.isArray(parsed)) parsed = [parsed];
             return parsed.map(item => ({
                 name: item.name,
@@ -141,6 +162,7 @@ class ImportExportService {
     /**
      * Validate imported positions against the current activity.
      * Invalid positions are removed with a warning; if none remain, all are assigned.
+     * Warnings are per-player but deduplicated in getUniqueWarnings().
      * @private
      */
     _validateImportPositions(players) {
@@ -170,6 +192,25 @@ class ImportExportService {
         });
     }
 
+    /**
+     * Get unique warnings from parsed players (deduplicated)
+     * @param {Array} players - Parsed player array with warnings
+     * @returns {string[]} Unique warning messages
+     */
+    getUniqueWarnings(players) {
+        const seen = new Set();
+        const unique = [];
+        for (const p of players) {
+            for (const w of (p.warnings || [])) {
+                if (!seen.has(w)) {
+                    seen.add(w);
+                    unique.push(w);
+                }
+            }
+        }
+        return unique;
+    }
+
     // ===== EXPORT: Players =====
 
     /**
@@ -180,9 +221,7 @@ class ImportExportService {
     exportPlayersCsv(players) {
         const lines = ['name,positions'];
         for (const player of players) {
-            const name = player.name.includes(',') || player.name.includes('"')
-                ? `"${player.name.replace(/"/g, '""')}"`
-                : player.name;
+            const name = escapeCSVValue(player.name);
             const positions = player.positions.join(',');
             lines.push(`${name},"${positions}"`);
         }
@@ -207,7 +246,7 @@ class ImportExportService {
     /**
      * Generate plain text export for teams
      * @param {Array} teams - Team arrays
-     * @param {Object} options - { showElo, showPositions, positionWeights, calculateTeamRating }
+     * @param {Object} options - { showElo, showPositions, calculateTeamRating }
      * @returns {string}
      */
     generateTextExport(teams, options = {}) {
@@ -238,6 +277,7 @@ class ImportExportService {
 
     /**
      * Generate CSV export for teams
+     * Uses escapeCSVValue for all fields to prevent CSV injection
      * @param {Array} teams - Team arrays
      * @param {Object} options - { showElo, showPositions }
      * @returns {string}
@@ -259,10 +299,10 @@ class ImportExportService {
 
                 const row = [
                     `Team ${teamIndex + 1}`,
-                    `"${player.name.replace(/"/g, '""')}"`
+                    escapeCSVValue(player.name)
                 ];
 
-                if (showPositions) row.push(posName);
+                if (showPositions) row.push(escapeCSVValue(posName));
                 if (showElo) row.push(rating);
 
                 lines.push(row.join(','));
@@ -273,7 +313,8 @@ class ImportExportService {
     }
 
     /**
-     * Generate JSON export for teams with metadata
+     * Generate JSON export for teams with metadata.
+     * Includes positionCode for round-trip compatibility with import.
      * @param {Array} teams - Team arrays
      * @param {Object} options - { showElo, showPositions, calculateTeamRating, activityKey, positionWeights }
      * @returns {string}

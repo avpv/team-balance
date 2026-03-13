@@ -617,6 +617,10 @@ class SettingsPage extends BasePage {
                 if (this.importModal) {
                     this.importModal.setConfirmVisible(isContentStep);
                 }
+                // Clear parse cache when switching source types
+                if (!isContentStep && this.importExportService) {
+                    this.importExportService.clearParseCache();
+                }
             }
         });
 
@@ -674,8 +678,8 @@ class SettingsPage extends BasePage {
                 return;
             }
 
-            // Collect warnings from position validation
-            const allWarnings = players.flatMap(p => p.warnings || []);
+            // Collect deduplicated warnings from position validation
+            const allWarnings = this.importExportService.getUniqueWarnings(players);
 
             const previewHTML = `
                 <div class="preview-success">
